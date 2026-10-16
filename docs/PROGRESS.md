@@ -1,10 +1,10 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 1
-Last commit: phase 1: database schema
+Last commit: phase 1: seed script
 
 ## Phases
-- [ ] 1 Foundation (scaffold, schema, seed)
+- [x] 1 Foundation (scaffold, schema, seed)
 - [ ] 2 Auth (Better Auth, roles, guards)
 - [ ] 3 Layout + Home
 - [ ] 4 Shop + Product page
@@ -19,6 +19,8 @@ Last commit: phase 1: database schema
 - Completed 1.1 Scaffold: Next.js app with Tailwind, shadcn/ui, etc.
 - Completed 1.2 Env, utils, fonts, tokens
 - Completed 1.3 Database schema (Prisma 5.22, app models + enums, `src/lib/prisma.ts` singleton, npm scripts). `prisma validate` and `prisma generate` pass. DB commands NOT run (no real DATABASE_URL).
+- Completed 1.4 Seed script: `prisma/seed.ts` (idempotent upserts; replaces product images per run; deterministic stock) + `prisma/seed-data.ts` (11 categories, 24 products, 208 variants, 10 settings, 3 banners) + `src/lib/bd-locations.ts` (8 divisions, 64 districts). Admin creation left as a TODO hook for 2.4. Added `prisma/**/*.ts` to tsconfig so the seed is typechecked.
+- PENDING (human): fill `.env` (DATABASE_URL, DIRECT_URL at minimum) and run `npm run db:push` then `npm run db:seed` to verify the seed in Prisma Studio. Seed was not run here because `.env` has no DATABASE_URL.
 -
 
 ## Known issues
