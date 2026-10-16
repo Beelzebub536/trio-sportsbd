@@ -1,17 +1,42 @@
-import Logo from "@/components/brand/Logo";
+import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import Footer from "@/components/layout/Footer";
+import SiteHeader from "@/components/layout/SiteHeader";
+import { getCategoryTree } from "@/lib/queries/categories";
+import { getSession } from "@/lib/session";
+import { getSettings } from "@/lib/settings";
 
-export default function StoreLayout({
+// The storefront shell depends on the database (categories, settings) and the
+// session, so it is rendered dynamically rather than prerendered at build time.
+export const dynamic = "force-dynamic";
+
+export default async function StoreLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const [categories, session, settings] = await Promise.all([
+    getCategoryTree(),
+    getSession(),
+    getSettings(),
+  ]);
+
+  const user = session?.user
+    ? { name: session.user.name, role: session.user.role ?? null }
+    : null;
+
   return (
     <div className="flex min-h-screen flex-col">
-      {/* Placeholder header. Replaced by the announcement bar + sticky header + mega menu in Phase 3.1. */}
-      <header className="bg-white p-4 shadow-sm md:p-6">
-        <Logo />
-      </header>
+      <AnnouncementBar
+        freeShippingThreshold={settings.freeShippingThreshold}
+        whatsappNumber={settings.whatsappNumber}
+      />
+      <SiteHeader
+        categories={categories}
+        user={user}
+        freeShippingThreshold={settings.freeShippingThreshold}
+      />
       <main className="flex-1">{children}</main>
+      <Footer settings={settings} />
     </div>
   );
 }

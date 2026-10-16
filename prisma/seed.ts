@@ -1,4 +1,7 @@
 import { PrismaClient, Prisma } from "@prisma/client";
+import { betterAuth } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { admin as adminPlugin } from "better-auth/plugins";
 import {
   seedBanners,
   seedCategories,
@@ -22,6 +25,24 @@ if (typeof nodeProcess.loadEnvFile === "function") {
 }
 
 const prisma = new PrismaClient();
+
+/**
+ * A Better Auth instance used ONLY by the seed script to create the admin
+ * account. It intentionally omits `nextCookies()` (Next.js-only) so it can run
+ * as a plain Node script. Creating users through Better Auth's own API means
+ * the password is hashed with the exact algorithm the running app verifies.
+ */
+const seedAuth = betterAuth({
+  database: prismaAdapter(prisma, { provider: "postgresql" }),
+  secret: process.env.BETTER_AUTH_SECRET ?? "seed-only-secret-not-used-at-runtime",
+  baseURL: process.env.BETTER_AUTH_URL ?? "http://localhost:3000",
+  emailAndPassword: { enabled: true, requireEmailVerification: false },
+  // Mirrors the runtime config. The admin plugin declares `role` with
+  // `input: false`, so a public signup can never set `role` — only this seed
+  // (which updates the row directly) or an admin action can. See
+  // `src/lib/auth.ts` and `src/actions/customers.ts`.
+  plugins: [adminPlugin({ adminRoles: ["admin"], defaultRole: "customer" })],
+});
 
 const slugify = (value: string): string =>
   value
@@ -224,6 +245,43 @@ async function upsertProducts(categoryIds: Map<string, number>): Promise<void> {
   console.log(`  Products: ${seedProducts.length}, variants: ${variantCount}`);
 }
 
+/** Create (or promote) the store admin from ADMIN_EMAIL / ADMIN_PASSWORD. */
+async function ensureAdmin(): Promise<void> {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+
+  if (!email || !password) {
+    console.log("  Admin: skipped (ADMIN_EMAIL / ADMIN_PASSWORD not set)");
+    return;
+  }
+
+  const existing = await prisma.user.findUnique({ where: { email } });
+  if (existing) {
+    // Never reset an existing admin's password on re-run.
+    if (existing.role !== "admin") {
+      await prisma.user.update({ where: { email }, data: { role: "admin" } });
+      console.log(`  Admin: promoted existing user ${email} to admin`);
+    } else {
+      console.log(`  Admin: ${email} already exists (left unchanged)`);
+    }
+    return;
+  }
+
+  const result = await seedAuth.api.signUpEmail({
+    body: { email, password, name: "Store Admin" },
+  });
+
+  if (!result?.user?.id) {
+    throw new Error(`Admin signup did not return a user for ${email}.`);
+  }
+
+  await prisma.user.update({
+    where: { id: result.user.id },
+    data: { role: "admin" },
+  });
+  console.log(`  Admin: created ${email}`);
+}
+
 async function main(): Promise<void> {
   console.log("Seeding trio-sportsbd...");
 
@@ -238,8 +296,7 @@ async function main(): Promise<void> {
 
   await upsertProducts(categoryIds);
 
-  // TODO (Phase 2.4): create the admin user from ADMIN_EMAIL / ADMIN_PASSWORD
-  // using Better Auth's own API/hashing once the auth tables exist.
+  await ensureAdmin();
 
   console.log("Seed complete.");
 }

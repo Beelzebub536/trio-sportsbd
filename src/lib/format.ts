@@ -1,26 +1,47 @@
+/** Money helpers. All prices are whole taka (BDT integers). */
+
+/** Format a whole-taka amount, e.g. `formatBDT(1250) -> "৳1,250"`. */
 export const formatBDT = (amount: number): string => {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(Math.round(amount / 100));
+  const value = Math.round(Number.isFinite(amount) ? amount : 0);
+  const sign = value < 0 ? "-" : "";
+  return `${sign}৳${Math.abs(value).toLocaleString("en-IN")}`;
 };
 
-export const discountPercent = (originalPrice: number, salePrice: number): number => {
-  if (originalPrice <= 0 || salePrice >= originalPrice) return 0;
-  return Math.round(((originalPrice - salePrice) / originalPrice) * 100);
+/** Effective selling price: the sale price when valid, otherwise the base price. */
+export const effectivePrice = (
+  basePrice: number,
+  salePrice?: number | null,
+): number => (salePrice != null && salePrice < basePrice ? salePrice : basePrice);
+
+/** Discount as a whole percentage, e.g. 1150 from 1450 -> 21. */
+export const discountPercent = (
+  basePrice: number,
+  salePrice?: number | null,
+): number => {
+  if (basePrice <= 0 || salePrice == null || salePrice >= basePrice) return 0;
+  return Math.round(((basePrice - salePrice) / basePrice) * 100);
 };
 
-export const calculateTotal = (items: Array<{ unitPrice: number; qty: number }>): number => {
-  return items.reduce((sum, item) => sum + (item.unitPrice * item.qty), 0);
-};
+export const calculateTotal = (
+  items: Array<{ unitPrice: number; qty: number }>,
+): number => items.reduce((sum, item) => sum + item.unitPrice * item.qty, 0);
 
+/** `01712345678` -> `0171-234-5678` (display only). */
 export const formatPhoneNumber = (phone: string): string => {
-  // Remove non-digit characters
-  const digits = phone.replace(/\D/g, '');
-  if (digits.startsWith('880') && digits.length === 13) {
-    return digits.slice(0, 4) + '-' + digits.slice(4, 8) + '-' + digits.slice(8);
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("880") && digits.length === 13) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`;
   }
+  if (digits.length === 11) {
+    return `${digits.slice(0, 4)}-${digits.slice(4, 8)}-${digits.slice(8)}`;
+  }
+  return digits;
+};
+
+/** International-friendly phone for wa.me links: `01712345678` -> `8801712345678`. */
+export const toWhatsAppNumber = (phone: string): string => {
+  const digits = phone.replace(/\D/g, "");
+  if (digits.startsWith("880")) return digits;
+  if (digits.startsWith("0")) return `88${digits}`;
   return digits;
 };

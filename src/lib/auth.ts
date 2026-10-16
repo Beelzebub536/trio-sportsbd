@@ -54,6 +54,10 @@ export const auth = betterAuth({
   },
   plugins: [
     admin({
+      // Users with role "admin" get the admin API. The plugin marks the
+      // `role` field as `input: false`, so a signup payload containing
+      // `role: "admin"` is ignored and the default "customer" is used. Only
+      // the seed and admin server actions can change a role.
       adminRoles: ["admin"],
       defaultRole: "customer",
     }),
