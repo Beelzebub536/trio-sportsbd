@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 1
-Last commit: phase 2: better auth server + tables
+Last commit: phase 2: session helpers + route guards
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
@@ -23,7 +23,9 @@ Last commit: phase 2: better auth server + tables
 - PENDING (human): fill `.env` (DATABASE_URL, DIRECT_URL at minimum) and run `npm run db:push` then `npm run db:seed` to verify the seed in Prisma Studio. Seed was not run here because `.env` has no DATABASE_URL.
 - Completed 2.1 Better Auth: upgraded `better-auth` 0.2.11 -> 1.7.10 (0.2.x has NO admin plugin). Added `src/lib/auth.ts` (Prisma adapter, email+password with no email sending, conditional Google/Facebook, admin plugin `adminRoles: ["admin"]` + `defaultRole: "customer"`, Google-only account linking, `nextCookies()` last), `src/app/api/auth/[...all]/route.ts`, `src/lib/auth-client.ts` (adminClient). Auth tables (User/Session/Account/Verification) generated with `npx @better-auth/cli generate` and merged into `schema.prisma` (all app models kept).
 - tsconfig: removed `declaration`/`outDir` (they forced declaration emit and broke on Better Auth's nested zod types). `prisma validate`, `tsc`, `lint`, `build` all pass.
+- Completed 2.2 Session helpers + route guards: `src/lib/session.ts` (`getSession`, `requireUser` -> `/login?next=`, `requireAdmin` -> `/` for non-admins), `src/middleware.ts` (Next 14 file name; optimistic `getSessionCookie` guard on `/admin/*` and `/account/*`, forwards `x-pathname`), placeholder `/admin` and `/account` pages using the helpers. `tsc`, `lint`, `build` pass.
+- Between tasks: if the repo looks inconsistent (ignored core files, missing commits), check `.gitignore` and `docs/PROGRESS.md` first.
 -
 
 ## Known issues
--
+- Build prints a benign warning: `better-auth/cookies` pulls `jose` into the Edge (middleware) bundle and jose references `CompressionStream`. `getSessionCookie` does not use it at runtime (cookie sessions, not JWT), so the build passes and middleware works. Revisit if middleware ever runs JWT-based sessions.
