@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
-Current phase: 1
-Last commit: phase 2: session helpers + route guards
+Current phase: 2
+Last commit: phase 2: login and signup pages
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
@@ -24,6 +24,8 @@ Last commit: phase 2: session helpers + route guards
 - Completed 2.1 Better Auth: upgraded `better-auth` 0.2.11 -> 1.7.10 (0.2.x has NO admin plugin). Added `src/lib/auth.ts` (Prisma adapter, email+password with no email sending, conditional Google/Facebook, admin plugin `adminRoles: ["admin"]` + `defaultRole: "customer"`, Google-only account linking, `nextCookies()` last), `src/app/api/auth/[...all]/route.ts`, `src/lib/auth-client.ts` (adminClient). Auth tables (User/Session/Account/Verification) generated with `npx @better-auth/cli generate` and merged into `schema.prisma` (all app models kept).
 - tsconfig: removed `declaration`/`outDir` (they forced declaration emit and broke on Better Auth's nested zod types). `prisma validate`, `tsc`, `lint`, `build` all pass.
 - Completed 2.2 Session helpers + route guards: `src/lib/session.ts` (`getSession`, `requireUser` -> `/login?next=`, `requireAdmin` -> `/` for non-admins), `src/middleware.ts` (Next 14 file name; optimistic `getSessionCookie` guard on `/admin/*` and `/account/*`, forwards `x-pathname`), placeholder `/admin` and `/account` pages using the helpers. `tsc`, `lint`, `build` pass.
+- Completed 2.3 Login + signup: route groups `(store)` (placeholder header) and `(auth)` (Adidas split layout: black panel left on desktop). `src/app/(auth)/login` + `signup` pages (server) pass `next` and provider flags to `src/components/auth/LoginForm.tsx` / `SignupForm.tsx` (RHF + Zod, error toasts, arrow buttons). `SocialButtons.tsx` renders Google/Facebook only when their env keys exist; `SignOutButton.tsx` added to `/account`. Validators in `src/lib/validators/auth.ts`, server helpers in `src/lib/auth-helpers.ts` (open-redirect-safe `safeNext`). Root layout now minimal and mounts `<Toaster/>`. Moved home to `(store)/page.tsx`. Smoke-tested `/login` and `/signup` with `npm run start`.
+- The login "Forgot your password?" WhatsApp link uses `WHATSAPP_NUMBER` env with a `8801700000000` fallback until the settings helper exists (Phase 3/7).
 - Between tasks: if the repo looks inconsistent (ignored core files, missing commits), check `.gitignore` and `docs/PROGRESS.md` first.
 -
 
