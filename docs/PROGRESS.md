@@ -17,6 +17,7 @@ Last commit: (none)
 
 ## Notes / decisions
 - Completed 1.1 Scaffold: Next.js app with Tailwind, shadcn/ui, etc.
+- Completed 1.2 Env, utils, fonts, tokens
 -
 
 ## Known issues
