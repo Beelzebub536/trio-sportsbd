@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 1
-Last commit: (none)
+Last commit: phase 1: database schema
 
 ## Phases
 - [ ] 1 Foundation (scaffold, schema, seed)
@@ -18,6 +18,7 @@ Last commit: (none)
 ## Notes / decisions
 - Completed 1.1 Scaffold: Next.js app with Tailwind, shadcn/ui, etc.
 - Completed 1.2 Env, utils, fonts, tokens
+- Completed 1.3 Database schema (Prisma 5.22, app models + enums, `src/lib/prisma.ts` singleton, npm scripts). `prisma validate` and `prisma generate` pass. DB commands NOT run (no real DATABASE_URL).
 -
 
 ## Known issues
