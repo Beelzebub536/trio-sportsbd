@@ -40,3 +40,19 @@ export async function requireAdmin() {
   }
   return session;
 }
+
+/** For server actions: return the user id, or throw if not signed in. */
+export async function requireUserId(): Promise<string> {
+  const session = await getSession();
+  if (!session?.user) throw new Error("Not authenticated");
+  return session.user.id;
+}
+
+/** For server actions: return the session user, or throw if not an admin. */
+export async function requireAdminUser() {
+  const session = await getSession();
+  if (!session?.user || session.user.role !== "admin") {
+    throw new Error("Not authorised");
+  }
+  return session.user;
+}

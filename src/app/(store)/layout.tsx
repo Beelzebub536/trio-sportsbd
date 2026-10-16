@@ -1,3 +1,4 @@
+import WishlistSync from "@/components/account/WishlistSync";
 import AnnouncementBar from "@/components/layout/AnnouncementBar";
 import Footer from "@/components/layout/Footer";
 import SiteHeader from "@/components/layout/SiteHeader";
@@ -37,6 +38,7 @@ export default async function StoreLayout({
       />
       <main className="flex-1">{children}</main>
       <Footer settings={settings} />
+      {user && <WishlistSync />}
     </div>
   );
 }

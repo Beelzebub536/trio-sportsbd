@@ -306,3 +306,14 @@ export async function getRelatedProducts(
 export type ProductDetail = NonNullable<
   Awaited<ReturnType<typeof getProductBySlug>>
 >;
+
+export async function getProductsByIds(
+  ids: number[],
+): Promise<ProductCardData[]> {
+  if (ids.length === 0) return [];
+  const rows = await prisma.product.findMany({
+    where: { id: { in: ids }, isActive: true },
+    select: cardSelect,
+  });
+  return rows.map(toCard);
+}
