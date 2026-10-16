@@ -48,6 +48,15 @@ export default function ProductImages({
   };
 
   const handleFile = async (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Choose an image file (JPG, PNG or WebP).");
+      return;
+    }
+    if (file.size > 5_000_000) {
+      toast.error("Images must be smaller than 5 MB.");
+      return;
+    }
+
     setUploading(true);
     try {
       const signResponse = await fetch("/api/upload/sign", { method: "POST" });
@@ -57,24 +66,19 @@ export default function ProductImages({
         return;
       }
       const sign = (await signResponse.json()) as {
-        cloudName: string;
         apiKey: string;
-        timestamp: number;
-        folder: string;
-        signature: string;
+        uploadUrl: string;
+        params: Record<string, string | number>;
       };
 
       const body = new FormData();
       body.append("file", file);
       body.append("api_key", sign.apiKey);
-      body.append("timestamp", String(sign.timestamp));
-      body.append("folder", sign.folder);
-      body.append("signature", sign.signature);
+      for (const [key, value] of Object.entries(sign.params)) {
+        body.append(key, String(value));
+      }
 
-      const upload = await fetch(
-        `https://api.cloudinary.com/v1_1/${sign.cloudName}/image/upload`,
-        { method: "POST", body },
-      );
+      const upload = await fetch(sign.uploadUrl, { method: "POST", body });
       const data = (await upload.json()) as {
         secure_url?: string;
         public_id?: string;

@@ -6,6 +6,7 @@ import type { RawSearchParams } from "@/lib/listing-params";
 export const metadata: Metadata = {
   title: "Kids",
   description: "Kids' jerseys, track pants and training kit.",
+  alternates: { canonical: "/kids" },
 };
 
 export default async function KidsPage({

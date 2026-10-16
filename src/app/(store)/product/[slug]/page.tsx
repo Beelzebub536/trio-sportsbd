@@ -8,6 +8,7 @@ import { effectivePrice } from "@/lib/format";
 import { getProductBySlug, getRelatedProducts } from "@/lib/queries/products";
 import { getWishlistProductIds } from "@/lib/queries/wishlist";
 import { getSession } from "@/lib/session";
+import { buildMetadata } from "@/lib/seo";
 import { getSettings } from "@/lib/settings";
 
 type PageParams = { slug: string };
@@ -20,17 +21,14 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = await getProductBySlug(slug);
 
-  if (!product) return { title: "Product not found" };
+  if (!product) return { title: "Product not found", robots: { index: false } };
 
-  return {
+  return buildMetadata({
     title: product.name,
     description: product.description.slice(0, 155),
-    openGraph: {
-      title: product.name,
-      description: product.description.slice(0, 155),
-      images: product.images[0]?.url ? [product.images[0].url] : [],
-    },
-  };
+    path: `/product/${product.slug}`,
+    image: product.images[0]?.url ?? null,
+  });
 }
 
 export default async function ProductPage({ params }: { params: PageParams }) {

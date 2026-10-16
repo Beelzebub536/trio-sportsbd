@@ -103,8 +103,8 @@ export default async function AccountOrderDetailPage({
             </div>
             <div className="flex justify-between">
               <dt>
-                Advance ({order.advanceMethod},{" "}
-                {order.advanceStatus.toLowerCase()})
+                Advance{order.advanceMethod ? ` (${order.advanceMethod})` : ""}{" "}
+                · {order.advanceStatus.toLowerCase()}
               </dt>
               <dd>{formatBDT(order.advanceAmount)}</dd>
             </div>

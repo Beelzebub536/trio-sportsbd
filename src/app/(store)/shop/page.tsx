@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Shop all",
   description:
     "Browse every jersey, trouser and accessory at Trio Sports BD.",
+  alternates: { canonical: "/shop" },
 };
 
 export default async function ShopPage({

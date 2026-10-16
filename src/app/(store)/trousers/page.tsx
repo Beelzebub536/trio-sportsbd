@@ -6,6 +6,7 @@ import type { RawSearchParams } from "@/lib/listing-params";
 export const metadata: Metadata = {
   title: "Trousers",
   description: "Track pants and training shorts for every session.",
+  alternates: { canonical: "/trousers" },
 };
 
 export default async function TrousersPage({

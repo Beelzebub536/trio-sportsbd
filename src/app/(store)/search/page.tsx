@@ -5,6 +5,7 @@ import type { RawSearchParams } from "@/lib/listing-params";
 
 export const metadata: Metadata = {
   title: "Search",
+  robots: { index: false, follow: true },
 };
 
 export default async function SearchPage({

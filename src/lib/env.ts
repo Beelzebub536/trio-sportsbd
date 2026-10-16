@@ -16,15 +16,11 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email"),
   ADMIN_PASSWORD: z.string().min(8, "ADMIN_PASSWORD must be at least 8 characters"),
   WHATSAPP_NUMBER: z.string().optional(),
-  // Optional keys - will be validated if present
-  STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET: z.string().optional(),
 });
 
 export const env = {
   // Use NEXT_PUBLIC_ prefix for client-side variables
   NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
-  NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET: process.env.NEXT_PUBLIC_STRIPE_WEBHOOK_SECRET,
   // Server-side only variables
   DATABASE_URL: process.env.DATABASE_URL,
   DIRECT_URL: process.env.DIRECT_URL,
