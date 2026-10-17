@@ -19,11 +19,14 @@ export async function generateMetadata({
   params: PageParams;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const product = await getProductBySlug(slug);
+  if (!product) notFound();
+
   return buildMetadata({
-    title: "Sports Jerseys & Activewear",
-    description:
-      "Shop sports jerseys, trousers and accessories at Trio Sports BD, with delivery across Bangladesh.",
-    path: `/product/${slug}`,
+    title: product.name,
+    description: product.description.slice(0, 155),
+    path: `/product/${product.slug}`,
+    image: product.images[0]?.url ?? null,
   });
 }
 
@@ -70,7 +73,10 @@ export default async function ProductPage({ params }: { params: PageParams }) {
           Shop
         </Link>
         <span aria-hidden>/</span>
-        <Link href={`/${product.category.slug}`} className="hover:underline">
+        <Link
+          href={`/shop?category=${encodeURIComponent(product.category.slug)}`}
+          className="hover:underline"
+        >
           {product.category.name}
         </Link>
       </nav>
@@ -97,7 +103,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
         <div className="mt-12 border-t border-border pt-4">
           <ProductRow
             title="You may also like"
-            href={`/${product.category.slug}`}
+            href={`/shop?category=${encodeURIComponent(product.category.slug)}`}
             products={related}
           />
         </div>

@@ -18,12 +18,14 @@ export default function CartView() {
   const hydrated = useHydrated();
 
   const [details, setDetails] = useState<CartLineDetails[]>([]);
+  const [loadedSnapshot, setLoadedSnapshot] = useState("");
   const snapshot = items.map((item) => `${item.variantId}:${item.qty}`).join(",");
 
   useEffect(() => {
     const current = useCartStore.getState().items;
     if (!hydrated || current.length === 0) {
       setDetails([]);
+      setLoadedSnapshot(snapshot);
       return;
     }
 
@@ -32,7 +34,10 @@ export default function CartView() {
       current.map((item) => ({ variantId: item.variantId, qty: item.qty })),
     )
       .then((result) => {
-        if (!cancelled) setDetails(result);
+        if (!cancelled) {
+          setDetails(result);
+          setLoadedSnapshot(snapshot);
+        }
       })
       .catch(() => {
         if (!cancelled) setDetails([]);
@@ -69,9 +74,10 @@ export default function CartView() {
     (sum, detail) => sum + detail.unitPrice * detail.qty,
     0,
   );
+  const pending = items.length > 0 && loadedSnapshot !== snapshot;
   const hasProblem = details.some(
     (detail) => !detail.available || detail.stock < detail.qty,
-  );
+  ) || details.length !== items.length;
 
   return (
     <div className="grid gap-10 lg:grid-cols-[1fr_340px]">
@@ -157,7 +163,13 @@ export default function CartView() {
                       type="button"
                       aria-label="Increase quantity"
                       className="p-2 hover:bg-secondary"
-                      onClick={() => setQty(line.variantId, line.qty + 1)}
+                      disabled={Boolean(detail && line.qty >= detail.stock)}
+                      onClick={() =>
+                        setQty(
+                          line.variantId,
+                          detail ? Math.min(detail.stock, line.qty + 1) : line.qty + 1,
+                        )
+                      }
                     >
                       <Plus className="h-3.5 w-3.5" />
                     </button>
@@ -180,7 +192,9 @@ export default function CartView() {
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
-              <dd className="font-semibold">{formatBDT(subtotal)}</dd>
+              <dd className="font-semibold" aria-live="polite">
+                {pending ? "Checking…" : formatBDT(subtotal)}
+              </dd>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <dt>Delivery</dt>
@@ -188,13 +202,22 @@ export default function CartView() {
             </div>
           </dl>
 
-          <Button asChild className="mt-5 w-full" disabled={hasProblem}>
-            <Link href={hasProblem ? "/cart" : "/checkout"}>
+          {pending || hasProblem ? (
+            <Button type="button" className="mt-5 w-full" disabled aria-disabled="true">
               Proceed to checkout
-            </Link>
-          </Button>
+            </Button>
+          ) : (
+            <Button asChild className="mt-5 w-full">
+              <Link href="/checkout">Proceed to checkout</Link>
+            </Button>
+          )}
 
-          {hasProblem && (
+          {pending && (
+            <p className="mt-2 text-xs text-muted-foreground" aria-live="polite">
+              Checking current price and stock…
+            </p>
+          )}
+          {!pending && hasProblem && (
             <p className="mt-2 text-xs text-[var(--brand-sale)]">
               Please fix the highlighted items before checking out.
             </p>

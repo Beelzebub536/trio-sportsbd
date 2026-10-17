@@ -27,6 +27,7 @@ export default function CartSheet({
   const setQty = useCartStore((state) => state.setQty);
   const remove = useCartStore((state) => state.remove);
   const hydrated = useHydrated();
+  const totalQty = items.reduce((sum, item) => sum + item.qty, 0);
 
   const subtotal = hydrated ? subtotalOf(items) : 0;
   const remaining = Math.max(0, freeShippingThreshold - subtotal);
@@ -40,7 +41,7 @@ export default function CartSheet({
       <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
         <SheetHeader className="border-b border-border px-5 py-4 text-left">
           <SheetTitle className="text-lg font-bold uppercase">
-            Your bag{hydrated && items.length > 0 ? ` (${items.length})` : ""}
+            Your bag{hydrated && totalQty > 0 ? ` (${totalQty})` : ""}
           </SheetTitle>
         </SheetHeader>
 

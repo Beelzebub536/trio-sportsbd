@@ -1,7 +1,7 @@
 import { Prisma, type Gender } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 
-import { discountPercent, effectivePrice } from "@/lib/format";
+import { effectivePrice } from "@/lib/format";
 import { CATALOG_TAG, PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 
@@ -37,6 +37,11 @@ const cardSelect = {
 } satisfies Prisma.ProductSelect;
 
 type CardRow = Prisma.ProductGetPayload<{ select: typeof cardSelect }>;
+
+const discountRatio = (basePrice: number, salePrice: number | null): number =>
+  basePrice > 0 && salePrice != null && salePrice < basePrice
+    ? (basePrice - salePrice) / basePrice
+    : 0;
 
 const toCard = (row: CardRow): ProductCardData => ({
   id: row.id,
@@ -170,7 +175,10 @@ const getCachedListing = unstable_cache(
       if (sort === "price-desc") {
         return effectivePrice(b.basePrice, b.salePrice) - effectivePrice(a.basePrice, a.salePrice);
       }
-      return discountPercent(b.basePrice, b.salePrice) - discountPercent(a.basePrice, a.salePrice);
+      return (
+        discountRatio(b.basePrice, b.salePrice) -
+        discountRatio(a.basePrice, a.salePrice)
+      );
     });
     const pageIds = sorted.slice(start, start + perPage).map((item) => item.id);
     const rows = await prisma.product.findMany({

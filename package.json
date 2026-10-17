@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "tsc": "npx tsc --noEmit",
+    "test:links": "node scripts/check-store-links.mjs",
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",

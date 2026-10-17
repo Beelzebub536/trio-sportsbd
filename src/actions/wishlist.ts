@@ -2,6 +2,23 @@
 
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
+import { getProductsByIds } from "@/lib/queries/products";
+import { z } from "zod";
+
+const guestWishlistIds = z.array(z.number().int().positive()).max(200);
+
+/** Resolve the guest's local wishlist to current, active product cards. */
+export async function getGuestWishlistProductsAction(input: number[]) {
+  const parsed = guestWishlistIds.safeParse(input);
+  if (!parsed.success) return [];
+  const ids = [...new Set(parsed.data)];
+  const products = await getProductsByIds(ids);
+  const byId = new Map(products.map((product) => [product.id, product]));
+  return ids.flatMap((id) => {
+    const product = byId.get(id);
+    return product ? [product] : [];
+  });
+}
 
 /** Toggle a product in the signed-in user's wishlist. */
 export async function toggleWishlistAction(

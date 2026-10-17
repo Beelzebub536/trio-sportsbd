@@ -9,8 +9,10 @@ import type { ProductCardData } from "@/lib/queries/products";
 
 export default function CachedListingPreview({
   products,
+  onRemove,
 }: {
   products: ProductCardData[];
+  onRemove?: (productId: number) => void;
 }) {
   return (
     <div className="grid grid-cols-2 gap-x-3 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">
@@ -39,6 +41,15 @@ export default function CachedListingPreview({
           <p className="pt-1 text-sm font-semibold">
             {formatBDT(product.salePrice ?? product.basePrice)}
           </p>
+          {onRemove && (
+            <button
+              type="button"
+              onClick={() => onRemove(product.id)}
+              className="mt-2 text-xs uppercase tracking-wide underline underline-offset-2"
+            >
+              Remove from wishlist
+            </button>
+          )}
         </article>
       ))}
     </div>

@@ -22,9 +22,6 @@ export const metadata: Metadata = {
     "sports accessories",
     "cash on delivery",
   ],
-  icons: {
-    icon: [{ url: "/favicon.ico" }],
-  },
   openGraph: {
     type: "website",
     siteName: SITE_NAME,

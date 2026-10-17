@@ -13,13 +13,13 @@ export const effectivePrice = (
   salePrice?: number | null,
 ): number => (salePrice != null && salePrice < basePrice ? salePrice : basePrice);
 
-/** Discount as a whole percentage, e.g. 1150 from 1450 -> 21. */
+/** Display discount rounded down to a whole percentage (1450 → 1150 = 20%). */
 export const discountPercent = (
   basePrice: number,
   salePrice?: number | null,
 ): number => {
   if (basePrice <= 0 || salePrice == null || salePrice >= basePrice) return 0;
-  return Math.round(((basePrice - salePrice) / basePrice) * 100);
+  return Math.floor(((basePrice - salePrice) / basePrice) * 100);
 };
 
 export const calculateTotal = (

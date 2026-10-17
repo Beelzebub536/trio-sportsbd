@@ -81,7 +81,7 @@ export default function MobileMenu({
                           {children.map((child) => (
                             <li key={child.id}>
                               <Link
-                                href={`/${child.slug}`}
+                                href={`/shop?category=${encodeURIComponent(child.slug)}`}
                                 onClick={close}
                                 className="block py-2 text-sm text-muted-foreground"
                               >
@@ -127,11 +127,18 @@ export default function MobileMenu({
                 </li>
               </>
             ) : (
-              <li>
-                <Link href="/login" onClick={close} className="block py-2 text-sm">
-                  Sign in / Create account
-                </Link>
-              </li>
+              <>
+                <li>
+                  <Link href="/wishlist" onClick={close} className="block py-2 text-sm">
+                    Wishlist
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" onClick={close} className="block py-2 text-sm">
+                    Sign in / Create account
+                  </Link>
+                </li>
+              </>
             )}
             <li>
               <Link href="/track" onClick={close} className="block py-2 text-sm">

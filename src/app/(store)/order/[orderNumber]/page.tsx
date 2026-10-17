@@ -14,10 +14,30 @@ import { getSession } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
 import { buildWhatsAppLink, orderStatusMessage } from "@/lib/whatsapp";
 
-export const metadata: Metadata = {
-  title: "Order confirmation",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params: { orderNumber: string };
+  searchParams: { token?: string };
+}): Promise<Metadata> {
+  const [{ orderNumber }, { token }] = await Promise.all([params, searchParams]);
+  const order = await prisma.order.findUnique({
+    where: { orderNumber },
+    select: { userId: true },
+  });
+  if (!order) notFound();
+
+  const session = await getSession();
+  const isOwner = Boolean(session?.user?.id && order.userId === session.user.id);
+  const tokenValid = typeof token === "string" && verifyOrderToken(orderNumber, token);
+  if (!isOwner && !tokenValid) notFound();
+
+  return {
+    title: "Order confirmation",
+    robots: { index: false, follow: false },
+  };
+}
 
 const ADVANCE_NOTES: Record<string, string> = {
   PENDING:

@@ -58,6 +58,8 @@ export default function CheckoutForm({
   const items = useCartStore((state) => state.items);
   const clear = useCartStore((state) => state.clear);
   const [details, setDetails] = useState<CartLineDetails[]>([]);
+  const [loadedSnapshot, setLoadedSnapshot] = useState("");
+  const [cartLoadError, setCartLoadError] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const snapshot = items.map((item) => `${item.variantId}:${item.qty}`).join(",");
@@ -93,16 +95,27 @@ export default function CheckoutForm({
     const current = useCartStore.getState().items;
     if (!hydrated || current.length === 0) {
       setDetails([]);
+      setLoadedSnapshot(snapshot);
+      setCartLoadError(false);
       return;
     }
     let cancelled = false;
+    setCartLoadError(false);
     getCartDetails(
       current.map((item) => ({ variantId: item.variantId, qty: item.qty })),
     )
       .then((result) => {
-        if (!cancelled) setDetails(result);
+        if (!cancelled) {
+          setDetails(result);
+          setLoadedSnapshot(snapshot);
+        }
       })
-      .catch(() => undefined);
+      .catch(() => {
+        if (!cancelled) {
+          setLoadedSnapshot(snapshot);
+          setCartLoadError(true);
+        }
+      });
     return () => {
       cancelled = true;
     };
@@ -117,13 +130,20 @@ export default function CheckoutForm({
     (sum, detail) => sum + detail.unitPrice * detail.qty,
     0,
   );
-  let shippingFee =
-    division === "Dhaka"
-      ? settings.shippingInsideDhaka
-      : settings.shippingOutsideDhaka;
-  if (subtotal >= settings.freeShippingThreshold) shippingFee = 0;
-  const total = subtotal + shippingFee;
-  const advanceAmount = Math.ceil((total * settings.advancePercent) / 100);
+  const cartPending = items.length > 0 && loadedSnapshot !== snapshot;
+  let shippingFee: number | null = null;
+  if (!cartPending && !cartLoadError) {
+    if (subtotal >= settings.freeShippingThreshold) shippingFee = 0;
+    else if (division) {
+      shippingFee =
+        division === "Dhaka"
+          ? settings.shippingInsideDhaka
+          : settings.shippingOutsideDhaka;
+    }
+  }
+  const total = cartPending || shippingFee == null ? null : subtotal + shippingFee;
+  const advanceAmount =
+    total == null ? null : Math.ceil((total * settings.advancePercent) / 100);
 
   const applySavedAddress = (address: SavedAddress) => {
     setValue("fullName", address.fullName);
@@ -135,7 +155,7 @@ export default function CheckoutForm({
   };
 
   const onSubmit = async (values: CheckoutFormValues) => {
-    if (details.length === 0) {
+    if (cartPending || cartLoadError || details.length === 0) {
       toast.error("Your bag is empty.");
       return;
     }
@@ -186,6 +206,11 @@ export default function CheckoutForm({
       noValidate
     >
       <div className="space-y-8">
+        {cartLoadError && (
+          <p className="border border-destructive p-3 text-sm text-destructive" role="alert">
+            We could not check your bag. Refresh this page to try again.
+          </p>
+        )}
         {addresses.length > 0 && (
           <section>
             <h2 className="text-sm font-bold uppercase tracking-widest">
@@ -320,7 +345,7 @@ export default function CheckoutForm({
             Advance payment ({settings.advancePercent}%)
           </h2>
           <p className="text-sm text-muted-foreground">
-            Send <strong className="text-foreground">{formatBDT(advanceAmount)}</strong>{" "}
+            Send <strong className="text-foreground">{advanceAmount == null ? "—" : formatBDT(advanceAmount)}</strong>{" "}
             to our {advanceMethod === "NAGAD" ? "Nagad" : "bKash"} number{" "}
             <strong className="text-foreground">{storeNumber}</strong> (Send
             Money), then enter the transaction details below.
@@ -383,7 +408,11 @@ export default function CheckoutForm({
           </label>
           <FieldError message={errors.terms?.message} />
 
-          <Button type="submit" className="w-full" disabled={submitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={submitting || cartPending || cartLoadError || details.length === 0}
+          >
             {submitting ? "Placing order…" : "Place order"}
           </Button>
         </section>
@@ -399,8 +428,9 @@ export default function CheckoutForm({
             unitPrice: detail.unitPrice,
             qty: detail.qty,
           }))}
-          subtotal={subtotal}
+          subtotal={cartPending || cartLoadError ? null : subtotal}
           shippingFee={shippingFee}
+          shippingPending={cartPending || cartLoadError}
           total={total}
           advanceAmount={advanceAmount}
           advancePercent={settings.advancePercent}

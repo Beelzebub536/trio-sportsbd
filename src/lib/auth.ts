@@ -13,13 +13,39 @@ const googleEnabled = Boolean(
 const facebookEnabled = Boolean(
   process.env.FACEBOOK_CLIENT_ID && process.env.FACEBOOK_CLIENT_SECRET,
 );
+const canonicalAuthUrl = process.env.BETTER_AUTH_URL;
+const canonicalAuth = (() => {
+  try {
+    return canonicalAuthUrl ? new URL(canonicalAuthUrl) : undefined;
+  } catch {
+    return undefined;
+  }
+})();
+const canonicalAuthOrigin = canonicalAuth?.origin;
+const deploymentHost = process.env.VERCEL_URL;
+const allowedAuthHosts = [
+  "localhost:*",
+  "127.0.0.1:*",
+  ...(canonicalAuth ? [canonicalAuth.host] : []),
+  ...(deploymentHost ? [deploymentHost] : []),
+];
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
     provider: "postgresql",
   }),
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL,
+  baseURL: {
+    allowedHosts: allowedAuthHosts,
+    ...(canonicalAuthUrl ? { fallback: canonicalAuthUrl } : {}),
+    protocol: "auto",
+  },
+  trustedOrigins: [
+    ...(canonicalAuthOrigin ? [canonicalAuthOrigin] : []),
+    ...(deploymentHost ? [`https://${deploymentHost}`] : []),
+    "http://localhost:*",
+    "http://127.0.0.1:*",
+  ],
   emailAndPassword: {
     // Email + password sign-in with NO email sending: no verification mail and
     // no password-reset mail. Admins reset passwords from the dashboard.

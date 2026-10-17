@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath, revalidateTag } from "next/cache";
+import { headers } from "next/headers";
 
 import { effectivePrice } from "@/lib/format";
 import { PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
@@ -25,6 +26,47 @@ const makeOrderNumber = (): string => {
 };
 
 const RATE_LIMIT_PER_HOUR = 5;
+const RATE_LIMIT_PER_IP_PER_HOUR = 20;
+const ipOrderAttempts = new Map<string, number[]>();
+
+function coarseClientIp(value: string): string | null {
+  const ip = value.trim().toLowerCase().replace(/^\[|\]$/g, "");
+  const ipv4 = ip.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.\d{1,3}$/);
+  if (ipv4 && ipv4.slice(1).every((octet) => Number(octet) <= 255)) {
+    return ipv4[1] + "." + ipv4[2] + "." + ipv4[3] + ".0/24";
+  }
+  if (ip.includes(":")) {
+    const address = ip.split("%")[0];
+    const [left = "", right = ""] = address.split("::");
+    const leftParts = left ? left.split(":") : [];
+    const rightParts = right ? right.split(":") : [];
+    const missingParts = 8 - leftParts.length - rightParts.length;
+    const parts = address.includes("::")
+      ? [...leftParts, ...Array(Math.max(0, missingParts)).fill("0"), ...rightParts]
+      : leftParts;
+    if (parts.length === 8 && parts.every((part) => /^[a-f0-9]{1,4}$/.test(part))) {
+      return parts.slice(0, 4).join(":") + "::/64";
+    }
+  }
+  return null;
+}
+
+function allowIpOrder(ip: string | null): boolean {
+  if (!ip) return true;
+  const now = Date.now();
+  const cutoff = now - 60 * 60 * 1000;
+  for (const [key, timestamps] of ipOrderAttempts) {
+    const recent = timestamps.filter((timestamp) => timestamp > cutoff);
+    if (recent.length === 0) ipOrderAttempts.delete(key);
+    else ipOrderAttempts.set(key, recent);
+  }
+
+  const attempts = ipOrderAttempts.get(ip) ?? [];
+  if (attempts.length >= RATE_LIMIT_PER_IP_PER_HOUR) return false;
+  attempts.push(now);
+  ipOrderAttempts.set(ip, attempts);
+  return true;
+}
 
 export async function placeOrder(
   input: CheckoutValues,
@@ -38,12 +80,26 @@ export async function placeOrder(
   }
   const values = parsed.data;
 
+  const requestHeaders = await headers();
+  const rawIp =
+    requestHeaders.get("x-real-ip") ??
+    requestHeaders.get("x-forwarded-for")?.split(",")[0] ??
+    "";
+  if (!allowIpOrder(coarseClientIp(rawIp))) {
+    return {
+      ok: false,
+      error:
+        "Too many orders from this network recently. Please message us on WhatsApp.",
+    };
+  }
+
   const [settings, session] = await Promise.all([getSettings(), getSession()]);
 
-  // Simple DB-based rate limit: max 5 orders per phone number per hour.
+  // Persisted per-phone limit plus a coarse, best-effort per-IP limit above.
   const recent = await prisma.order.count({
     where: {
       phone: values.phone,
+      status: { notIn: ["CANCELLED", "RETURNED"] },
       createdAt: { gte: new Date(Date.now() - 60 * 60 * 1000) },
     },
   });

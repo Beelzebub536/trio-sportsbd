@@ -75,6 +75,8 @@ Admin (admin only): `/admin` `/admin/products` `/admin/products/new` `/admin/pro
 Static: `/about` `/contact` `/shipping-returns` `/privacy` `/terms` `/data-deletion` `/size-guide`
 API: `/api/auth/[...all]` `/api/upload/sign` (Cloudinary signed upload, admin only) `/sitemap.xml` `/robots.txt`
 
+Cart storage: there is no `Cart` or `line_items` table. `localStorage["trio-cart"]` is the source of truth until checkout; checkout revalidates prices and stock from the database. `OrderItem` stores the historical order snapshot after purchase.
+
 ## 6. Folder structure
 ```
 src/

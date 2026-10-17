@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Heart, Search, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 
+import Logo from "@/components/brand/Logo";
 import MobileMenu from "@/components/layout/MobileMenu";
 import AccountMenu from "@/components/layout/AccountMenu";
 import CartSheet from "@/components/layout/CartSheet";
@@ -17,19 +18,6 @@ export type HeaderUser = {
   name: string;
   role?: string | null;
 } | null;
-
-function Logo() {
-  return (
-    <Link href="/" className="shrink-0" aria-label="Trio Sports BD home">
-      <span className="block text-xl font-bold uppercase leading-none tracking-tight md:text-2xl">
-        TRIO SPORTS BD
-      </span>
-      <span className="mt-0.5 hidden text-[10px] uppercase tracking-widest text-muted-foreground md:block">
-        Sports Jerseys, Trousers &amp; Accessories
-      </span>
-    </Link>
-  );
-}
 
 export default function SiteHeader({
   categories,
@@ -63,7 +51,9 @@ export default function SiteHeader({
           <span className="mt-1.5 block h-0.5 w-6 bg-black" />
         </button>
 
-        <Logo />
+        <Link href="/" className="shrink-0" aria-label="Trio Sports BD home">
+          <Logo variant="header" />
+        </Link>
 
         <nav aria-label="Main" className="mx-auto hidden lg:block">
           <ul className="flex items-center gap-6">
@@ -83,13 +73,13 @@ export default function SiteHeader({
                         {children.map((child) => (
                           <div key={child.id}>
                             <Link
-                              href={`/${child.slug}`}
+                              href={`/shop?category=${encodeURIComponent(child.slug)}`}
                               className="text-sm font-bold uppercase tracking-wide hover:underline"
                             >
                               {child.name}
                             </Link>
                             <Link
-                              href={`/${child.slug}`}
+                              href={`/shop?category=${encodeURIComponent(child.slug)}`}
                               className="mt-2 block text-xs text-muted-foreground underline-offset-4 hover:underline"
                             >
                               Shop {child.name.toLowerCase()}
@@ -115,7 +105,7 @@ export default function SiteHeader({
             <Search className="h-5 w-5" />
           </button>
           <Link
-            href="/wishlist"
+            href={user ? "/account/wishlist" : "/wishlist"}
             aria-label="Wishlist"
             className="hidden p-2 hover:bg-secondary sm:block"
           >
@@ -124,7 +114,7 @@ export default function SiteHeader({
           <AccountMenu user={user} />
           <button
             type="button"
-            aria-label={`Open bag${hydrated && count > 0 ? `, ${count} items` : ""}`}
+            aria-label={`Open bag${hydrated && count > 0 ? `, ${count} ${count === 1 ? "item" : "items"}` : ""}`}
             className="relative p-2 hover:bg-secondary"
             onClick={openCart}
           >
