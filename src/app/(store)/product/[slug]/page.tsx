@@ -19,15 +19,11 @@ export async function generateMetadata({
   params: PageParams;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = await getProductBySlug(slug);
-
-  if (!product) return { title: "Product not found", robots: { index: false } };
-
   return buildMetadata({
-    title: product.name,
-    description: product.description.slice(0, 155),
-    path: `/product/${product.slug}`,
-    image: product.images[0]?.url ?? null,
+    title: "Sports Jerseys & Activewear",
+    description:
+      "Shop sports jerseys, trousers and accessories at Trio Sports BD, with delivery across Bangladesh.",
+    path: `/product/${slug}`,
   });
 }
 
