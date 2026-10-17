@@ -44,7 +44,20 @@ export const checkoutSchema = z.object({
   items: z
     .array(cartItemSchema)
     .min(1, "Your bag is empty")
-    .max(50, "Too many items in one order"),
+    .max(50, "Too many items in one order")
+    .superRefine((items, context) => {
+      const seen = new Set<number>();
+      items.forEach((item, index) => {
+        if (seen.has(item.variantId)) {
+          context.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: "Each product option can only appear once.",
+            path: [index, "variantId"],
+          });
+        }
+        seen.add(item.variantId);
+      });
+    }),
 });
 
 /** The checkout form fields only — `items` come from the cart store. */

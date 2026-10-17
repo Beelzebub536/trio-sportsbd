@@ -40,6 +40,7 @@ Last commit: phase 6-8: customer account, admin panel, bulk price manager
 - Docs: `README.md` (setup, scripts, routes, common changes, business rules) and `docs/DEPLOY.md` (Vercel, Neon, Google + Facebook OAuth with exact redirect URIs, Cloudinary, post-deploy checklist, troubleshooting). `.env.example` cleaned of the leftover Stripe variables; `src/lib/env.ts` no longer mentions Stripe.
 - `formatBDT` returns `৳1,250` (whole taka, `en-IN` grouping). `effectivePrice` and `discountPercent` live beside it in `src/lib/format.ts`.
 - `src/lib/settings.ts` exposes `getSettings()` (cached, tagged `store-settings`) which swallows database errors and returns defaults, so the storefront renders before the database is reachable.
+- Review fixes: reuse the Prisma client during development, reject duplicate variant lines in checkout requests, and restore order stock transactionally on first cancellation. Typecheck, lint and production build pass; build logs still warn that Better Auth has no configured secret/base URL in the build environment.
 
 ## PENDING (human)
 - Fill `.env` (`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`) and run `npm run db:push` then `npm run db:seed`.
@@ -51,3 +52,4 @@ Last commit: phase 6-8: customer account, admin panel, bulk price manager
 - `ProductVariant.sku` is globally unique. The admin form auto-generates `SLUG-COLOUR-SIZE`, so collisions are unlikely, but two products cannot share a manually entered SKU.
 - Re-saving a product recreates its variants, which nulls `OrderItem.variantId` on historical orders (the order keeps its own name/size/colour/price snapshot, so nothing is lost visually).
 - Rate limiting for `placeOrder` is in-memory, so it resets on redeploy and is per-instance on serverless. Fine for now; move to the database if spam becomes a problem.
+- Database-backed flows (auth, checkout, order tracking, admin actions) have not been exercised against a configured Neon database; the local build alone does not verify runtime behavior.

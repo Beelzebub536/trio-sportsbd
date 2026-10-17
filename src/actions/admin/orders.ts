@@ -31,7 +31,45 @@ export async function updateOrderStatus(
     return { ok: false, error: "Unknown order status." };
   }
 
-  await prisma.order.update({ where: { id }, data: { status } });
+  try {
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id },
+        include: { orderItems: { select: { variantId: true, qty: true } } },
+      });
+      if (!order) throw new Error("ORDER_NOT_FOUND");
+      if (order.status === "CANCELLED" && status !== "CANCELLED") {
+        throw new Error("CANCELLED_ORDER");
+      }
+
+      const updated = await tx.order.updateMany({
+        where: { id, status: order.status },
+        data: { status },
+      });
+      if (updated.count !== 1) throw new Error("ORDER_CHANGED");
+
+      if (status === "CANCELLED" && order.status !== "CANCELLED") {
+        for (const item of order.orderItems) {
+          if (item.variantId == null) continue;
+          await tx.productVariant.updateMany({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.qty } },
+          });
+        }
+      }
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+      return { ok: false, error: "Order not found." };
+    }
+    if (error instanceof Error && error.message === "CANCELLED_ORDER") {
+      return { ok: false, error: "A cancelled order cannot be reopened." };
+    }
+    if (error instanceof Error && error.message === "ORDER_CHANGED") {
+      return { ok: false, error: "This order changed. Refresh and try again." };
+    }
+    return { ok: false, error: "Could not update the order status." };
+  }
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/account/orders");
