@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 9 (all phases 1–9 implemented; runtime verification pending a filled `.env`)
-Last commit: phase 6-8: customer account, admin panel, bulk price manager
+Last commit: phase 9: storefront performance pass
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
@@ -41,6 +41,7 @@ Last commit: phase 6-8: customer account, admin panel, bulk price manager
 - `formatBDT` returns `৳1,250` (whole taka, `en-IN` grouping). `effectivePrice` and `discountPercent` live beside it in `src/lib/format.ts`.
 - `src/lib/settings.ts` exposes `getSettings()` (cached, tagged `store-settings`) which swallows database errors and returns defaults, so the storefront renders before the database is reachable.
 - Review fixes: reuse the Prisma client during development, reject duplicate variant lines in checkout requests, and restore order stock transactionally on first cancellation. Typecheck, lint and production build pass; build logs still warn that Better Auth has no configured secret/base URL in the build environment.
+- Performance pass: the storefront chrome and home sections now stream behind Suspense fallbacks; public category, banner and product data use short tagged caches with admin/order invalidation; listing filters, effective-price bounds, counts and newest pagination stay in PostgreSQL while exact price/discount sorting reads only compact price records. A 16-entry, two-minute in-memory browser cache shows previously visited listing results during navigation. Product cards/gallery thumbnails use Cloudinary resized variants and the product gallery opens the original on demand. Typecheck, lint and build pass; live latency still needs measurement with the Neon database configured.
 
 ## PENDING (human)
 - Fill `.env` (`DATABASE_URL`, `DIRECT_URL`, `BETTER_AUTH_SECRET`, `BETTER_AUTH_URL`, `NEXT_PUBLIC_APP_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`) and run `npm run db:push` then `npm run db:seed`.

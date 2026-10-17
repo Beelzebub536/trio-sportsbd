@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import { effectivePrice } from "@/lib/format";
+import { PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import { signOrderToken } from "@/lib/order-token";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
@@ -183,6 +184,7 @@ export async function placeOrder(
 
     revalidatePath("/admin");
     revalidatePath("/admin/orders");
+    revalidateTag(PRODUCT_DETAIL_TAG);
 
     return {
       ok: true,

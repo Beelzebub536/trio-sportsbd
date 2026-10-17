@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { CATALOG_TAG, PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 import { priceBatchSchema } from "@/lib/validators/prices";
 
@@ -143,6 +144,8 @@ export async function savePriceBatch(values: {
     });
 
     revalidateStorefront();
+    revalidateTag(CATALOG_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG);
     revalidatePath("/admin/prices");
     revalidatePath("/admin/prices/history");
 
@@ -230,6 +233,8 @@ export async function undoBatch(batchId: number): Promise<PriceActionResult> {
     });
 
     revalidateStorefront();
+    revalidateTag(CATALOG_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG);
     revalidatePath("/admin/prices");
     revalidatePath("/admin/prices/history");
 

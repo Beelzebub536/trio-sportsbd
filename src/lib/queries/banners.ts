@@ -1,4 +1,7 @@
+import { unstable_cache } from "next/cache";
+
 import prisma from "@/lib/prisma";
+import { BANNERS_TAG } from "@/lib/cache-tags";
 
 export type BannerData = {
   id: number;
@@ -8,7 +11,8 @@ export type BannerData = {
   linkUrl: string;
 };
 
-export async function getActiveBanners(): Promise<BannerData[]> {
+const getCachedActiveBanners = unstable_cache(
+  async (): Promise<BannerData[]> => {
   try {
     return await prisma.banner.findMany({
       where: { isActive: true },
@@ -24,4 +28,11 @@ export async function getActiveBanners(): Promise<BannerData[]> {
   } catch {
     return [];
   }
+  },
+  ["active-banners-v1"],
+  { tags: [BANNERS_TAG], revalidate: 300 },
+);
+
+export async function getActiveBanners(): Promise<BannerData[]> {
+  return getCachedActiveBanners();
 }

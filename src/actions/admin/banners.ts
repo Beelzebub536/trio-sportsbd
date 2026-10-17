@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { BANNERS_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 import { bannerSchema, type BannerValues } from "@/lib/validators/banner";
 
@@ -37,6 +38,7 @@ export async function saveBanner(
     }
     revalidatePath("/admin/banners");
     revalidatePath("/");
+    revalidateTag(BANNERS_TAG);
     return { ok: true };
   } catch (error) {
     console.error("saveBanner failed:", error);
@@ -48,6 +50,7 @@ export async function deleteBanner(id: number): Promise<AdminActionResult> {
   await requireAdminUser();
   try {
     await prisma.banner.delete({ where: { id } });
+    revalidateTag(BANNERS_TAG);
     revalidatePath("/admin/banners");
     revalidatePath("/");
     return { ok: true };

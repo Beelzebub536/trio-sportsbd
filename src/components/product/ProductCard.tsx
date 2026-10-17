@@ -4,6 +4,7 @@ import Link from "next/link";
 import WishlistButton from "@/components/product/WishlistButton";
 import { discountPercent, effectivePrice, formatBDT } from "@/lib/format";
 import type { ProductCardData } from "@/lib/queries/products";
+import { getListingImageUrl } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
 
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
@@ -36,10 +37,11 @@ export default function ProductCard({
         {product.image ? (
           <>
             <Image
-              src={product.image}
+              src={getListingImageUrl(product.image)}
               alt={product.name}
               fill
               priority={priority}
+              quality={60}
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className={cn(
                 "object-cover transition-opacity duration-200",
@@ -48,9 +50,10 @@ export default function ProductCard({
             />
             {product.secondImage && (
               <Image
-                src={product.secondImage}
+                src={getListingImageUrl(product.secondImage)}
                 alt=""
                 aria-hidden
+                quality={60}
                 fill
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 className="object-cover opacity-0 transition-opacity duration-200 group-hover:opacity-100"

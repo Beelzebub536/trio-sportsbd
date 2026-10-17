@@ -2,7 +2,14 @@
 
 import { useMemo, useRef, useState } from "react";
 import Image from "next/image";
+import { Maximize2 } from "lucide-react";
 
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { getListingImageUrl } from "@/lib/image-url";
 import { cn } from "@/lib/utils";
 
 export type GalleryImage = { url: string; color: string | null };
@@ -23,6 +30,7 @@ export default function ProductGallery({
   }, [images, selectedColor]);
 
   const [index, setIndex] = useState(0);
+  const [viewFullSize, setViewFullSize] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
 
   if (ordered.length === 0) {
@@ -58,7 +66,14 @@ export default function ProductGallery({
               i === index ? "ring-2 ring-black" : "opacity-80 hover:opacity-100",
             )}
           >
-            <Image src={image.url} alt="" fill sizes="64px" className="object-cover" />
+            <Image
+              src={getListingImageUrl(image.url)}
+              alt=""
+              fill
+              sizes="64px"
+              quality={60}
+              className="object-cover"
+            />
           </button>
         ))}
       </div>
@@ -81,9 +96,43 @@ export default function ProductGallery({
               sizes="(max-width: 1024px) 100vw, 50vw"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
+            <button
+              type="button"
+              aria-label={`View full-size image ${i + 1} of ${productName}`}
+              className="absolute inset-0"
+              onClick={() => {
+                setIndex(i);
+                setViewFullSize(true);
+              }}
+            />
+            <span
+              aria-hidden="true"
+              className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-2 bg-black/70 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white"
+            >
+              <Maximize2 className="h-3.5 w-3.5" /> View full size
+            </span>
           </div>
         ))}
       </div>
+      <Dialog open={viewFullSize} onOpenChange={setViewFullSize}>
+        <DialogContent className="h-[100dvh] w-screen max-w-none border-0 bg-black p-0 text-white sm:rounded-none">
+          <DialogTitle className="sr-only">
+            {productName} — full-size image
+          </DialogTitle>
+          {ordered[index] && (
+            <div className="relative h-full w-full">
+              <Image
+                src={ordered[index].url}
+                alt={`${productName} — full-size view ${index + 1}`}
+                fill
+                sizes="100vw"
+                unoptimized
+                className="object-contain"
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

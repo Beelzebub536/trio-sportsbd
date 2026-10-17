@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 
 export type AdminActionResult = { ok: boolean; error?: string };
@@ -73,6 +74,7 @@ export async function updateOrderStatus(
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/account/orders");
+  if (status === "CANCELLED") revalidateTag(PRODUCT_DETAIL_TAG);
   return { ok: true };
 }
 

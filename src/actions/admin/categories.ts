@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { CATEGORIES_TAG, CATALOG_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 import { categorySchema, type CategoryValues } from "@/lib/validators/category";
 
@@ -52,6 +53,8 @@ export async function saveCategory(
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
+    revalidateTag(CATEGORIES_TAG);
+    revalidateTag(CATALOG_TAG);
     return { ok: true };
   } catch (error) {
     console.error("saveCategory failed:", error);
@@ -82,6 +85,8 @@ export async function deleteCategory(id: number): Promise<AdminActionResult> {
 
   try {
     await prisma.category.delete({ where: { id } });
+    revalidateTag(CATEGORIES_TAG);
+    revalidateTag(CATALOG_TAG);
     revalidatePath("/admin/categories");
     revalidatePath("/");
     return { ok: true };

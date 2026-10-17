@@ -1,6 +1,8 @@
 import { Prisma, type Gender } from "@prisma/client";
+import { unstable_cache } from "next/cache";
 
 import { discountPercent, effectivePrice } from "@/lib/format";
+import { CATALOG_TAG, PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import prisma from "@/lib/prisma";
 
 export type ProductCardData = {
@@ -81,35 +83,6 @@ async function resolveCategoryIds(slugs: string[]): Promise<number[]> {
   return [...ids];
 }
 
-const sortCards = (items: ProductCardData[], sort: SortKey): ProductCardData[] => {
-  const copy = [...items];
-  switch (sort) {
-    case "price-asc":
-      return copy.sort(
-        (a, b) =>
-          effectivePrice(a.basePrice, a.salePrice) -
-          effectivePrice(b.basePrice, b.salePrice),
-      );
-    case "price-desc":
-      return copy.sort(
-        (a, b) =>
-          effectivePrice(b.basePrice, b.salePrice) -
-          effectivePrice(a.basePrice, a.salePrice),
-      );
-    case "discount":
-      return copy.sort(
-        (a, b) =>
-          discountPercent(b.basePrice, b.salePrice) -
-          discountPercent(a.basePrice, a.salePrice),
-      );
-    case "newest":
-    default:
-      return copy.sort(
-        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-      );
-  }
-};
-
 export type ListingResult = {
   items: ProductCardData[];
   total: number;
@@ -118,12 +91,13 @@ export type ListingResult = {
   pageCount: number;
 };
 
-export async function getListing(
+const getCachedListing = unstable_cache(
+  async (
   filters: ListingFilters,
   sort: SortKey = "newest",
   page = 1,
   perPage = 12,
-): Promise<ListingResult> {
+): Promise<ListingResult> => {
   const where: Prisma.ProductWhereInput = { isActive: true };
 
   if (filters.categorySlugs?.length) {
@@ -149,33 +123,86 @@ export async function getListing(
     ];
   }
 
-  const rows = await prisma.product.findMany({ where, select: cardSelect });
-  let items = rows.map(toCard);
-
-  // Price filters use the effective (sale-aware) price.
+  // Effective-price bounds are expressed in SQL so the database can count and
+  // page the matching catalogue without loading every product into Node.
   if (filters.minPrice != null || filters.maxPrice != null) {
-    items = items.filter((item) => {
-      const price = effectivePrice(item.basePrice, item.salePrice);
-      if (filters.minPrice != null && price < filters.minPrice) return false;
-      if (filters.maxPrice != null && price > filters.maxPrice) return false;
-      return true;
-    });
+    const basePrice: Prisma.IntFilter = {};
+    const salePrice: Prisma.IntNullableFilter = { not: null };
+    if (filters.minPrice != null) {
+      basePrice.gte = filters.minPrice;
+      salePrice.gte = filters.minPrice;
+    }
+    if (filters.maxPrice != null) {
+      basePrice.lte = filters.maxPrice;
+      salePrice.lte = filters.maxPrice;
+    }
+    where.AND = [
+      { OR: [{ salePrice: null, basePrice }, { salePrice }] },
+    ];
   }
 
-  items = sortCards(items, sort);
-
-  const total = items.length;
+  const total = await prisma.product.count({ where });
   const pageCount = Math.max(1, Math.ceil(total / perPage));
   const safePage = Math.min(Math.max(1, page), pageCount);
   const start = (safePage - 1) * perPage;
+  let items: ProductCardData[];
+
+  if (sort === "newest") {
+    const rows = await prisma.product.findMany({
+      where,
+      select: cardSelect,
+      orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+      skip: start,
+      take: perPage,
+    });
+    items = rows.map(toCard);
+  } else {
+    // Price/discount ordering compares the effective sale price and percentage,
+    // so sort only the small price index in Node, then fetch cards for this page.
+    const candidates = await prisma.product.findMany({
+      where,
+      select: { id: true, basePrice: true, salePrice: true },
+    });
+    const sorted = candidates.sort((a, b) => {
+      if (sort === "price-asc") {
+        return effectivePrice(a.basePrice, a.salePrice) - effectivePrice(b.basePrice, b.salePrice);
+      }
+      if (sort === "price-desc") {
+        return effectivePrice(b.basePrice, b.salePrice) - effectivePrice(a.basePrice, a.salePrice);
+      }
+      return discountPercent(b.basePrice, b.salePrice) - discountPercent(a.basePrice, a.salePrice);
+    });
+    const pageIds = sorted.slice(start, start + perPage).map((item) => item.id);
+    const rows = await prisma.product.findMany({
+      where: { id: { in: pageIds } },
+      select: cardSelect,
+    });
+    const byId = new Map(rows.map((row) => [row.id, row]));
+    items = pageIds.flatMap((id) => {
+      const row = byId.get(id);
+      return row ? [toCard(row)] : [];
+    });
+  }
 
   return {
-    items: items.slice(start, start + perPage),
+    items,
     total,
     page: safePage,
     perPage,
     pageCount,
   };
+  },
+  ["catalog-listing-v2"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
+export async function getListing(
+  filters: ListingFilters,
+  sort: SortKey = "newest",
+  page = 1,
+  perPage = 12,
+): Promise<ListingResult> {
+  return getCachedListing(filters, sort, page, perPage);
 }
 
 export type Facets = {
@@ -185,7 +212,8 @@ export type Facets = {
   priceRange: { min: number; max: number };
 };
 
-export async function getFacets(): Promise<Facets> {
+const getCachedFacets = unstable_cache(
+  async (): Promise<Facets> => {
   const [variants, brandRows, priceAgg] = await Promise.all([
     prisma.productVariant.findMany({
       where: { product: { isActive: true } },
@@ -225,9 +253,17 @@ export async function getFacets(): Promise<Facets> {
       max: priceAgg._max.basePrice ?? 10000,
     },
   };
+  },
+  ["catalog-facets-v1"],
+  { tags: [CATALOG_TAG], revalidate: 300 },
+);
+
+export async function getFacets(): Promise<Facets> {
+  return getCachedFacets();
 }
 
-export async function getNewArrivals(limit = 8): Promise<ProductCardData[]> {
+const getCachedNewArrivals = unstable_cache(
+  async (limit: number): Promise<ProductCardData[]> => {
   const rows = await prisma.product.findMany({
     where: { isActive: true },
     orderBy: { createdAt: "desc" },
@@ -235,9 +271,17 @@ export async function getNewArrivals(limit = 8): Promise<ProductCardData[]> {
     select: cardSelect,
   });
   return rows.map(toCard);
+  },
+  ["new-arrivals-v1"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
+export async function getNewArrivals(limit = 8): Promise<ProductCardData[]> {
+  return getCachedNewArrivals(limit);
 }
 
-export async function getFeaturedProducts(limit = 8): Promise<ProductCardData[]> {
+const getCachedFeaturedProducts = unstable_cache(
+  async (limit: number): Promise<ProductCardData[]> => {
   const rows = await prisma.product.findMany({
     where: { isActive: true, isFeatured: true },
     orderBy: { updatedAt: "desc" },
@@ -245,9 +289,17 @@ export async function getFeaturedProducts(limit = 8): Promise<ProductCardData[]>
     select: cardSelect,
   });
   return rows.map(toCard);
+  },
+  ["featured-products-v1"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
+export async function getFeaturedProducts(limit = 8): Promise<ProductCardData[]> {
+  return getCachedFeaturedProducts(limit);
 }
 
-export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
+const getCachedSaleProducts = unstable_cache(
+  async (limit: number): Promise<ProductCardData[]> => {
   const rows = await prisma.product.findMany({
     where: { isActive: true, salePrice: { not: null } },
     orderBy: { createdAt: "desc" },
@@ -255,6 +307,13 @@ export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
     select: cardSelect,
   });
   return rows.map(toCard);
+  },
+  ["sale-products-v1"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
+export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
+  return getCachedSaleProducts(limit);
 }
 
 export async function searchProductCards(
@@ -278,22 +337,31 @@ export async function searchProductCards(
   return rows.map(toCard);
 }
 
+const getCachedProductBySlug = unstable_cache(
+  async (slug: string) => {
+    return prisma.product.findFirst({
+      where: { slug, isActive: true },
+      include: {
+        category: true,
+        images: { orderBy: { sortOrder: "asc" } },
+        variants: { orderBy: [{ color: "asc" }, { size: "asc" }] },
+      },
+    });
+  },
+  ["product-by-slug-v1"],
+  { tags: [PRODUCT_DETAIL_TAG], revalidate: 60 },
+);
+
 export async function getProductBySlug(slug: string) {
-  return prisma.product.findFirst({
-    where: { slug, isActive: true },
-    include: {
-      category: true,
-      images: { orderBy: { sortOrder: "asc" } },
-      variants: { orderBy: [{ color: "asc" }, { size: "asc" }] },
-    },
-  });
+  return getCachedProductBySlug(slug);
 }
 
-export async function getRelatedProducts(
+const getCachedRelatedProducts = unstable_cache(
+  async (
   productId: number,
   categoryId: number,
   limit = 4,
-): Promise<ProductCardData[]> {
+): Promise<ProductCardData[]> => {
   const rows = await prisma.product.findMany({
     where: { isActive: true, categoryId, id: { not: productId } },
     orderBy: { createdAt: "desc" },
@@ -301,6 +369,17 @@ export async function getRelatedProducts(
     select: cardSelect,
   });
   return rows.map(toCard);
+  },
+  ["related-products-v1"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
+export async function getRelatedProducts(
+  productId: number,
+  categoryId: number,
+  limit = 4,
+): Promise<ProductCardData[]> {
+  return getCachedRelatedProducts(productId, categoryId, limit);
 }
 
 export type ProductDetail = NonNullable<

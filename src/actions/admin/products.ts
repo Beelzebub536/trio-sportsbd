@@ -1,8 +1,9 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
+import { CATALOG_TAG, PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 import { productSchema, type ProductValues } from "@/lib/validators/product";
 
@@ -121,6 +122,8 @@ export async function saveProduct(
     revalidatePath("/shop");
     revalidatePath("/");
     revalidatePath(`/product/${data.slug}`);
+    revalidateTag(CATALOG_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG);
 
     return { ok: true, id: productId };
   } catch (error) {
@@ -138,6 +141,8 @@ export async function toggleProductActive(
 ): Promise<AdminActionResult> {
   await requireAdminUser();
   await prisma.product.update({ where: { id }, data: { isActive } });
+  revalidateTag(CATALOG_TAG);
+  revalidateTag(PRODUCT_DETAIL_TAG);
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   return { ok: true };
@@ -154,6 +159,8 @@ export async function deleteProduct(id: number): Promise<AdminActionResult> {
       prisma.productVariant.deleteMany({ where: { productId: id } }),
       prisma.product.delete({ where: { id } }),
     ]);
+    revalidateTag(CATALOG_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG);
     revalidatePath("/admin/products");
     revalidatePath("/shop");
     return { ok: true };

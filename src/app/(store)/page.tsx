@@ -1,42 +1,36 @@
+import { Suspense } from "react";
+
 import BrandStory from "@/components/home/BrandStory";
-import CategoryTiles from "@/components/home/CategoryTiles";
-import HeroCarousel from "@/components/home/HeroCarousel";
-import ProductRow from "@/components/home/ProductRow";
+import HomeCategories from "@/components/home/HomeCategories";
+import HomeHero from "@/components/home/HomeHero";
+import HomeProductRow from "@/components/home/HomeProductRow";
+import HomeSectionSkeleton from "@/components/home/HomeSectionSkeleton";
+import HomeWhatsAppCta from "@/components/home/HomeWhatsAppCta";
 import SaleStrip from "@/components/home/SaleStrip";
-import WhatsAppCta from "@/components/home/WhatsAppCta";
-import { getActiveBanners } from "@/lib/queries/banners";
-import { getTopLevelCategories } from "@/lib/queries/categories";
-import {
-  getFeaturedProducts,
-  getNewArrivals,
-  getSaleProducts,
-} from "@/lib/queries/products";
-import { getSettings } from "@/lib/settings";
 
-export default async function HomePage() {
-  const [banners, categories, newArrivals, bestSellers, saleProducts, settings] =
-    await Promise.all([
-      getActiveBanners(),
-      getTopLevelCategories(),
-      getNewArrivals(8),
-      getFeaturedProducts(8),
-      getSaleProducts(8),
-      getSettings(),
-    ]);
-
+export default function HomePage() {
   return (
     <>
-      <HeroCarousel banners={banners} />
-      <CategoryTiles categories={categories} />
-      <ProductRow title="New arrivals" href="/shop" products={newArrivals} />
+      <Suspense fallback={<HomeSectionSkeleton kind="hero" />}>
+        <HomeHero />
+      </Suspense>
+      <Suspense fallback={<HomeSectionSkeleton kind="tiles" />}>
+        <HomeCategories />
+      </Suspense>
+      <Suspense fallback={<HomeSectionSkeleton kind="row" />}>
+        <HomeProductRow kind="new" title="New arrivals" href="/shop" />
+      </Suspense>
       <SaleStrip />
-      <ProductRow title="Best sellers" href="/shop" products={bestSellers} />
-      <ProductRow title="On sale" href="/sale" products={saleProducts} />
+      <Suspense fallback={<HomeSectionSkeleton kind="row" />}>
+        <HomeProductRow kind="featured" title="Best sellers" href="/shop" />
+      </Suspense>
+      <Suspense fallback={<HomeSectionSkeleton kind="row" />}>
+        <HomeProductRow kind="sale" title="On sale" href="/sale" />
+      </Suspense>
       <BrandStory />
-      <WhatsAppCta
-        whatsappNumber={settings.whatsappNumber}
-        supportHours={settings.supportHours}
-      />
+      <Suspense fallback={<HomeSectionSkeleton kind="cta" />}>
+        <HomeWhatsAppCta />
+      </Suspense>
     </>
   );
 }

@@ -1,6 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { X } from "lucide-react";
 
+import ListingSkeleton from "@/components/product/ListingSkeleton";
+import ListingCacheSeed from "@/components/product/ListingCacheSeed";
 import FilterPanel from "@/components/product/FilterPanel";
 import ListingToolbar from "@/components/product/ListingToolbar";
 import Pagination from "@/components/product/Pagination";
@@ -12,11 +15,29 @@ import { getSession } from "@/lib/session";
 import {
   buildFilterChips,
   parseListingParams,
+  toQueryString,
   toArray,
   withParams,
   type FixedFilters,
   type RawSearchParams,
 } from "@/lib/listing-params";
+import { makeListingCacheKey } from "@/lib/listing-cache-key";
+
+type ProductListingProps = {
+  basePath: string;
+  params: RawSearchParams;
+  fixed?: FixedFilters;
+  title?: string;
+  description?: string;
+};
+
+export default function ProductListing(props: ProductListingProps) {
+  return (
+    <Suspense fallback={<ListingSkeleton />}>
+      <ListingContent {...props} />
+    </Suspense>
+  );
+}
 
 const PER_PAGE = 12;
 
@@ -51,19 +72,13 @@ function ActiveChips({
   );
 }
 
-export default async function ProductListing({
+async function ListingContent({
   basePath,
   params,
   fixed = {},
   title,
   description,
-}: {
-  basePath: string;
-  params: RawSearchParams;
-  fixed?: FixedFilters;
-  title?: string;
-  description?: string;
-}) {
+}: ProductListingProps) {
   const { filters, sort, page } = parseListingParams(params, fixed);
 
   const [result, facets, tree, session] = await Promise.all([
@@ -141,6 +156,10 @@ export default async function ProductListing({
         </aside>
 
         <div className="min-w-0 flex-1">
+          <ListingCacheSeed
+            cacheKey={buildListingCacheKey(basePath, params)}
+            products={result.items}
+          />
           <ProductGrid
             products={result.items}
             isAuthed={isAuthed}
@@ -159,4 +178,10 @@ export default async function ProductListing({
       </div>
     </div>
   );
+}
+
+function buildListingCacheKey(basePath: string, params: RawSearchParams): string {
+  const query = toQueryString(params);
+  const search = query.startsWith("?") ? query.slice(1) : query;
+  return makeListingCacheKey(basePath, search);
 }

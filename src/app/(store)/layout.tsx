@@ -1,44 +1,29 @@
-import WishlistSync from "@/components/account/WishlistSync";
-import AnnouncementBar from "@/components/layout/AnnouncementBar";
+import { Suspense } from "react";
+
+import StoreChrome from "@/components/layout/StoreChrome";
+import StoreChromeFallback from "@/components/layout/StoreChromeFallback";
+import StoreFooter from "@/components/layout/StoreFooter";
 import Footer from "@/components/layout/Footer";
-import SiteHeader from "@/components/layout/SiteHeader";
-import { getCategoryTree } from "@/lib/queries/categories";
-import { getSession } from "@/lib/session";
-import { getSettings } from "@/lib/settings";
+import { defaultSettings } from "@/lib/settings";
 
 // The storefront shell depends on the database (categories, settings) and the
 // session, so it is rendered dynamically rather than prerendered at build time.
 export const dynamic = "force-dynamic";
 
-export default async function StoreLayout({
+export default function StoreLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [categories, session, settings] = await Promise.all([
-    getCategoryTree(),
-    getSession(),
-    getSettings(),
-  ]);
-
-  const user = session?.user
-    ? { name: session.user.name, role: session.user.role ?? null }
-    : null;
-
   return (
     <div className="flex min-h-screen flex-col">
-      <AnnouncementBar
-        freeShippingThreshold={settings.freeShippingThreshold}
-        whatsappNumber={settings.whatsappNumber}
-      />
-      <SiteHeader
-        categories={categories}
-        user={user}
-        freeShippingThreshold={settings.freeShippingThreshold}
-      />
+      <Suspense fallback={<StoreChromeFallback />}>
+        <StoreChrome />
+      </Suspense>
       <main className="flex-1">{children}</main>
-      <Footer settings={settings} />
-      {user && <WishlistSync />}
+      <Suspense fallback={<Footer settings={defaultSettings} />}>
+        <StoreFooter />
+      </Suspense>
     </div>
   );
 }

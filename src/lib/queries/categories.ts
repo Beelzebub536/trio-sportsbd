@@ -1,4 +1,7 @@
+import { unstable_cache } from "next/cache";
+
 import prisma from "@/lib/prisma";
+import { CATEGORIES_TAG } from "@/lib/cache-tags";
 
 export type CategoryNode = {
   id: number;
@@ -11,7 +14,8 @@ export type CategoryNode = {
 };
 
 /** All categories as a parent/child tree, ordered by `sortOrder`. */
-export async function getCategoryTree(): Promise<CategoryNode[]> {
+const getCachedCategoryTree = unstable_cache(
+  async (): Promise<CategoryNode[]> => {
   try {
     const rows = await prisma.category.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
@@ -40,6 +44,13 @@ export async function getCategoryTree(): Promise<CategoryNode[]> {
     // Never let a transient DB problem take down the whole storefront shell.
     return [];
   }
+  },
+  ["category-tree-v1"],
+  { tags: [CATEGORIES_TAG], revalidate: 300 },
+);
+
+export async function getCategoryTree(): Promise<CategoryNode[]> {
+  return getCachedCategoryTree();
 }
 
 /** Flat list of top-level categories (for menus and tiles). */
