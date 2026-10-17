@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 
-import ProductRow from "@/components/home/ProductRow";
+import HomeSectionSkeleton from "@/components/home/HomeSectionSkeleton";
 import ProductDetail from "@/components/product/ProductDetail";
+import RelatedProductsSection from "@/components/product/RelatedProductsSection";
 import { effectivePrice } from "@/lib/format";
-import { getProductBySlug, getRelatedProducts } from "@/lib/queries/products";
+import { getProductBySlug } from "@/lib/queries/products";
 import { getWishlistProductIds } from "@/lib/queries/wishlist";
 import { getSession } from "@/lib/session";
 import { buildMetadata } from "@/lib/seo";
@@ -43,12 +45,10 @@ export default async function ProductPage({ params }: { params: PageParams }) {
     sessionPromise,
   ]);
   const isAuthed = Boolean(session?.user);
-  const [savedIds, related] = await Promise.all([
+  const savedIds =
     isAuthed && session?.user
-      ? getWishlistProductIds(session.user.id)
-      : Promise.resolve([]),
-    getRelatedProducts(product.id, product.categoryId, 4),
-  ]);
+      ? await getWishlistProductIds(session.user.id)
+      : [];
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -107,15 +107,13 @@ export default async function ProductPage({ params }: { params: PageParams }) {
         whatsappNumber={settings.whatsappNumber}
       />
 
-      {related.length > 0 && (
-        <div className="mt-12 border-t border-border pt-4">
-          <ProductRow
-            title="You may also like"
-            href={`/shop?category=${encodeURIComponent(product.category.slug)}`}
-            products={related}
-          />
-        </div>
-      )}
+      <Suspense fallback={<HomeSectionSkeleton kind="row" />}>
+        <RelatedProductsSection
+          productId={product.id}
+          categoryId={product.categoryId}
+          categorySlug={product.category.slug}
+        />
+      </Suspense>
 
       <script
         type="application/ld+json"

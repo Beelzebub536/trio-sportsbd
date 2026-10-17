@@ -1,5 +1,5 @@
-import ListingSkeleton from "@/components/product/ListingSkeleton";
+import ListingLoadingFallback from "@/components/product/ListingLoadingFallback";
 
 export default function Loading() {
-  return <ListingSkeleton />;
+  return <ListingLoadingFallback />;
 }

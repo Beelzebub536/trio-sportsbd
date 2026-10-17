@@ -160,7 +160,7 @@ export const seedBanners: SeedBanner[] = [
     title: "Bangladesh Cricket 24/25",
     subtitle: "Wear your colours",
     imageUrl: placeholder("Bangladesh Cricket 24/25", 1600, 600),
-    linkUrl: "/cricket-jerseys",
+    linkUrl: "/shop?category=cricket-jerseys",
     sortOrder: 2,
     isActive: true,
   },

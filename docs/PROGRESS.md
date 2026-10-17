@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 9 (all phases 1–9 implemented; runtime verification pending a filled `.env`)
-Last commit: phase 9: storefront performance pass
+Last commit: phase 9: runtime QA performance follow-up
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
@@ -45,10 +45,12 @@ Last commit: phase 9: storefront performance pass
 - Follow-up streaming fix: simplified listing skeletons to server-rendered markup without URL or client-store hooks so the fallback itself cannot wait on client navigation state. Product metadata now uses its cached product query to return hard 404s before streaming; this means a cold product query can delay that route's fallback, while a warm query is shared with page rendering.
 - QA audit fixes: added a guest wishlist route and mobile/header links; generated an app favicon; validate product and order access in metadata so missing/unauthorized resources return HTTP 404 before streaming; fixed cart item counts, overstock controls and CTA, cart/checkout pending totals, category links, same-origin auth requests with allowed local/Vercel deployment hosts, discount display rounding, shared header logo and root 404 chrome. Removed unconfigured social placeholders. Added `npm run test:links` for storefront navigation routes. Cart remains localStorage-only; no abandoned-cart records are stored server-side.
 - QA recheck fixes: moved Vercel functions to Singapore (`sin1`) to match the reported Neon region; added React request memoization around settings, category-tree and product-detail reads; cached product search results for 60 seconds; parallelized independent product-detail reads; removed store-wide/product loading boundaries that caused nested `notFound()` responses to stream as HTTP 200; added `ProductImage(productId)` and `OrderItem(orderId)` indexes to the Prisma schema. The two indexes need to be applied with the normal reviewed `npm run db:push` workflow before they affect the database. CDN HTML caching remains a follow-up because the storefront layout reads session-specific data.
+- Runtime recheck follow-ups: OpenCode verified the committed 404 and query-cache fixes in production and clean dev. Corrected the seeded cricket banner target and added a permanent legacy-path redirect so the existing banner row also works without a database write. Product details now stream the related-products row behind its own Suspense boundary after the product is validated, preserving the 404 behavior. Listing route fallbacks now show a fresh cached product preview during client navigation/back-navigation; entries expire after two minutes and stale entries are pruned. Public search responses now allow a 60-second CDN cache. `npm run test:links` also checks seeded banner paths and the cricket redirect. Anonymous HTML CDN caching remains deferred because the shared storefront shell reads session-specific content.
 
 ## PENDING (human)
 - The QA audit reports a populated Neon database and successful guest/authenticated checkout tests, and it left QA orders, a QA user, a wishlist row, and changed stock in that database. Review those records before any cleanup; no destructive DB command was run for this task.
-- Runtime HTTP retests of the new 404 and favicon behavior could not connect to a local server from this execution environment. Re-run those probes in the user's local browser/dev server; do not infer runtime status from the build alone.
+- The 10/18 runtime report confirms product/order 404s and validates a clean dev server. It also found the long-running `:3000` dev server had a stale `.next` directory after a production build; restart `npm run dev` if that server still shows missing chunk/500 errors.
+- The follow-up code changes (legacy banner redirect, deferred related row, listing-preview fallback, search response cache headers) pass typecheck/lint/build and static link validation, but still need browser runtime verification; the in-app browser could not connect to local port 3061 in this execution environment.
 - The audit did not cover admin CRUD/bulk-price flows or OAuth round-trips. Follow `docs/DEPLOY.md` §9 for those checks when convenient.
 
 ## Known issues

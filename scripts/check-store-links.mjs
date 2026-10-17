@@ -32,8 +32,17 @@ const sources = [
   "src/components/layout/SearchOverlay.tsx",
   "src/app/(store)/product/[slug]/page.tsx",
   "src/lib/nav.ts",
+  "prisma/seed-data.ts",
 ];
 const failures = [];
+const nextConfig = readFileSync(join(projectRoot, "next.config.js"), "utf8");
+if (
+  !nextConfig.includes('source: "/cricket-jerseys"') ||
+  !nextConfig.includes('destination: "/shop?category=cricket-jerseys"')
+) {
+  failures.push("next.config.js: legacy cricket jersey URL must redirect to its listing");
+}
+
 for (const sourcePath of sources) {
   const source = readFileSync(join(projectRoot, sourcePath), "utf8");
   const literalPaths = [...source.matchAll(/["'](\/[^"'`$]*)["']/g)].map(

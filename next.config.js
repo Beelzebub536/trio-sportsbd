@@ -48,6 +48,15 @@ const nextConfig = {
       },
     ];
   },
+  async redirects() {
+    return [
+      {
+        source: "/cricket-jerseys",
+        destination: "/shop?category=cricket-jerseys",
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
