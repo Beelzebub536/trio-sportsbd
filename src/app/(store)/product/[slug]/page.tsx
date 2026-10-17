@@ -32,15 +32,23 @@ export async function generateMetadata({
 
 export default async function ProductPage({ params }: { params: PageParams }) {
   const { slug } = await params;
+  const settingsPromise = getSettings();
+  const sessionPromise = getSession();
   const product = await getProductBySlug(slug);
 
   if (!product) notFound();
 
-  const [settings, session] = await Promise.all([getSettings(), getSession()]);
+  const [settings, session] = await Promise.all([
+    settingsPromise,
+    sessionPromise,
+  ]);
   const isAuthed = Boolean(session?.user);
-  const savedIds =
-    isAuthed && session?.user ? await getWishlistProductIds(session.user.id) : [];
-  const related = await getRelatedProducts(product.id, product.categoryId, 4);
+  const [savedIds, related] = await Promise.all([
+    isAuthed && session?.user
+      ? getWishlistProductIds(session.user.id)
+      : Promise.resolve([]),
+    getRelatedProducts(product.id, product.categoryId, 4),
+  ]);
 
   const jsonLd = {
     "@context": "https://schema.org",

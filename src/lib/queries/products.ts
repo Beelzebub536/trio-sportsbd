@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Prisma, type Gender } from "@prisma/client";
 import { unstable_cache } from "next/cache";
 
@@ -324,25 +325,33 @@ export async function getSaleProducts(limit = 8): Promise<ProductCardData[]> {
   return getCachedSaleProducts(limit);
 }
 
+const getCachedSearchProductCards = unstable_cache(
+  async (term: string, limit: number): Promise<ProductCardData[]> => {
+    const rows = await prisma.product.findMany({
+      where: {
+        isActive: true,
+        OR: [
+          { name: { contains: term, mode: "insensitive" } },
+          { brand: { contains: term, mode: "insensitive" } },
+          { category: { name: { contains: term, mode: "insensitive" } } },
+        ],
+      },
+      take: limit,
+      select: cardSelect,
+    });
+    return rows.map(toCard);
+  },
+  ["catalog-search-v1"],
+  { tags: [CATALOG_TAG], revalidate: 60 },
+);
+
 export async function searchProductCards(
   query: string,
   limit = 6,
 ): Promise<ProductCardData[]> {
-  const term = query.trim();
+  const term = query.trim().slice(0, 100);
   if (!term) return [];
-  const rows = await prisma.product.findMany({
-    where: {
-      isActive: true,
-      OR: [
-        { name: { contains: term, mode: "insensitive" } },
-        { brand: { contains: term, mode: "insensitive" } },
-        { category: { name: { contains: term, mode: "insensitive" } } },
-      ],
-    },
-    take: limit,
-    select: cardSelect,
-  });
-  return rows.map(toCard);
+  return getCachedSearchProductCards(term, Math.min(Math.max(limit, 1), 20));
 }
 
 const getCachedProductBySlug = unstable_cache(
@@ -360,9 +369,9 @@ const getCachedProductBySlug = unstable_cache(
   { tags: [PRODUCT_DETAIL_TAG], revalidate: 60 },
 );
 
-export async function getProductBySlug(slug: string) {
-  return getCachedProductBySlug(slug);
-}
+export const getProductBySlug = cache((slug: string) =>
+  getCachedProductBySlug(slug),
+);
 
 const getCachedRelatedProducts = unstable_cache(
   async (

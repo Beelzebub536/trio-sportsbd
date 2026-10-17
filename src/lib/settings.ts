@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 
 import prisma from "@/lib/prisma";
@@ -40,7 +41,7 @@ const asNumber = (value: unknown, fallback: number): number => {
 };
 
 /** Read all settings, merged over the defaults. Cached and tagged `SETTINGS_TAG`. */
-export const getSettings = unstable_cache(
+const getCachedSettings = unstable_cache(
   async (): Promise<StoreSettings> => {
     let rows: Array<{ key: string; value: unknown }> = [];
     try {
@@ -83,3 +84,7 @@ export const getSettings = unstable_cache(
   ["store-settings"],
   { tags: [SETTINGS_TAG], revalidate: 300 },
 );
+
+// Coalesce simultaneous reads in one React render as well as using the
+// persistent Next.js data cache to avoid duplicate cold-cache DB queries.
+export const getSettings = cache(() => getCachedSettings());

@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { unstable_cache } from "next/cache";
 
 import prisma from "@/lib/prisma";
@@ -49,9 +50,7 @@ const getCachedCategoryTree = unstable_cache(
   { tags: [CATEGORIES_TAG], revalidate: 300 },
 );
 
-export async function getCategoryTree(): Promise<CategoryNode[]> {
-  return getCachedCategoryTree();
-}
+export const getCategoryTree = cache(() => getCachedCategoryTree());
 
 /** Flat list of top-level categories (for menus and tiles). */
 export async function getTopLevelCategories(): Promise<CategoryNode[]> {
