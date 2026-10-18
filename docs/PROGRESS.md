@@ -1,7 +1,7 @@
 # Progress log (agent keeps this updated)
 
-Current phase: 9 (all phases 1–9 implemented; runtime verification pending a filled `.env`)
-Last commit: phase 5: require accounts for checkout
+Current phase: 9 (application checks pass; production deployment setup still required)
+Last commit: phase 9: production readiness verification
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
@@ -16,7 +16,7 @@ Last commit: phase 5: require accounts for checkout
 - [ ] 10 (later) SSLCommerz
 
 ## Notes / decisions
-- UI loading/contrast pass: added a shared blurred loading surface with a centered accessible spinner to route, product, home-section, wishlist, search and order-tracking states; refreshed the admin online-payment toggle with a glass-style surface and stronger contrast. `npx tsc --noEmit`, `npm run lint`, and `npm run build` pass.
+- UI loading/contrast pass: added a shared blurred loading surface with a centered accessible spinner to listing/admin/home-section, wishlist, search and order-tracking states; refreshed the admin online-payment toggle with a glass-style surface and stronger contrast. Kept root and product not-found responses non-streamed to preserve their HTTP 404 status. `npx tsc --noEmit`, `npm run lint`, and `npm run build` pass.
 - Completed 1.1 Scaffold: Next.js app with Tailwind, shadcn/ui, etc.
 - Completed 1.2 Env, utils, fonts, tokens
 - Completed 1.3 Database schema (Prisma 5.22, app models + enums, `src/lib/prisma.ts` singleton, npm scripts). `prisma validate` and `prisma generate` pass.
@@ -52,21 +52,20 @@ Last commit: phase 5: require accounts for checkout
 - Production-readiness report follow-up: rejected online claims now cancel and release reserved stock; stale COD requests expire after 24 hours; pending-phone checks run inside a serializable transaction; payment verification errors distinguish already-verified orders; balance collection is limited to delivered orders; unique-constraint errors are classified; new orders record COD vs ONLINE correctly. Added product-route loading/error boundaries and a home-page H1. COD still intentionally does not reserve stock until admin confirmation, so stock can sell out while the request is pending; the customer-facing page states that stock is not reserved and admin confirmation rechecks availability.
 - Checkout account requirement: `/checkout` redirects signed-out visitors through `/login` or `/signup` with `/checkout` as the safe return path. `placeOrder` independently rejects unauthenticated calls and saves new orders against the authenticated user's ID, so new orders appear in `/account/orders`. The cart remains browser-persisted through authentication. Existing guest orders are not attached to accounts by matching phone numbers.
 
-## PENDING (human)
-- The QA audit reports a populated Neon database and successful guest/authenticated checkout tests, and it left QA orders, a QA user, a wishlist row, and changed stock in that database. Review those records before any cleanup; no destructive DB command was run for this task.
-- The 10/18 runtime report confirms product/order 404s and validates a clean dev server. It also found the long-running `:3000` dev server had a stale `.next` directory after a production build; restart `npm run dev` if that server still shows missing chunk/500 errors.
-- The follow-up code changes (legacy banner redirect, deferred related row, listing-preview fallback, search response cache headers) pass typecheck/lint/build and static link validation, but still need browser runtime verification; the in-app browser could not connect to local port 3061 in this execution environment.
-- The audit did not cover admin CRUD/bulk-price flows or OAuth round-trips. Follow `docs/DEPLOY.md` §9 for those checks when convenient.
-- OpenCode's 10/18 production audit created QA orders and users and changed test stock; see `docs/QA-PRODUCTION-READINESS-2026-10-18.md` §8 before any cleanup. Its final listed COD test order is still PENDING. No database cleanup or `db:push` was performed by this follow-up.
-- OpenCode reported the Neon duplicate-TrxID precheck clean. Before launch, set the real WhatsApp number, configure deployment variables including `CRON_SECRET`, and apply the additive payment schema changes (TrxID unique constraint and ONLINE enum value) with `npm run db:push`. Re-run database/browser payment checks against staging after that push. The report's local test orders used temporary test payment numbers which it says were restored.
+## PENDING (human / deployment)
+- Read-only checks against the configured Neon database found zero duplicate TrxID pairs; the composite TrxID unique index, `ProductImage.productId` and `OrderItem.orderId` indexes, and `PaymentMethod.ONLINE` enum value are already present. No `db:push` is currently needed. Online payments remain disabled. The store has configured contact/payment numbers; owner must confirm they are the real accounts before publishing them.
+- Production-mode local smoke checks passed: home, shop, valid product, search, admin auth redirect, legacy cricket redirect; missing product and order returned HTTP 404. Warm local production responses were 35–75 ms for home/shop/product and 3–10 ms for cached search. `npm run test:links` passes. This does not replace checkout/admin/OAuth end-to-end tests.
+- Deployment is not linked from this checkout: no Git remote, Vercel CLI, or `.vercel/project.json` is configured. Local `.env` URLs point to localhost; `ADMIN_EMAIL` and Facebook OAuth values are placeholders. Configure production domain, secrets, OAuth and cron values in Vercel before deploying; never copy the local file wholesale.
+- Vercel Hobby is restricted to non-commercial personal use. A store taking orders/sales needs an eligible commercial hosting plan (Vercel Pro or another host) before public launch.
+- The live catalog currently has 24 active dummy products and 50 `placehold.co` images, retained at the owner's request. Replace them with authorized product images before taking real orders. Prior QA also left test users/orders/stock changes; see `docs/QA-PRODUCTION-READINESS-2026-10-18.md` §8 before any cleanup.
+- Confirm business address, shipping/returns/refund terms, the correct WhatsApp account, and the approved bKash/Nagad receiving accounts. Keep online payments off until the account and payment instructions are verified.
 
 ## Known issues
 - Build prints a benign warning: `better-auth/cookies` pulls `jose` into the Edge (middleware) bundle and jose references `CompressionStream`. `getSessionCookie` does not use it at runtime (cookie sessions, not JWT), so the build passes and middleware works. Revisit if middleware ever runs JWT-based sessions.
-- Build also warns that `BETTER_AUTH_SECRET`/`BETTER_AUTH_URL` are missing while `.env` is empty. It is non-blocking and disappears once `.env` is filled.
+- Build prints a Node module-type warning for `next.config.js`; it is non-blocking and the production build completes.
 - `ProductVariant.sku` is globally unique. The admin form auto-generates `SLUG-COLOUR-SIZE`, so collisions are unlikely, but two products cannot share a manually entered SKU.
 - Re-saving a product recreates its variants, which nulls `OrderItem.variantId` on historical orders (the order keeps its own name/size/colour/price snapshot, so nothing is lost visually).
 - `placeOrder` limits active orders to 5/hour per phone in the database and applies an additional 20/hour coarse-IP cap in process memory. The IP cap resets on redeploy and is per-instance on serverless; the phone limit persists.
-- Database-backed flows (auth, checkout, order tracking, admin actions) were exercised by OpenCode against the configured Neon database, but that audit predates the latest fixes and left test data. Re-run relevant checkout/admin checks after applying the pending schema change; do not clean up audit data without reviewing its report.
-- The checkout switch itself uses settings stored as JSON and adds no Prisma fields, but the payment-reference unique constraint in this follow-up does require `db:push`. Typecheck, standalone lint, Prisma validation and production build pass. Checkout/payment workflows still need browser/database runtime verification with the real PRA details.
-- This follow-up adds a Prisma composite unique constraint for payment method + TrxID. Unlike the settings toggle, this schema change requires `npm run db:push`; first inspect production for duplicate (method, TrxID) pairs because a unique index cannot be created while duplicates exist. Set a random 16+ character `CRON_SECRET` in Vercel before the cron endpoint can run, then redeploy. Payment expiry and duplicate protection still need runtime checkout/admin verification before accepting live payments.
-- The production-readiness report also measured a slow-DB product route and highlighted missing loading feedback. A product-specific loading skeleton and retry error boundary are now present; the 40-second simulated DB-hang case has not yet been rerun after this change. Storefront HTML remains private/no-store because the shared shell reads session-specific data; do not enable anonymous CDN caching without separating that shell.
+- The previous production QA created test orders/users and changed stock. Do not clean up those records without reviewing `docs/QA-PRODUCTION-READINESS-2026-10-18.md` §8.
+- Storefront HTML remains private/no-store because the shared shell reads session-specific content; do not enable anonymous CDN caching without separating that shell.
+- Product and order 404s must remain non-streamed. Do not add root or product `loading.tsx` boundaries until their HTTP status behavior is guarded by runtime tests; listing, admin and nested product-related fallbacks cover safe loading cases.
