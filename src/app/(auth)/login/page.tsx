@@ -25,7 +25,9 @@ export default async function LoginPage({
           Sign in
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Welcome back. Sign in to track orders and check out faster.
+          {next.startsWith("/checkout")
+            ? "Sign in to continue to checkout. Your bag will be here when you return."
+            : "Welcome back. Sign in to track your orders and continue shopping."}
         </p>
       </div>
 

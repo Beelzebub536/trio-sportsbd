@@ -24,8 +24,9 @@ export default async function SignupPage({
           Create account
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Join Trio Sports BD for faster checkout, order tracking and a
-          wishlist.
+          {next.startsWith("/checkout")
+            ? "Create an account to place and track your order. Your bag will be here when you return."
+            : "Join Trio Sports BD to place and track orders, save addresses and build a wishlist."}
         </p>
       </div>
 

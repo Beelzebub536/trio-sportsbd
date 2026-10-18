@@ -4,7 +4,7 @@ import CheckoutForm, {
   type SavedAddress,
 } from "@/components/checkout/CheckoutForm";
 import prisma from "@/lib/prisma";
-import { getSession } from "@/lib/session";
+import { requireUser } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
@@ -12,25 +12,22 @@ export const metadata: Metadata = {
 };
 
 export default async function CheckoutPage() {
-  const [settings, session] = await Promise.all([getSettings(), getSession()]);
+  const [settings, session] = await Promise.all([getSettings(), requireUser()]);
 
-  let addresses: SavedAddress[] = [];
-  if (session?.user) {
-    addresses = await prisma.address.findMany({
-      where: { userId: session.user.id },
-      orderBy: [{ isDefault: "desc" }, { id: "asc" }],
-      select: {
-        id: true,
-        fullName: true,
-        phone: true,
-        division: true,
-        district: true,
-        upazila: true,
-        line1: true,
-        isDefault: true,
-      },
-    });
-  }
+  const addresses: SavedAddress[] = await prisma.address.findMany({
+    where: { userId: session.user.id },
+    orderBy: [{ isDefault: "desc" }, { id: "asc" }],
+    select: {
+      id: true,
+      fullName: true,
+      phone: true,
+      division: true,
+      district: true,
+      upazila: true,
+      line1: true,
+      isDefault: true,
+    },
+  });
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">

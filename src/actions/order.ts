@@ -91,6 +91,14 @@ export async function placeOrder(
   }
   const values = parsed.data;
 
+  const session = await getSession();
+  if (!session?.user) {
+    return {
+      ok: false,
+      error: "Sign in or create an account before placing an order.",
+    };
+  }
+
   const requestHeaders = await headers();
   const rawIp =
     requestHeaders.get("x-real-ip") ??
@@ -104,7 +112,7 @@ export async function placeOrder(
     };
   }
 
-  const [settings, session] = await Promise.all([getSettings(), getSession()]);
+  const settings = await getSettings();
 
   if (
     (settings.onlinePaymentsEnabled && values.paymentMode === "MANUAL") ||
@@ -272,7 +280,7 @@ export async function placeOrder(
       return tx.order.create({
         data: {
           orderNumber,
-          userId: session?.user?.id ?? null,
+          userId: session.user.id,
           customerName: values.fullName,
           phone: values.phone,
           division: values.division,

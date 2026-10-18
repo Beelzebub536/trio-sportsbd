@@ -87,8 +87,8 @@ Complete the Zustand cart (persisted, add/remove/update qty, clear, hydration-sa
 Acceptance: cart survives refresh; prices shown always come from the server.
 
 ### 5.2 Checkout form and order creation
-`/checkout`: contact + address form (BD phone validation, division -> district select, upazila text), saved-address picker for logged-in users, order summary, shipping fee by region, advance box (percent from settings), bKash/Nagad choice with the store number, TrxID + sender number fields, terms checkbox. Server action `placeOrder` per the skill (transaction, stock decrement, order number, rate limit). Never trust client prices.
-Acceptance: a guest can place an order; stock decreases; an order with insufficient stock is rejected with a clear message; tampering with prices in the browser has no effect.
+`/checkout`: require account sign-in (redirect guests to sign-in/sign-up with a safe return to checkout; keep the local cart intact), contact + address form (BD phone validation, division -> district select, upazila text), saved-address picker, order summary, shipping fee by region, advance box (percent from settings), bKash/Nagad choice with the store number, TrxID + sender number fields, terms checkbox. Server action `placeOrder` must independently require an authenticated user and associate the order to that user's id. Never trust client prices.
+Acceptance: guests are redirected to sign-in/sign-up and return to checkout with their cart intact; signed-in customers can place an order; the order appears under their account; stock and price rules are checked server-side; an order with insufficient stock is rejected with a clear message; tampering with prices in the browser has no effect.
 
 ### 5.3 Order success, WhatsApp, tracking
 `/order/[orderNumber]` success page (shows only to the creator via a signed short-lived token in the URL or session; do not expose other people's orders by guessing numbers), summary, status timeline, "Confirm on WhatsApp" button with the pre-filled message. `/track` for guests (order number + phone). Clear the cart after success.
@@ -98,7 +98,7 @@ Acceptance: pre-filled WhatsApp message opens correctly with all order details; 
 ## PHASE 6 - Customer account
 
 ### 6.1 Orders and order detail
-`/account` dashboard (greeting, last order, quick links), `/account/orders` (list with status badges), `/account/orders/[id]` (items, totals, advance status, timeline, "Need help? WhatsApp us" link). Orders placed as guest with the same phone are NOT auto-attached; only orders with `userId`.
+`/account` dashboard (greeting, last order, quick links), `/account/orders` (list with status badges), `/account/orders/[id]` (items, totals, advance status, timeline, "Need help? WhatsApp us" link). New orders require an account and are linked by authenticated `userId`; do not auto-attach historical guest orders by phone alone.
 Acceptance: user sees only their own orders; another user's order id returns 404.
 
 ### 6.2 Addresses, wishlist, profile

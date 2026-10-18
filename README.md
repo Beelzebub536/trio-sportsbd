@@ -91,9 +91,9 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `/search` | keyword search |
 | `/product/[slug]` | gallery, colour/size picker, stock, related items |
 | `/cart` | cart with live prices and stock |
-| `/checkout` | address, delivery, advance payment (bKash/Nagad) |
+| `/checkout` | account-required checkout: address, delivery, payment (bKash/Nagad or COD request) |
 | `/order/[orderNumber]` | order confirmation (owner session or signed token) |
-| `/track` | guest order tracking by order number + phone |
+| `/track` | order lookup by order number + phone (including historical guest orders) |
 | `/login`, `/signup` | email + password, Google, Facebook |
 | `/account` | orders, addresses, wishlist, profile |
 | `/about`, `/contact`, `/shipping-returns`, `/privacy`, `/terms`, `/size-guide`, `/data-deletion` | static pages |
@@ -134,7 +134,9 @@ review the old → new preview, then save. Every save is a batch you can undo fr
 
 - Prices are whole taka. A sale price must be **below** the base price.
 - Effective price = sale price when set, otherwise the base price.
-- Checkout is open to guests. The server always recomputes prices, delivery and
+- Customers must sign in or create an account before checkout; orders are linked
+  to that account and appear in its order history. The cart remains in the
+  browser through the sign-in flow. The server always recomputes prices, delivery and
   stock from the database — client values are never trusted.
 - Advance payment = `ceil(total × advancePercent / 100)`, paid by bKash or Nagad
   with a TrxID that an admin verifies. The balance is collected on delivery.

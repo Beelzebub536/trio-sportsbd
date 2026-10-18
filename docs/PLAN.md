@@ -1,7 +1,7 @@
 # trio-sportsbd - master plan
 
 ## 1. Product
-Online store "trio-sportsbd": sports jerseys, trousers and accessories for Bangladesh. Adidas-style, intuitive, mobile first. English only, currency BDT (৳). Logo is a placeholder. Communication happens on WhatsApp (placeholder number), there is NO email. Guest checkout allowed. Admin settings choose between COD order requests and online payment proof; when enabled, customers may submit full payment or the configured advance, and an admin verifies it before confirmation. WhatsApp is a customer-initiated handoff, not an automatic message sender. SSLCommerz remains a later phase. Admin can change many prices in a few clicks.
+Online store "trio-sportsbd": sports jerseys, trousers and accessories for Bangladesh. Adidas-style, intuitive, mobile first. English only, currency BDT (৳). Logo is a placeholder. Communication happens on WhatsApp (placeholder number), there is NO email. Customers must create an account or sign in before checkout so their orders appear in their account history. Admin settings choose between COD order requests and online payment proof; when enabled, customers may submit full payment or the configured advance, and an admin verifies it before confirmation. WhatsApp is a customer-initiated handoff, not an automatic message sender. SSLCommerz remains a later phase. Admin can change many prices in a few clicks.
 
 Roles: `customer` (default), `admin` (seeded only). Customers: browse, wishlist, cart, checkout, own orders, addresses, profile. Admin: everything in /admin.
 

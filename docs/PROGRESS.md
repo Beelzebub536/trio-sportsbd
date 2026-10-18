@@ -1,14 +1,14 @@
 # Progress log (agent keeps this updated)
 
 Current phase: 9 (all phases 1–9 implemented; runtime verification pending a filled `.env`)
-Last commit: phase 9: runtime QA performance follow-up
+Last commit: phase 5: require accounts for checkout
 
 ## Phases
 - [x] 1 Foundation (scaffold, schema, seed)
 - [x] 2 Auth (Better Auth, roles, guards)
 - [x] 3 Layout + Home
 - [x] 4 Shop + Product page
-- [x] 5 Cart + Checkout + Orders (guest, 10% advance, WhatsApp)
+- [x] 5 Cart + Checkout + Orders (account-required checkout, 10% advance, WhatsApp)
 - [x] 6 Customer account
 - [x] 7 Admin panel (products, categories, orders, customers, settings)
 - [x] 8 Bulk price manager
@@ -49,6 +49,7 @@ Last commit: phase 9: runtime QA performance follow-up
 - Checkout update: admin settings now control whether checkout requests manual COD confirmation or online payment proof. When enabled, buyers choose the configured advance or full amount; online orders remain unconfirmed until an admin verifies payment, which confirms the order. When disabled, checkout creates a COD order request and the customer can open a prefilled WhatsApp draft with its order number. COD requests do not reserve stock until an admin confirms them; stock is rechecked and reserved atomically on approval. The default is off until the store has an approved business payment account. WhatsApp requires the customer to press Send; this app does not automatically send messages.
 - Payment-research safeguards: checkout normalizes TrxIDs and rejects duplicates, permits only one pending order per phone, explains that bKash must be paid using Payment/QR (not Send Money to a personal account), and checks that an actual receiving number is configured. Unverified online orders are cancelled after 24 hours and reserved stock is returned transactionally; cleanup runs on checkout, order/admin views and the authenticated Vercel cron. Cron schedule is daily and approximate on Vercel Hobby, so the lazy cleanup is also required. Verified payments cannot be applied to cancelled/closed orders. Placeholder payment numbers were removed from defaults/seed data and online payments cannot be enabled without a real receiving account. Prisma now has a composite unique constraint on payment method + TrxID; review existing duplicate references before `npm run db:push`.
 - Production-readiness report follow-up: rejected online claims now cancel and release reserved stock; stale COD requests expire after 24 hours; pending-phone checks run inside a serializable transaction; payment verification errors distinguish already-verified orders; balance collection is limited to delivered orders; unique-constraint errors are classified; new orders record COD vs ONLINE correctly. Added product-route loading/error boundaries and a home-page H1. COD still intentionally does not reserve stock until admin confirmation, so stock can sell out while the request is pending; the customer-facing page states that stock is not reserved and admin confirmation rechecks availability.
+- Checkout account requirement: `/checkout` redirects signed-out visitors through `/login` or `/signup` with `/checkout` as the safe return path. `placeOrder` independently rejects unauthenticated calls and saves new orders against the authenticated user's ID, so new orders appear in `/account/orders`. The cart remains browser-persisted through authentication. Existing guest orders are not attached to accounts by matching phone numbers.
 
 ## PENDING (human)
 - The QA audit reports a populated Neon database and successful guest/authenticated checkout tests, and it left QA orders, a QA user, a wishlist row, and changed stock in that database. Review those records before any cleanup; no destructive DB command was run for this task.
