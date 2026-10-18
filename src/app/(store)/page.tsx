@@ -11,6 +11,7 @@ import SaleStrip from "@/components/home/SaleStrip";
 export default function HomePage() {
   return (
     <>
+      <h1 className="sr-only">Sports jerseys, trousers and accessories</h1>
       <Suspense fallback={<HomeSectionSkeleton kind="hero" />}>
         <HomeHero />
       </Suspense>

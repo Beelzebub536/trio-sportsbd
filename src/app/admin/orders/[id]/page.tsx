@@ -6,7 +6,7 @@ import OrderStatusControls from "@/components/admin/OrderStatusControls";
 import OrderStatusBadge from "@/components/order/OrderStatusBadge";
 import OrderTimeline from "@/components/order/OrderTimeline";
 import { formatBDT } from "@/lib/format";
-import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
+import { expireStalePendingOrders } from "@/lib/order-expiry";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 
@@ -16,7 +16,7 @@ export default async function AdminOrderDetailPage({
   params: { id: string };
 }) {
   await requireAdmin();
-  await expireUnverifiedOnlineOrders();
+  await expireStalePendingOrders();
 
   const id = Number((await params).id);
   if (!Number.isInteger(id)) notFound();

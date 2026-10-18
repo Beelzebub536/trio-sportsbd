@@ -436,6 +436,7 @@ export default function CheckoutForm({
                 We’ll review your request and contact you on WhatsApp to confirm
                 availability and delivery. No online payment is requested here.
                 This is a request only; stock is not reserved until we confirm it.
+                Pending requests expire after 24 hours if we cannot confirm them.
                 After placing the request, use the WhatsApp button and press Send
                 in WhatsApp; browsers cannot send that message automatically.
               </p>

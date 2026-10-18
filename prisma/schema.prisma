@@ -161,6 +161,7 @@ enum AdvanceMethod {
 
 enum PaymentMethod {
   COD
+  ONLINE
 }
 
 model OrderItem {

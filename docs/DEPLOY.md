@@ -100,9 +100,11 @@ resets an existing password.
 Before applying schema changes, inspect existing orders for duplicate payment
 references (same payment method and TrxID). This release adds a unique constraint
 for those pairs, so `npm run db:push` will fail if duplicate claims already exist.
-The Vercel cron expires unverified online orders daily; on Hobby, the scheduled
-time is approximate. Checkout and order/admin pages also clean up overdue orders
-when used, so stock release does not depend only on the cron.
+The Vercel cron expires stale pending requests daily; this includes unverified
+online orders (and releases their stock) and unconfirmed COD requests. Rejected
+online claims are cancelled and their stock is released immediately. On Hobby,
+the scheduled time is approximate. Checkout and order/admin pages also clean up
+overdue requests when used, so stock release does not depend only on the cron.
 
 ## 6. Google OAuth
 

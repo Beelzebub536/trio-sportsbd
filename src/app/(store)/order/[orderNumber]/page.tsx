@@ -12,7 +12,7 @@ import { verifyOrderToken } from "@/lib/order-token";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
-import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
+import { expireStalePendingOrders } from "@/lib/order-expiry";
 import { buildWhatsAppLink, orderStatusMessage } from "@/lib/whatsapp";
 
 export async function generateMetadata({
@@ -58,7 +58,7 @@ export default async function OrderPage({
   const { orderNumber } = await params;
   const { token } = await searchParams;
 
-  await expireUnverifiedOnlineOrders();
+  await expireStalePendingOrders();
 
   const order = await prisma.order.findUnique({
     where: { orderNumber },
@@ -120,9 +120,13 @@ export default async function OrderPage({
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <OrderStatusBadge status={order.status} />
         <span className="text-sm text-muted-foreground">
-          {order.advanceAmount === 0
-            ? "Your request is waiting for the store to review and confirm it."
-            : ADVANCE_NOTES[order.advanceStatus] ?? ""}
+          {order.status === "CANCELLED"
+            ? order.advanceAmount === 0
+              ? "This unconfirmed order request expired or was cancelled. Contact the store if you still need help."
+              : ADVANCE_NOTES[order.advanceStatus] ?? "This order was cancelled."
+            : order.advanceAmount === 0
+              ? "Your request is waiting for the store to review and confirm it. It expires after 24 hours."
+              : ADVANCE_NOTES[order.advanceStatus] ?? ""}
         </span>
       </div>
 

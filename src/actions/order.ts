@@ -9,7 +9,7 @@ import { signOrderToken } from "@/lib/order-token";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
-import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
+import { expireStalePendingOrders } from "@/lib/order-expiry";
 import { checkoutSchema, type CheckoutValues } from "@/lib/validators/order";
 
 export type PlaceOrderResult =
@@ -29,6 +29,16 @@ const makeOrderNumber = (): string => {
 const RATE_LIMIT_PER_HOUR = 5;
 const RATE_LIMIT_PER_IP_PER_HOUR = 20;
 const ipOrderAttempts = new Map<string, number[]>();
+
+function isDuplicatePaymentReference(error: unknown): boolean {
+  if (typeof error !== "object" || error === null || !("code" in error)) {
+    return false;
+  }
+  if (error.code !== "P2002" || !("meta" in error)) return false;
+  const target = (error.meta as { target?: unknown } | undefined)?.target;
+  const fields = Array.isArray(target) ? target.join(" ") : String(target ?? "");
+  return fields.includes("advanceMethod") && fields.includes("advanceTrxId");
+}
 
 function coarseClientIp(value: string): string | null {
   const ip = value.trim().toLowerCase().replace(/^\[|\]$/g, "");
@@ -120,18 +130,7 @@ export async function placeOrder(
   }
 
   // Cron runs once daily on the free deployment tier, so clean up lazily too.
-  await expireUnverifiedOnlineOrders();
-
-  const openOrder = await prisma.order.findFirst({
-    where: { phone: values.phone, status: "PENDING" },
-    select: { orderNumber: true },
-  });
-  if (openOrder) {
-    return {
-      ok: false,
-      error: `You already have an order awaiting confirmation (${openOrder.orderNumber}). Please contact us if you need help.`,
-    };
-  }
+  await expireStalePendingOrders();
 
   if (values.paymentMode !== "MANUAL") {
     const duplicateTrx = await prisma.order.findFirst({
@@ -240,6 +239,12 @@ export async function placeOrder(
 
   try {
     const created = await prisma.$transaction(async (tx) => {
+      const openOrder = await tx.order.findFirst({
+        where: { phone: values.phone, status: "PENDING" },
+        select: { orderNumber: true },
+      });
+      if (openOrder) throw new Error(`PHONE_PENDING:${openOrder.orderNumber}`);
+
       if (values.paymentMode !== "MANUAL") {
         for (const line of lines) {
           const result = await tx.productVariant.updateMany({
@@ -279,6 +284,7 @@ export async function placeOrder(
           shippingFee,
           total,
           advanceAmount,
+          paymentMethod: values.paymentMode === "MANUAL" ? "COD" : "ONLINE",
           advanceMethod:
             values.paymentMode === "MANUAL" ? null : values.advanceMethod,
           advanceTrxId:
@@ -302,7 +308,7 @@ export async function placeOrder(
         },
         select: { orderNumber: true },
       });
-    });
+    }, { isolationLevel: "Serializable" });
 
     revalidatePath("/admin");
     revalidatePath("/admin/orders");
@@ -314,12 +320,19 @@ export async function placeOrder(
       token: signOrderToken(created.orderNumber),
     };
   } catch (error) {
+    if (error instanceof Error && error.message.startsWith("PHONE_PENDING:")) {
+      return {
+        ok: false,
+        error: `You already have an order awaiting confirmation (${error.message.slice("PHONE_PENDING:".length)}). Please contact us if you need help.`,
+      };
+    }
     if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "P2002"
+      typeof error === "object" && error !== null && "code" in error &&
+      (error.code === "P2034" || error.code === "40001")
     ) {
+      return { ok: false, error: "Checkout changed while this order was being placed. Please refresh and try again." };
+    }
+    if (isDuplicatePaymentReference(error)) {
       return {
         ok: false,
         error: "This transaction ID has already been submitted. Check it and contact us if you believe this is an error.",

@@ -3,7 +3,7 @@
 import { revalidatePath, revalidateTag } from "next/cache";
 
 import prisma from "@/lib/prisma";
-import { PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
+import { CATALOG_TAG, PRODUCT_DETAIL_TAG } from "@/lib/cache-tags";
 import { requireAdminUser } from "@/lib/session";
 
 export type AdminActionResult = { ok: boolean; error?: string };
@@ -146,14 +146,14 @@ export async function updateAdvanceStatus(
     await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id },
-        select: { status: true, advanceAmount: true, advanceStatus: true },
+        include: { orderItems: { select: { variantId: true, qty: true } } },
       });
       if (!order) throw new Error("ORDER_NOT_FOUND");
       if (order.advanceAmount === 0) throw new Error("NO_ONLINE_PAYMENT");
-      if (order.status !== "PENDING") throw new Error("ORDER_NOT_PENDING");
-      if (order.advanceStatus === "VERIFIED" && advanceStatus !== "VERIFIED") {
+      if (order.advanceStatus === "VERIFIED") {
         throw new Error("PAYMENT_ALREADY_VERIFIED");
       }
+      if (order.status !== "PENDING") throw new Error("ORDER_NOT_PENDING");
       const updated = await tx.order.updateMany({
         where: {
           id,
@@ -162,12 +162,22 @@ export async function updateAdvanceStatus(
         },
         data: {
           advanceStatus,
+          ...(advanceStatus === "REJECTED" ? { status: "CANCELLED" as const } : {}),
           ...(advanceStatus === "VERIFIED" && order.status === "PENDING"
             ? { status: "CONFIRMED" as const }
             : {}),
         },
       });
       if (updated.count !== 1) throw new Error("ORDER_CHANGED");
+      if (advanceStatus === "REJECTED") {
+        for (const item of order.orderItems) {
+          if (item.variantId == null) continue;
+          await tx.productVariant.updateMany({
+            where: { id: item.variantId },
+            data: { stock: { increment: item.qty } },
+          });
+        }
+      }
     });
   } catch (error) {
     if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
@@ -190,6 +200,8 @@ export async function updateAdvanceStatus(
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/account/orders");
+  if (advanceStatus === "REJECTED") revalidateTag(CATALOG_TAG);
+  if (advanceStatus === "REJECTED") revalidateTag(PRODUCT_DETAIL_TAG);
   return { ok: true };
 }
 
@@ -198,7 +210,16 @@ export async function setBalanceCollected(
   value: boolean,
 ): Promise<AdminActionResult> {
   await requireAdminUser();
-  await prisma.order.update({ where: { id }, data: { balanceCollected: value } });
+  if (!Number.isInteger(id) || id <= 0 || typeof value !== "boolean") {
+    return { ok: false, error: "Invalid balance update." };
+  }
+  const result = await prisma.order.updateMany({
+    where: { id, status: "DELIVERED" },
+    data: { balanceCollected: value },
+  });
+  if (result.count !== 1) {
+    return { ok: false, error: "Balance can only be updated after delivery." };
+  }
   revalidatePath(`/admin/orders/${id}`);
   return { ok: true };
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { env } from "@/lib/env";
-import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
+import { expireStalePendingOrders } from "@/lib/order-expiry";
 
 export const dynamic = "force-dynamic";
 
@@ -13,6 +13,6 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
   }
 
-  const result = await expireUnverifiedOnlineOrders();
+  const result = await expireStalePendingOrders();
   return NextResponse.json(result);
 }
