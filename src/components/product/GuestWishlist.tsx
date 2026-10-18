@@ -5,6 +5,8 @@ import Link from "next/link";
 
 import { getGuestWishlistProductsAction } from "@/actions/wishlist";
 import CachedListingPreview from "@/components/product/CachedListingPreview";
+import LoadingSurface from "@/components/ui/LoadingSurface";
+import { Skeleton } from "@/components/ui/skeleton";
 import { useHydrated } from "@/lib/hooks";
 import type { ProductCardData } from "@/lib/queries/products";
 import { useWishlistStore } from "@/stores/wishlist";
@@ -51,7 +53,13 @@ export default function GuestWishlist() {
         Wishlist
       </h1>
       {loading ? (
-        <p className="mt-6 text-sm text-muted-foreground">Loading saved items…</p>
+        <LoadingSurface className="mt-6 min-h-[50vh]" label="Loading saved items">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {Array.from({ length: 4 }).map((_, index) => (
+              <Skeleton key={index} className="aspect-[4/5]" />
+            ))}
+          </div>
+        </LoadingSurface>
       ) : loadError ? (
         <p className="mt-6 border border-destructive p-5 text-sm text-destructive" role="alert">
           We could not load saved items. Refresh this page to try again.

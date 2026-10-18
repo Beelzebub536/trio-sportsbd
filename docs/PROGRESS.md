@@ -16,6 +16,7 @@ Last commit: phase 5: require accounts for checkout
 - [ ] 10 (later) SSLCommerz
 
 ## Notes / decisions
+- UI loading/contrast pass: added a shared blurred loading surface with a centered accessible spinner to route, product, home-section, wishlist, search and order-tracking states; refreshed the admin online-payment toggle with a glass-style surface and stronger contrast. `npx tsc --noEmit`, `npm run lint`, and `npm run build` pass.
 - Completed 1.1 Scaffold: Next.js app with Tailwind, shadcn/ui, etc.
 - Completed 1.2 Env, utils, fonts, tokens
 - Completed 1.3 Database schema (Prisma 5.22, app models + enums, `src/lib/prisma.ts` singleton, npm scripts). `prisma validate` and `prisma generate` pass.

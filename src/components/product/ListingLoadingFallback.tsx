@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 import CachedListingPreview from "@/components/product/CachedListingPreview";
 import ListingSkeleton from "@/components/product/ListingSkeleton";
+import LoadingSurface from "@/components/ui/LoadingSurface";
 import {
   LISTING_CACHE_TTL_MS,
   makeListingCacheKey,
@@ -33,8 +34,10 @@ export default function ListingLoadingFallback() {
   if (!preview || preview.cacheKey !== cacheKey) return <ListingSkeleton />;
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
-      <CachedListingPreview products={preview.products} />
-    </div>
+    <LoadingSurface className="min-h-[70vh]" label="Updating products">
+      <div className="mx-auto max-w-7xl px-4 py-8">
+        <CachedListingPreview products={preview.products} />
+      </div>
+    </LoadingSurface>
   );
 }

@@ -9,6 +9,7 @@ import OrderTimeline from "@/components/order/OrderTimeline";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import LoadingSurface from "@/components/ui/LoadingSurface";
 import { formatBDT } from "@/lib/format";
 
 export default function TrackForm() {
@@ -37,6 +38,7 @@ export default function TrackForm() {
 
   return (
     <div className="space-y-8">
+      <LoadingSurface className="min-h-48 max-w-xl" label="Looking up order" active={loading}>
       <form onSubmit={handleSubmit} className="grid max-w-xl gap-4 sm:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="orderNumber">Order number</Label>
@@ -62,6 +64,7 @@ export default function TrackForm() {
           </Button>
         </div>
       </form>
+      </LoadingSurface>
 
       {searched && !result && (
         <p className="bg-secondary px-4 py-3 text-sm">

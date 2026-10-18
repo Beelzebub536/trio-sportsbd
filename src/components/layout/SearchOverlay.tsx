@@ -8,6 +8,7 @@ import { Search } from "lucide-react";
 
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import LoadingSurface from "@/components/ui/LoadingSurface";
 import { formatBDT } from "@/lib/format";
 import { useDebouncedValue } from "@/lib/hooks";
 
@@ -96,7 +97,9 @@ export default function SearchOverlay({
 
         <div className="max-h-[60vh] overflow-y-auto">
           {loading && (
-            <p className="px-4 py-6 text-sm text-muted-foreground">Searching…</p>
+            <LoadingSurface className="min-h-32" label="Searching products">
+              <div className="h-32 bg-gradient-to-br from-white to-slate-100" />
+            </LoadingSurface>
           )}
 
           {!loading && query.trim() && items.length === 0 && (

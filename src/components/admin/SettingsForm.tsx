@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
+import LoadingSurface from "@/components/ui/LoadingSurface";
 import type { StoreSettings } from "@/lib/settings";
 
 const TEXT_FIELDS: Array<{
@@ -88,6 +89,7 @@ export default function SettingsForm({
   };
 
   return (
+    <LoadingSurface className="min-h-[55vh]" label="Saving settings" active={busy}>
     <form onSubmit={submit} className="space-y-6" noValidate>
       <section className="grid gap-4 border border-border p-4 sm:grid-cols-2">
         <h2 className="text-sm font-bold uppercase tracking-widest sm:col-span-2">
@@ -108,20 +110,25 @@ export default function SettingsForm({
         ))}
       </section>
 
-      <section className="space-y-3 border border-border p-4">
+      <section className="space-y-4 border border-slate-200 bg-gradient-to-br from-white via-white to-slate-50 p-5 shadow-[0_8px_30px_rgba(15,23,42,0.07)] ring-1 ring-black/[0.025]">
         <h2 className="text-sm font-bold uppercase tracking-widest">
           Checkout payment
         </h2>
-        <label className="flex items-center gap-3 text-sm">
+        <label className="flex cursor-pointer items-center justify-between gap-4 border border-slate-200 bg-white/90 p-4 shadow-sm backdrop-blur-md">
+          <span className="text-sm font-semibold text-slate-900">Accept online payments</span>
           <Switch
+            id="online-payments-enabled"
+            aria-label="Accept online payments"
             checked={form.onlinePaymentsEnabled === "true"}
             onCheckedChange={(enabled) =>
               set("onlinePaymentsEnabled", String(enabled))
             }
           />
-          Accept online payments
+          <span className={form.onlinePaymentsEnabled === "true" ? "shrink-0 bg-emerald-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-800" : "shrink-0 bg-slate-100 px-2.5 py-1 text-[10px] font-bold uppercase tracking-widest text-slate-700"}>
+            {form.onlinePaymentsEnabled === "true" ? "Enabled" : "Disabled"}
+          </span>
         </label>
-        <p className="text-xs text-muted-foreground">
+        <p className="max-w-3xl text-sm leading-relaxed text-slate-700">
           When off, customers submit an order request and confirm it with you on
           WhatsApp. When on, they can choose a full payment or the configured
           advance and submit transaction details for manual verification. Enable
@@ -155,5 +162,6 @@ export default function SettingsForm({
         {busy ? "Saving…" : "Save settings"}
       </Button>
     </form>
+    </LoadingSurface>
   );
 }
