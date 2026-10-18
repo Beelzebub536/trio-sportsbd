@@ -43,11 +43,35 @@ export async function updateOrderStatus(
         throw new Error("CANCELLED_ORDER");
       }
       if (
+        order.advanceAmount === 0 &&
+        order.status === "PENDING" &&
+        status !== "CONFIRMED" &&
+        status !== "CANCELLED" &&
+        status !== "PENDING"
+      ) {
+        throw new Error("COD_NOT_CONFIRMED");
+      }
+      if (
         order.advanceAmount > 0 &&
         order.advanceStatus !== "VERIFIED" &&
         ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"].includes(status)
       ) {
         throw new Error("ADVANCE_NOT_VERIFIED");
+      }
+
+      if (
+        order.advanceAmount === 0 &&
+        order.status === "PENDING" &&
+        status === "CONFIRMED"
+      ) {
+        for (const item of order.orderItems) {
+          if (item.variantId == null) continue;
+          const reserved = await tx.productVariant.updateMany({
+            where: { id: item.variantId, stock: { gte: item.qty } },
+            data: { stock: { decrement: item.qty } },
+          });
+          if (reserved.count !== 1) throw new Error("COD_STOCK_UNAVAILABLE");
+        }
       }
 
       const updated = await tx.order.updateMany({
@@ -56,7 +80,13 @@ export async function updateOrderStatus(
       });
       if (updated.count !== 1) throw new Error("ORDER_CHANGED");
 
-      if (status === "CANCELLED" && order.status !== "CANCELLED") {
+      const manualRequestWithoutReservation =
+        order.advanceAmount === 0 && order.status === "PENDING";
+      if (
+        status === "CANCELLED" &&
+        order.status !== "CANCELLED" &&
+        !manualRequestWithoutReservation
+      ) {
         for (const item of order.orderItems) {
           if (item.variantId == null) continue;
           await tx.productVariant.updateMany({
@@ -77,6 +107,18 @@ export async function updateOrderStatus(
       return {
         ok: false,
         error: "Verify the online payment before confirming this order.",
+      };
+    }
+    if (error instanceof Error && error.message === "COD_NOT_CONFIRMED") {
+      return {
+        ok: false,
+        error: "Confirm this COD request and check stock before moving it forward.",
+      };
+    }
+    if (error instanceof Error && error.message === "COD_STOCK_UNAVAILABLE") {
+      return {
+        ok: false,
+        error: "There is not enough stock to confirm this COD request.",
       };
     }
     if (error instanceof Error && error.message === "ORDER_CHANGED") {

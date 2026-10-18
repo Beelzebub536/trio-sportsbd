@@ -196,13 +196,15 @@ export async function placeOrder(
 
   try {
     const created = await prisma.$transaction(async (tx) => {
-      for (const line of lines) {
-        const result = await tx.productVariant.updateMany({
-          where: { id: line.variantId, stock: { gte: line.qty } },
-          data: { stock: { decrement: line.qty } },
-        });
-        if (result.count === 0) {
-          throw new Error(`STOCK:${line.name}`);
+      if (values.paymentMode !== "MANUAL") {
+        for (const line of lines) {
+          const result = await tx.productVariant.updateMany({
+            where: { id: line.variantId, stock: { gte: line.qty } },
+            data: { stock: { decrement: line.qty } },
+          });
+          if (result.count === 0) {
+            throw new Error(`STOCK:${line.name}`);
+          }
         }
       }
 
