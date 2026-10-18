@@ -34,7 +34,7 @@ export default function AuthLayout({
             </h2>
             <p className="mt-5 max-w-sm text-white/70">
               Jerseys, trousers and accessories for athletes across Bangladesh.
-              Cash on delivery with a 10% advance.
+              Flexible checkout with order confirmation on WhatsApp.
             </p>
           </div>
         </div>

@@ -8,6 +8,7 @@ export default function StoreChromeFallback() {
       <AnnouncementBar
         freeShippingThreshold={defaultSettings.freeShippingThreshold}
         whatsappNumber={defaultSettings.whatsappNumber}
+        onlinePaymentsEnabled={defaultSettings.onlinePaymentsEnabled}
       />
       <SiteHeader
         categories={[]}

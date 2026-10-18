@@ -105,7 +105,9 @@ export default async function AdminOrderDetailPage({
             </div>
             <div className="flex justify-between">
               <dt>
-                Advance ({order.advanceMethod ?? "—"}) — {order.advanceStatus}
+                {order.advanceAmount === 0
+                  ? "COD order request — no advance"
+                  : `Online payment (${order.advanceMethod ?? "—"}) — ${order.advanceStatus}`}
               </dt>
               <dd>{formatBDT(order.advanceAmount)}</dd>
             </div>
@@ -155,6 +157,7 @@ export default async function AdminOrderDetailPage({
         id={order.id}
         status={order.status}
         advanceStatus={order.advanceStatus}
+        hasOnlinePayment={order.advanceAmount > 0}
         balanceCollected={order.balanceCollected}
         adminNote={order.adminNote}
       />

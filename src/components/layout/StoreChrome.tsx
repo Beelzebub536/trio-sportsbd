@@ -21,6 +21,7 @@ export default async function StoreChrome() {
       <AnnouncementBar
         freeShippingThreshold={settings.freeShippingThreshold}
         whatsappNumber={settings.whatsappNumber}
+        onlinePaymentsEnabled={settings.onlinePaymentsEnabled}
       />
       <SiteHeader
         categories={categories}

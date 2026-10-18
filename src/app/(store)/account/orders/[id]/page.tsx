@@ -103,10 +103,15 @@ export default async function AccountOrderDetailPage({
             </div>
             <div className="flex justify-between">
               <dt>
-                Advance{order.advanceMethod ? ` (${order.advanceMethod})` : ""}{" "}
-                · {order.advanceStatus.toLowerCase()}
+                {order.advanceAmount === 0
+                  ? "Payment method"
+                  : `Online payment (${order.advanceMethod ?? "—"}) · ${order.advanceStatus.toLowerCase()}`}
               </dt>
-              <dd>{formatBDT(order.advanceAmount)}</dd>
+              <dd>
+                {order.advanceAmount === 0
+                  ? "Cash on delivery"
+                  : formatBDT(order.advanceAmount)}
+              </dd>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <dt>Balance on delivery</dt>

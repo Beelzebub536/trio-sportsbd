@@ -42,6 +42,13 @@ export async function updateOrderStatus(
       if (order.status === "CANCELLED" && status !== "CANCELLED") {
         throw new Error("CANCELLED_ORDER");
       }
+      if (
+        order.advanceAmount > 0 &&
+        order.advanceStatus !== "VERIFIED" &&
+        ["CONFIRMED", "PROCESSING", "SHIPPED", "DELIVERED"].includes(status)
+      ) {
+        throw new Error("ADVANCE_NOT_VERIFIED");
+      }
 
       const updated = await tx.order.updateMany({
         where: { id, status: order.status },
@@ -66,6 +73,12 @@ export async function updateOrderStatus(
     if (error instanceof Error && error.message === "CANCELLED_ORDER") {
       return { ok: false, error: "A cancelled order cannot be reopened." };
     }
+    if (error instanceof Error && error.message === "ADVANCE_NOT_VERIFIED") {
+      return {
+        ok: false,
+        error: "Verify the online payment before confirming this order.",
+      };
+    }
     if (error instanceof Error && error.message === "ORDER_CHANGED") {
       return { ok: false, error: "This order changed. Refresh and try again." };
     }
@@ -87,9 +100,36 @@ export async function updateAdvanceStatus(
     return { ok: false, error: "Unknown advance status." };
   }
 
-  await prisma.order.update({ where: { id }, data: { advanceStatus } });
+  try {
+    await prisma.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id },
+        select: { status: true, advanceAmount: true },
+      });
+      if (!order) throw new Error("ORDER_NOT_FOUND");
+      if (order.advanceAmount === 0) throw new Error("NO_ONLINE_PAYMENT");
+      await tx.order.update({
+        where: { id },
+        data: {
+          advanceStatus,
+          ...(advanceStatus === "VERIFIED" && order.status === "PENDING"
+            ? { status: "CONFIRMED" as const }
+            : {}),
+        },
+      });
+    });
+  } catch (error) {
+    if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
+      return { ok: false, error: "Order not found." };
+    }
+    if (error instanceof Error && error.message === "NO_ONLINE_PAYMENT") {
+      return { ok: false, error: "This COD order has no online payment to verify." };
+    }
+    return { ok: false, error: "Could not update the payment status." };
+  }
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
+  revalidatePath("/account/orders");
   return { ok: true };
 }
 

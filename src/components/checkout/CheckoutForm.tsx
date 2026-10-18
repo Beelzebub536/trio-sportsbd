@@ -81,6 +81,7 @@ export default function CheckoutForm({
       upazila: "",
       address: "",
       note: "",
+      paymentMode: settings.onlinePaymentsEnabled ? "ADVANCE" : "MANUAL",
       advanceMethod: "BKASH",
       advanceTrxId: "",
       advanceSenderNumber: "",
@@ -89,6 +90,7 @@ export default function CheckoutForm({
   });
 
   const division = watch("division");
+  const paymentMode = watch("paymentMode");
   const advanceMethod = watch("advanceMethod");
 
   useEffect(() => {
@@ -142,8 +144,13 @@ export default function CheckoutForm({
     }
   }
   const total = cartPending || shippingFee == null ? null : subtotal + shippingFee;
-  const advanceAmount =
-    total == null ? null : Math.ceil((total * settings.advancePercent) / 100);
+  const advanceAmount = total == null
+    ? null
+    : paymentMode === "FULL"
+      ? total
+      : paymentMode === "ADVANCE"
+        ? Math.ceil((total * settings.advancePercent) / 100)
+        : 0;
 
   const applySavedAddress = (address: SavedAddress) => {
     setValue("fullName", address.fullName);
@@ -176,7 +183,11 @@ export default function CheckoutForm({
     }
 
     clear();
-    toast.success("Order placed — please confirm it on WhatsApp.");
+    toast.success(
+      settings.onlinePaymentsEnabled
+        ? "Order placed — we’ll verify your payment details."
+        : "Order request placed — please send it to us on WhatsApp.",
+    );
     router.push(
       `/order/${result.orderNumber}?token=${encodeURIComponent(result.token)}`,
     );
@@ -342,51 +353,84 @@ export default function CheckoutForm({
 
         <section className="space-y-4">
           <h2 className="text-sm font-bold uppercase tracking-widest">
-            Advance payment ({settings.advancePercent}%)
+            Payment
           </h2>
-          <p className="text-sm text-muted-foreground">
-            Send <strong className="text-foreground">{advanceAmount == null ? "—" : formatBDT(advanceAmount)}</strong>{" "}
-            to our {advanceMethod === "NAGAD" ? "Nagad" : "bKash"} number{" "}
-            <strong className="text-foreground">{storeNumber}</strong> (Send
-            Money), then enter the transaction details below.
-          </p>
-
-          <Controller
-            control={control}
-            name="advanceMethod"
-            render={({ field }) => (
-              <RadioGroup
-                value={field.value}
-                onValueChange={field.onChange}
-                className="grid grid-cols-2 gap-3"
-              >
-                <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
-                  <RadioGroupItem value="BKASH" /> bKash
-                </Label>
-                <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
-                  <RadioGroupItem value="NAGAD" /> Nagad
-                </Label>
-              </RadioGroup>
-            )}
-          />
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="advanceTrxId">Transaction ID (TrxID)</Label>
-              <Input id="advanceTrxId" {...register("advanceTrxId")} />
-              <FieldError message={errors.advanceTrxId?.message} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="advanceSenderNumber">Sender number</Label>
-              <Input
-                id="advanceSenderNumber"
-                inputMode="tel"
-                placeholder="01XXXXXXXXX"
-                {...register("advanceSenderNumber")}
+          {settings.onlinePaymentsEnabled ? (
+            <>
+              <Controller
+                control={control}
+                name="paymentMode"
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="grid gap-3 sm:grid-cols-2"
+                  >
+                    <Label className="flex cursor-pointer items-start gap-2 border border-border p-3">
+                      <RadioGroupItem value="ADVANCE" />
+                      <span>Pay {settings.advancePercent}% now, rest on delivery</span>
+                    </Label>
+                    <Label className="flex cursor-pointer items-start gap-2 border border-border p-3">
+                      <RadioGroupItem value="FULL" />
+                      <span>Pay the full amount now</span>
+                    </Label>
+                  </RadioGroup>
+                )}
               />
-              <FieldError message={errors.advanceSenderNumber?.message} />
+              <p className="text-sm text-muted-foreground">
+                Send <strong className="text-foreground">{advanceAmount == null ? "—" : formatBDT(advanceAmount)}</strong>{" "}
+                to our {advanceMethod === "NAGAD" ? "Nagad" : "bKash"} account{" "}
+                <strong className="text-foreground">{storeNumber}</strong>, then
+                submit the transaction details. We verify payment before confirming
+                your order.
+              </p>
+              <Controller
+                control={control}
+                name="advanceMethod"
+                render={({ field }) => (
+                  <RadioGroup
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    className="grid grid-cols-2 gap-3"
+                  >
+                    <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
+                      <RadioGroupItem value="BKASH" /> bKash
+                    </Label>
+                    <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
+                      <RadioGroupItem value="NAGAD" /> Nagad
+                    </Label>
+                  </RadioGroup>
+                )}
+              />
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="advanceTrxId">Transaction ID (TrxID)</Label>
+                  <Input id="advanceTrxId" {...register("advanceTrxId")} />
+                  <FieldError message={errors.advanceTrxId?.message} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="advanceSenderNumber">Sender number</Label>
+                  <Input
+                    id="advanceSenderNumber"
+                    inputMode="tel"
+                    placeholder="01XXXXXXXXX"
+                    {...register("advanceSenderNumber")}
+                  />
+                  <FieldError message={errors.advanceSenderNumber?.message} />
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="border border-border bg-secondary p-4 text-sm">
+              <p className="font-semibold">Request this order for COD</p>
+              <p className="mt-1 text-muted-foreground">
+                We’ll review your request and contact you on WhatsApp to confirm
+                availability and delivery. No online payment is requested here.
+                After placing the request, use the WhatsApp button and press Send
+                in WhatsApp; browsers cannot send that message automatically.
+              </p>
             </div>
-          </div>
+          )}
 
           <label className="flex items-start gap-3 text-sm">
             <input
@@ -434,6 +478,7 @@ export default function CheckoutForm({
           total={total}
           advanceAmount={advanceAmount}
           advancePercent={settings.advancePercent}
+          paymentMode={paymentMode}
         />
       </aside>
     </form>

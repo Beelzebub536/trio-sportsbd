@@ -8,6 +8,7 @@ import { saveSettings } from "@/actions/admin/settings";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import type { StoreSettings } from "@/lib/settings";
 
 const TEXT_FIELDS: Array<{
@@ -66,6 +67,7 @@ export default function SettingsForm({
       bkashNumber: form.bkashNumber ?? "",
       nagadNumber: form.nagadNumber ?? "",
       advancePercent: Math.max(0, Number(form.advancePercent) || 0),
+      onlinePaymentsEnabled: form.onlinePaymentsEnabled === "true",
       shippingInsideDhaka: Math.max(0, Number(form.shippingInsideDhaka) || 0),
       shippingOutsideDhaka: Math.max(0, Number(form.shippingOutsideDhaka) || 0),
       freeShippingThreshold: Math.max(
@@ -104,6 +106,28 @@ export default function SettingsForm({
             )}
           </div>
         ))}
+      </section>
+
+      <section className="space-y-3 border border-border p-4">
+        <h2 className="text-sm font-bold uppercase tracking-widest">
+          Checkout payment
+        </h2>
+        <label className="flex items-center gap-3 text-sm">
+          <Switch
+            checked={form.onlinePaymentsEnabled === "true"}
+            onCheckedChange={(enabled) =>
+              set("onlinePaymentsEnabled", String(enabled))
+            }
+          />
+          Accept online payments
+        </label>
+        <p className="text-xs text-muted-foreground">
+          When off, customers submit an order request and confirm it with you on
+          WhatsApp. When on, they can choose a full payment or the configured
+          advance and submit transaction details for manual verification. Enable
+          this only after your bKash/Nagad account is approved to accept business
+          payments.
+        </p>
       </section>
 
       <section className="grid gap-4 border border-border p-4 sm:grid-cols-2">

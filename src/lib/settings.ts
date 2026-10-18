@@ -12,6 +12,7 @@ export type StoreSettings = {
   bkashNumber: string;
   nagadNumber: string;
   advancePercent: number;
+  onlinePaymentsEnabled: boolean;
   shippingInsideDhaka: number;
   shippingOutsideDhaka: number;
   freeShippingThreshold: number;
@@ -27,6 +28,7 @@ export const defaultSettings: StoreSettings = {
   bkashNumber: "01700000000",
   nagadNumber: "01700000000",
   advancePercent: 10,
+  onlinePaymentsEnabled: false,
   shippingInsideDhaka: 60,
   shippingOutsideDhaka: 120,
   freeShippingThreshold: 5000,
@@ -67,6 +69,10 @@ const getCachedSettings = unstable_cache(
         map.get("advancePercent"),
         defaultSettings.advancePercent,
       ),
+      onlinePaymentsEnabled:
+        typeof map.get("onlinePaymentsEnabled") === "boolean"
+          ? (map.get("onlinePaymentsEnabled") as boolean)
+          : defaultSettings.onlinePaymentsEnabled,
       shippingInsideDhaka: asNumber(
         map.get("shippingInsideDhaka"),
         defaultSettings.shippingInsideDhaka,

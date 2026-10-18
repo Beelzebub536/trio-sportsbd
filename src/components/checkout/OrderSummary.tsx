@@ -17,6 +17,7 @@ export default function OrderSummary({
   total,
   advanceAmount,
   advancePercent,
+  paymentMode,
 }: {
   lines: SummaryLine[];
   subtotal: number | null;
@@ -25,6 +26,7 @@ export default function OrderSummary({
   total: number | null;
   advanceAmount: number | null;
   advancePercent: number;
+  paymentMode: "MANUAL" | "ADVANCE" | "FULL";
 }) {
   const balance =
     total == null || advanceAmount == null
@@ -79,12 +81,19 @@ export default function OrderSummary({
       </dl>
 
       <div className="mt-4 bg-secondary p-3 text-sm">
-        <p className="font-semibold">
-          Pay {advanceAmount == null ? "—" : formatBDT(advanceAmount)} now ({advancePercent}%)
-        </p>
-        <p className="mt-1 text-muted-foreground">
-          Remaining {balance == null ? "—" : formatBDT(balance)} in cash on delivery.
-        </p>
+        {paymentMode === "MANUAL" ? (
+          <p className="font-semibold">Pay after order confirmation</p>
+        ) : (
+          <>
+            <p className="font-semibold">
+              Pay {advanceAmount == null ? "—" : formatBDT(advanceAmount)} now
+              {paymentMode === "ADVANCE" ? ` (${advancePercent}%)` : " (full)"}
+            </p>
+            <p className="mt-1 text-muted-foreground">
+              Remaining {balance == null ? "—" : formatBDT(balance)} in cash on delivery.
+            </p>
+          </>
+        )}
       </div>
     </div>
   );

@@ -18,10 +18,9 @@ export default async function TermsPage() {
     >
       <h2>Orders</h2>
       <p>
-        An order is confirmed only after we receive the {settings.advancePercent}
-        % advance and verify it. Until then, prices and stock may change. We may
-        cancel an order if an item is out of stock or if the advance is not
-        received; any advance paid is then returned in full.
+        {settings.onlinePaymentsEnabled
+          ? `Online payment details are checked before an order is confirmed. At checkout, you can pay in full or pay a ${settings.advancePercent}% advance and the balance on delivery. If an item is unavailable, contact us on WhatsApp to arrange a refund for any payment received.`
+          : "Orders are requests until our team confirms availability and delivery with you, usually on WhatsApp. No online payment is requested while online payments are disabled."} Until confirmation, stock may change.
       </p>
 
       <h2>Prices</h2>

@@ -39,12 +39,21 @@ export default async function ShippingReturnsPage() {
       </ul>
 
       <h2>Payment</h2>
-      <p>
-        We use cash on delivery. To confirm an order you pay a{" "}
-        <strong>{settings.advancePercent}% advance</strong> by bKash or Nagad
-        (store numbers: {settings.bkashNumber} / {settings.nagadNumber}). The
-        remaining balance is paid in cash when the parcel is delivered.
-      </p>
+      {settings.onlinePaymentsEnabled ? (
+        <p>
+          At checkout, choose full online payment or pay a{" "}
+          <strong>{settings.advancePercent}% advance</strong> by bKash or Nagad
+          (store numbers: {settings.bkashNumber} / {settings.nagadNumber}) and
+          pay the remaining balance in cash on delivery. Online payments are
+          manually verified before the order is confirmed.
+        </p>
+      ) : (
+        <p>
+          Cash on delivery is available. Submit your order request and contact
+          us on WhatsApp; we will confirm availability and delivery before
+          dispatch.
+        </p>
+      )}
 
       <h2>Returns</h2>
       <p>

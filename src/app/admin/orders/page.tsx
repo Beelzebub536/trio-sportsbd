@@ -132,7 +132,9 @@ export default async function AdminOrdersPage({
                     {formatBDT(order.total)}
                   </td>
                   <td className="py-3 pr-4 text-xs">
-                    {order.advanceStatus}
+                    {order.advanceAmount === 0
+                      ? "COD REQUEST"
+                      : `PAYMENT ${order.advanceStatus}`}
                   </td>
                   <td className="py-3">
                     <OrderStatusBadge status={order.status} />

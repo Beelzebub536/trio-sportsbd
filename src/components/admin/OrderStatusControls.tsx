@@ -38,12 +38,14 @@ export default function OrderStatusControls({
   id,
   status,
   advanceStatus,
+  hasOnlinePayment,
   balanceCollected,
   adminNote,
 }: {
   id: number;
   status: string;
   advanceStatus: string;
+  hasOnlinePayment: boolean;
   balanceCollected: boolean;
   adminNote: string | null;
 }) {
@@ -121,25 +123,27 @@ export default function OrderStatusControls({
           </Select>
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="o-advance">Advance payment</Label>
-          <Select
-            value={advanceStatus}
-            onValueChange={changeAdvance}
-            disabled={busy}
-          >
-            <SelectTrigger id="o-advance">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ADVANCE_STATUSES.map((option) => (
-                <SelectItem key={option} value={option}>
-                  {option}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+        {hasOnlinePayment && (
+          <div className="space-y-2">
+            <Label htmlFor="o-advance">Online payment verification</Label>
+            <Select
+              value={advanceStatus}
+              onValueChange={changeAdvance}
+              disabled={busy}
+            >
+              <SelectTrigger id="o-advance">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ADVANCE_STATUSES.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </div>
 
       <label className="flex items-center gap-2 text-sm">

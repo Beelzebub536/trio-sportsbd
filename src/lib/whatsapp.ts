@@ -30,9 +30,11 @@ export function orderStatusMessage(order: WhatsAppOrder): string {
     ),
     ``,
     `Total: ${formatBDT(order.total)}`,
-    `Advance (${order.advanceMethod ?? "bKash/Nagad"}): ${formatBDT(
-      order.advanceAmount,
-    )}${order.advanceTrxId ? ` — TrxID ${order.advanceTrxId}` : ""}`,
+    order.advanceAmount === 0
+      ? "Payment: cash on delivery — please review and confirm this order request."
+      : order.advanceAmount >= order.total
+        ? `Payment: full prepayment (${order.advanceMethod ?? "bKash/Nagad"}) — ${formatBDT(order.advanceAmount)}${order.advanceTrxId ? ` — TrxID ${order.advanceTrxId}` : ""}`
+        : `Advance (${order.advanceMethod ?? "bKash/Nagad"}): ${formatBDT(order.advanceAmount)}${order.advanceTrxId ? ` — TrxID ${order.advanceTrxId}` : ""}`,
     ``,
     `Please confirm my order. Thank you!`,
   ];

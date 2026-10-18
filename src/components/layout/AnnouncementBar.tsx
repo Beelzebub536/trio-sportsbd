@@ -3,9 +3,11 @@ import { formatBDT } from "@/lib/format";
 export default function AnnouncementBar({
   freeShippingThreshold,
   whatsappNumber,
+  onlinePaymentsEnabled,
 }: {
   freeShippingThreshold: number;
   whatsappNumber: string;
+  onlinePaymentsEnabled: boolean;
 }) {
   return (
     <div className="bg-black text-white">
@@ -14,7 +16,11 @@ export default function AnnouncementBar({
         <span aria-hidden className="hidden text-white/40 md:inline">
           |
         </span>
-        <span>Cash on delivery · 10% advance via bKash/Nagad</span>
+        <span>
+          {onlinePaymentsEnabled
+            ? "Cash on delivery · online payment at checkout"
+            : "Cash on delivery · WhatsApp order confirmation"}
+        </span>
         <span aria-hidden className="hidden text-white/40 md:inline">
           |
         </span>

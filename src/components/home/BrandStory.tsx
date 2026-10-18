@@ -9,7 +9,7 @@ const POINTS = [
   {
     icon: Wallet,
     title: "Cash on delivery",
-    body: "Pay only 10% advance by bKash/Nagad, rest on delivery.",
+    body: "Cash on delivery, with payment options shown clearly at checkout.",
   },
   {
     icon: Undo2,

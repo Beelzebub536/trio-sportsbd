@@ -103,7 +103,7 @@ export default function TrackForm() {
               <dd className="font-semibold">{formatBDT(result.total)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt>Advance ({result.advanceStatus.toLowerCase()})</dt>
+              <dt>{result.advanceAmount === 0 ? "Due on delivery" : `Online payment (${result.advanceStatus.toLowerCase()})`}</dt>
               <dd>{formatBDT(result.advanceAmount)}</dd>
             </div>
           </dl>

@@ -166,6 +166,7 @@ any new hostname to `images.remotePatterns` in `next.config.js`.
 - [ ] `/account` shows the order, addresses and wishlist
 - [ ] `/admin` loads for the admin account and is blocked for a customer
 - [ ] `/admin/settings` → change the WhatsApp number → the storefront updates
+- [ ] Keep online payments off until an approved business payment account is ready; then test advance and full-payment verification
 - [ ] `/admin/prices` → change one price → review → save → the shop updates
 - [ ] `/admin/prices/history` → undo that batch → the price reverts
 - [ ] `/sitemap.xml` and `/robots.txt` respond
@@ -175,7 +176,7 @@ any new hostname to `images.remotePatterns` in `next.config.js`.
 
 | Task | How |
 |---|---|
-| WhatsApp number, advance %, delivery fees | `/admin/settings` |
+| WhatsApp number, online-payment toggle, advance %, delivery fees | `/admin/settings` |
 | Admin password | sign in → `/account/profile` → Change password |
 | Logo | replace `src/components/brand/Logo.tsx` and redeploy |
 | Prices in bulk | `/admin/prices` (undo any batch from `/admin/prices/history`) |

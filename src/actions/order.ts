@@ -95,6 +95,16 @@ export async function placeOrder(
 
   const [settings, session] = await Promise.all([getSettings(), getSession()]);
 
+  if (
+    (settings.onlinePaymentsEnabled && values.paymentMode === "MANUAL") ||
+    (!settings.onlinePaymentsEnabled && values.paymentMode !== "MANUAL")
+  ) {
+    return {
+      ok: false,
+      error: "Checkout payment options changed. Refresh and try again.",
+    };
+  }
+
   // Persisted per-phone limit plus a coarse, best-effort per-IP limit above.
   const recent = await prisma.order.count({
     where: {
@@ -177,7 +187,12 @@ export async function placeOrder(
   if (subtotal >= settings.freeShippingThreshold) shippingFee = 0;
 
   const total = subtotal + shippingFee;
-  const advanceAmount = Math.ceil((total * settings.advancePercent) / 100);
+  const advanceAmount =
+    values.paymentMode === "FULL"
+      ? total
+      : values.paymentMode === "ADVANCE"
+        ? Math.ceil((total * settings.advancePercent) / 100)
+        : 0;
 
   try {
     const created = await prisma.$transaction(async (tx) => {
@@ -218,9 +233,14 @@ export async function placeOrder(
           shippingFee,
           total,
           advanceAmount,
-          advanceMethod: values.advanceMethod,
-          advanceTrxId: values.advanceTrxId,
-          advanceSenderNumber: values.advanceSenderNumber,
+          advanceMethod:
+            values.paymentMode === "MANUAL" ? null : values.advanceMethod,
+          advanceTrxId:
+            values.paymentMode === "MANUAL" ? null : values.advanceTrxId,
+          advanceSenderNumber:
+            values.paymentMode === "MANUAL"
+              ? null
+              : values.advanceSenderNumber,
           orderItems: {
             create: lines.map((line) => ({
               variantId: line.variantId,

@@ -9,7 +9,7 @@ export const cartItemSchema = z.object({
   qty: z.number().int().min(1).max(20),
 });
 
-export const checkoutSchema = z.object({
+const checkoutObjectSchema = z.object({
   fullName: z.string().trim().min(2, "Enter your full name"),
   phone: z
     .string()
@@ -26,18 +26,10 @@ export const checkoutSchema = z.object({
   upazila: z.string().trim().min(2, "Enter your upazila / thana"),
   address: z.string().trim().min(6, "Enter your full address"),
   note: z.string().trim().max(500, "Note is too long").optional().or(z.literal("")),
-  advanceMethod: z.enum(["BKASH", "NAGAD"]),
-  advanceTrxId: z
-    .string()
-    .trim()
-    .regex(
-      /^[A-Za-z0-9]{6,20}$/,
-      "Transaction ID must be 6–20 letters or numbers",
-    ),
-  advanceSenderNumber: z
-    .string()
-    .trim()
-    .regex(BD_PHONE_REGEX, "Enter the number you sent the money from"),
+  paymentMode: z.enum(["MANUAL", "ADVANCE", "FULL"]),
+  advanceMethod: z.enum(["BKASH", "NAGAD"]).optional(),
+  advanceTrxId: z.string().trim().optional().or(z.literal("")),
+  advanceSenderNumber: z.string().trim().optional().or(z.literal("")),
   terms: z.boolean().refine((value) => value === true, {
     message: "Please accept the terms and conditions",
   }),
@@ -60,8 +52,46 @@ export const checkoutSchema = z.object({
     }),
 });
 
+const validatePaymentDetails = (
+  values: Pick<
+    z.infer<typeof checkoutObjectSchema>,
+    "paymentMode" | "advanceMethod" | "advanceTrxId" | "advanceSenderNumber"
+  >,
+  context: z.RefinementCtx,
+) => {
+  if (values.paymentMode === "MANUAL") return;
+
+  if (!values.advanceMethod) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Choose bKash or Nagad.",
+      path: ["advanceMethod"],
+    });
+  }
+  if (!/^[A-Za-z0-9]{6,20}$/.test(values.advanceTrxId ?? "")) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Transaction ID must be 6–20 letters or numbers",
+      path: ["advanceTrxId"],
+    });
+  }
+  if (!BD_PHONE_REGEX.test(values.advanceSenderNumber ?? "")) {
+    context.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Enter the number you sent the money from",
+      path: ["advanceSenderNumber"],
+    });
+  }
+};
+
+export const checkoutSchema = checkoutObjectSchema.superRefine(
+  validatePaymentDetails,
+);
+
 /** The checkout form fields only — `items` come from the cart store. */
-export const checkoutFormSchema = checkoutSchema.omit({ items: true });
+export const checkoutFormSchema = checkoutObjectSchema.omit({ items: true }).superRefine(
+  validatePaymentDetails,
+);
 
 export type CheckoutValues = z.infer<typeof checkoutSchema>;
 export type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;

@@ -41,8 +41,8 @@ export async function generateMetadata({
 
 const ADVANCE_NOTES: Record<string, string> = {
   PENDING:
-    "We are checking your advance payment. Once verified, your order moves to Confirmed.",
-  VERIFIED: "Your advance payment is verified. Your order is confirmed.",
+    "We are checking your payment. Once verified, your order is confirmed.",
+  VERIFIED: "Your online payment is verified. Your order is confirmed.",
   REJECTED:
     "We could not verify your advance payment. Please message us on WhatsApp so we can sort it out.",
 };
@@ -117,7 +117,9 @@ export default async function OrderPage({
       <div className="mt-4 flex flex-wrap items-center gap-3">
         <OrderStatusBadge status={order.status} />
         <span className="text-sm text-muted-foreground">
-          {ADVANCE_NOTES[order.advanceStatus] ?? ""}
+          {order.advanceAmount === 0
+            ? "Your request is waiting for the store to review and confirm it."
+            : ADVANCE_NOTES[order.advanceStatus] ?? ""}
         </span>
       </div>
 
@@ -185,8 +187,16 @@ export default async function OrderPage({
               <dd>{formatBDT(order.total)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt>Advance ({order.advanceMethod})</dt>
-              <dd>{formatBDT(order.advanceAmount)}</dd>
+              <dt>
+                {order.advanceAmount === 0
+                  ? "Payment method"
+                  : `Online payment · ${order.advanceStatus.toLowerCase()}`}
+              </dt>
+              <dd>
+                {order.advanceAmount === 0
+                  ? "Cash on delivery"
+                  : formatBDT(order.advanceAmount)}
+              </dd>
             </div>
             <div className="flex justify-between text-muted-foreground">
               <dt>Balance on delivery</dt>
@@ -203,7 +213,7 @@ export default async function OrderPage({
           rel="noopener noreferrer"
           className="bg-black px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:opacity-90"
         >
-          Confirm on WhatsApp
+          {order.advanceAmount === 0 ? "Send order request on WhatsApp" : "Confirm on WhatsApp"}
         </a>
         <Button asChild variant="outline">
           <Link href="/shop">Continue shopping</Link>

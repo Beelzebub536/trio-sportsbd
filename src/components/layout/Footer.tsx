@@ -55,7 +55,9 @@ export default function Footer({ settings }: { settings: StoreSettings }) {
             © {new Date().getFullYear()} {settings.storeName}. All rights reserved.
           </p>
           <p className="uppercase tracking-wide">
-            Cash on delivery · 10% advance via bKash/Nagad
+            {settings.onlinePaymentsEnabled
+              ? "Cash on delivery · online payment at checkout"
+              : "Cash on delivery · WhatsApp order confirmation"}
           </p>
         </div>
       </div>

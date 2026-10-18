@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 
 import StaticPage from "@/components/layout/StaticPage";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = {
   title: "About us",
   description: "Who we are and how Trio Sports BD serves athletes in Bangladesh.",
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const settings = await getSettings();
   return (
     <StaticPage
       title="About Trio Sports BD"
@@ -35,10 +37,9 @@ export default function AboutPage() {
 
       <h2>How we work</h2>
       <p>
-        Payment is cash on delivery. You pay a 10% advance through bKash or
-        Nagad to confirm the order, and the rest when the parcel arrives. Every
-        question is answered on WhatsApp — there is no call centre and no email
-        queue.
+        {settings.onlinePaymentsEnabled
+          ? `Choose full online payment or pay a ${settings.advancePercent}% advance by bKash or Nagad and the rest when the parcel arrives. We verify payments manually before confirming orders.`
+          : "Place a cash-on-delivery order request and our team will confirm availability and delivery with you on WhatsApp."} Every question is answered on WhatsApp — there is no email queue.
       </p>
 
       <h2>Team and bulk orders</h2>
