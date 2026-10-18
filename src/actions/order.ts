@@ -9,6 +9,7 @@ import { signOrderToken } from "@/lib/order-token";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
+import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
 import { checkoutSchema, type CheckoutValues } from "@/lib/validators/order";
 
 export type PlaceOrderResult =
@@ -103,6 +104,49 @@ export async function placeOrder(
       ok: false,
       error: "Checkout payment options changed. Refresh and try again.",
     };
+  }
+
+  if (values.paymentMode !== "MANUAL") {
+    const receivingNumber =
+      values.advanceMethod === "NAGAD"
+        ? settings.nagadNumber
+        : settings.bkashNumber;
+    if (!receivingNumber.trim() || receivingNumber === "01700000000") {
+      return {
+        ok: false,
+        error: "Online payment is not configured yet. Please choose COD or contact the store.",
+      };
+    }
+  }
+
+  // Cron runs once daily on the free deployment tier, so clean up lazily too.
+  await expireUnverifiedOnlineOrders();
+
+  const openOrder = await prisma.order.findFirst({
+    where: { phone: values.phone, status: "PENDING" },
+    select: { orderNumber: true },
+  });
+  if (openOrder) {
+    return {
+      ok: false,
+      error: `You already have an order awaiting confirmation (${openOrder.orderNumber}). Please contact us if you need help.`,
+    };
+  }
+
+  if (values.paymentMode !== "MANUAL") {
+    const duplicateTrx = await prisma.order.findFirst({
+      where: {
+        advanceMethod: values.advanceMethod,
+        advanceTrxId: { equals: values.advanceTrxId, mode: "insensitive" },
+      },
+      select: { orderNumber: true },
+    });
+    if (duplicateTrx) {
+      return {
+        ok: false,
+        error: "This transaction ID has already been submitted. Check it and contact us if you believe this is an error.",
+      };
+    }
   }
 
   // Persisted per-phone limit plus a coarse, best-effort per-IP limit above.
@@ -270,6 +314,17 @@ export async function placeOrder(
       token: signOrderToken(created.orderNumber),
     };
   } catch (error) {
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      error.code === "P2002"
+    ) {
+      return {
+        ok: false,
+        error: "This transaction ID has already been submitted. Check it and contact us if you believe this is an error.",
+      };
+    }
     if (error instanceof Error && error.message.startsWith("STOCK:")) {
       return {
         ok: false,

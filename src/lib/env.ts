@@ -16,6 +16,7 @@ const envSchema = z.object({
   ADMIN_EMAIL: z.string().email("ADMIN_EMAIL must be a valid email"),
   ADMIN_PASSWORD: z.string().min(8, "ADMIN_PASSWORD must be at least 8 characters"),
   WHATSAPP_NUMBER: z.string().optional(),
+  CRON_SECRET: z.union([z.string().min(16), z.literal("")]).optional(),
 });
 
 export const env = {
@@ -36,6 +37,7 @@ export const env = {
   ADMIN_EMAIL: process.env.ADMIN_EMAIL,
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
   WHATSAPP_NUMBER: process.env.WHATSAPP_NUMBER,
+  CRON_SECRET: process.env.CRON_SECRET,
   // Validate all environment variables
 } as z.infer<typeof envSchema>;
 

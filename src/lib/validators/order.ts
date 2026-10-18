@@ -28,7 +28,12 @@ const checkoutObjectSchema = z.object({
   note: z.string().trim().max(500, "Note is too long").optional().or(z.literal("")),
   paymentMode: z.enum(["MANUAL", "ADVANCE", "FULL"]),
   advanceMethod: z.enum(["BKASH", "NAGAD"]).optional(),
-  advanceTrxId: z.string().trim().optional().or(z.literal("")),
+  advanceTrxId: z
+    .string()
+    .trim()
+    .transform((value) => value.toUpperCase())
+    .optional()
+    .or(z.literal("")),
   advanceSenderNumber: z.string().trim().optional().or(z.literal("")),
   terms: z.boolean().refine((value) => value === true, {
     message: "Please accept the terms and conditions",

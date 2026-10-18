@@ -146,12 +146,20 @@ export async function updateAdvanceStatus(
     await prisma.$transaction(async (tx) => {
       const order = await tx.order.findUnique({
         where: { id },
-        select: { status: true, advanceAmount: true },
+        select: { status: true, advanceAmount: true, advanceStatus: true },
       });
       if (!order) throw new Error("ORDER_NOT_FOUND");
       if (order.advanceAmount === 0) throw new Error("NO_ONLINE_PAYMENT");
-      await tx.order.update({
-        where: { id },
+      if (order.status !== "PENDING") throw new Error("ORDER_NOT_PENDING");
+      if (order.advanceStatus === "VERIFIED" && advanceStatus !== "VERIFIED") {
+        throw new Error("PAYMENT_ALREADY_VERIFIED");
+      }
+      const updated = await tx.order.updateMany({
+        where: {
+          id,
+          status: "PENDING",
+          advanceStatus: order.advanceStatus,
+        },
         data: {
           advanceStatus,
           ...(advanceStatus === "VERIFIED" && order.status === "PENDING"
@@ -159,6 +167,7 @@ export async function updateAdvanceStatus(
             : {}),
         },
       });
+      if (updated.count !== 1) throw new Error("ORDER_CHANGED");
     });
   } catch (error) {
     if (error instanceof Error && error.message === "ORDER_NOT_FOUND") {
@@ -166,6 +175,15 @@ export async function updateAdvanceStatus(
     }
     if (error instanceof Error && error.message === "NO_ONLINE_PAYMENT") {
       return { ok: false, error: "This COD order has no online payment to verify." };
+    }
+    if (error instanceof Error && error.message === "ORDER_NOT_PENDING") {
+      return { ok: false, error: "This order is no longer awaiting payment verification." };
+    }
+    if (error instanceof Error && error.message === "PAYMENT_ALREADY_VERIFIED") {
+      return { ok: false, error: "A verified payment cannot be changed here." };
+    }
+    if (error instanceof Error && error.message === "ORDER_CHANGED") {
+      return { ok: false, error: "This order changed. Refresh and try again." };
     }
     return { ok: false, error: "Could not update the payment status." };
   }

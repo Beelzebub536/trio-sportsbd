@@ -12,6 +12,7 @@ import { verifyOrderToken } from "@/lib/order-token";
 import prisma from "@/lib/prisma";
 import { getSession } from "@/lib/session";
 import { getSettings } from "@/lib/settings";
+import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
 import { buildWhatsAppLink, orderStatusMessage } from "@/lib/whatsapp";
 
 export async function generateMetadata({
@@ -56,6 +57,8 @@ export default async function OrderPage({
 }) {
   const { orderNumber } = await params;
   const { token } = await searchParams;
+
+  await expireUnverifiedOnlineOrders();
 
   const order = await prisma.order.findUnique({
     where: { orderNumber },

@@ -135,6 +135,7 @@ model Order {
 
   @@index([phone])
   @@index([status, createdAt])
+  @@unique([advanceMethod, advanceTrxId])
 }
 
 enum OrderStatus {

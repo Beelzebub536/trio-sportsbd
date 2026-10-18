@@ -209,6 +209,8 @@ export default function CheckoutForm({
 
   const storeNumber =
     advanceMethod === "NAGAD" ? settings.nagadNumber : settings.bkashNumber;
+  const canUseBkash = Boolean(settings.bkashNumber && settings.bkashNumber !== "01700000000");
+  const canUseNagad = Boolean(settings.nagadNumber && settings.nagadNumber !== "01700000000");
 
   return (
     <form
@@ -377,13 +379,16 @@ export default function CheckoutForm({
                   </RadioGroup>
                 )}
               />
-              <p className="text-sm text-muted-foreground">
-                Send <strong className="text-foreground">{advanceAmount == null ? "—" : formatBDT(advanceAmount)}</strong>{" "}
+              {storeNumber && storeNumber !== "01700000000" ? <p className="text-sm text-muted-foreground">
+                Pay <strong className="text-foreground">{advanceAmount == null ? "—" : formatBDT(advanceAmount)}</strong>{" "}
                 to our {advanceMethod === "NAGAD" ? "Nagad" : "bKash"} account{" "}
                 <strong className="text-foreground">{storeNumber}</strong>, then
-                submit the transaction details. We verify payment before confirming
-                your order.
-              </p>
+                submit the transaction details. For bKash, use Payment or QR to
+                the store account; do not use Send Money to a personal account.
+                We verify the amount and transaction against our account record
+                before confirming your order. A submitted TrxID alone is not proof
+                of payment. Unverified online orders expire after 24 hours.
+              </p> : <p className="border border-destructive p-3 text-sm text-destructive" role="alert">Online payments are temporarily unavailable. Please contact the store before placing this order.</p>}
               <Controller
                 control={control}
                 name="advanceMethod"
@@ -393,12 +398,16 @@ export default function CheckoutForm({
                     onValueChange={field.onChange}
                     className="grid grid-cols-2 gap-3"
                   >
-                    <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
-                      <RadioGroupItem value="BKASH" /> bKash
-                    </Label>
-                    <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
-                      <RadioGroupItem value="NAGAD" /> Nagad
-                    </Label>
+                    {canUseBkash ? (
+                      <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
+                        <RadioGroupItem value="BKASH" /> bKash
+                      </Label>
+                    ) : null}
+                    {canUseNagad ? (
+                      <Label className="flex cursor-pointer items-center gap-2 border border-border p-3">
+                        <RadioGroupItem value="NAGAD" /> Nagad
+                      </Label>
+                    ) : null}
                   </RadioGroup>
                 )}
               />
@@ -426,6 +435,7 @@ export default function CheckoutForm({
               <p className="mt-1 text-muted-foreground">
                 We’ll review your request and contact you on WhatsApp to confirm
                 availability and delivery. No online payment is requested here.
+                This is a request only; stock is not reserved until we confirm it.
                 After placing the request, use the WhatsApp button and press Send
                 in WhatsApp; browsers cannot send that message automatically.
               </p>

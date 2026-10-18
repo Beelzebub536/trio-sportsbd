@@ -66,6 +66,7 @@ git push -u origin main
    | `NEXT_PUBLIC_APP_URL` | `https://<your-domain>` |
    | `ADMIN_EMAIL` | your admin email |
    | `ADMIN_PASSWORD` | a strong password (used only when seeding) |
+   | `CRON_SECRET` | a random secret of at least 16 characters (protects pending-order expiry) |
    | `CLOUDINARY_CLOUD_NAME` | optional |
    | `CLOUDINARY_API_KEY` | optional |
    | `CLOUDINARY_API_SECRET` | optional |
@@ -95,6 +96,13 @@ categories, products and settings, creates the admin from `ADMIN_EMAIL` /
 resets an existing password.
 
 > Never run `prisma migrate reset` or any force-reset against production.
+
+Before applying schema changes, inspect existing orders for duplicate payment
+references (same payment method and TrxID). This release adds a unique constraint
+for those pairs, so `npm run db:push` will fail if duplicate claims already exist.
+The Vercel cron expires unverified online orders daily; on Hobby, the scheduled
+time is approximate. Checkout and order/admin pages also clean up overdue orders
+when used, so stock release does not depend only on the cron.
 
 ## 6. Google OAuth
 

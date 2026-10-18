@@ -4,6 +4,7 @@ import OrderStatusBadge from "@/components/order/OrderStatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { formatBDT } from "@/lib/format";
+import { expireUnverifiedOnlineOrders } from "@/lib/order-expiry";
 import prisma from "@/lib/prisma";
 import { requireAdmin } from "@/lib/session";
 import { cn } from "@/lib/utils";
@@ -24,6 +25,7 @@ export default async function AdminOrdersPage({
   searchParams: { status?: string; q?: string };
 }) {
   await requireAdmin();
+  await expireUnverifiedOnlineOrders();
   const params = await searchParams;
   const status = typeof params.status === "string" ? params.status : "";
   const query = typeof params.q === "string" ? params.q.trim() : "";

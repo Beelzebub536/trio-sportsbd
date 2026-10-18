@@ -25,8 +25,8 @@ export const defaultSettings: StoreSettings = {
   storeAddress: "Dhaka, Bangladesh",
   supportHours: "Sat–Thu, 10:00am – 8:00pm",
   whatsappNumber: "8801700000000",
-  bkashNumber: "01700000000",
-  nagadNumber: "01700000000",
+  bkashNumber: "",
+  nagadNumber: "",
   advancePercent: 10,
   onlinePaymentsEnabled: false,
   shippingInsideDhaka: 60,
@@ -63,8 +63,14 @@ const getCachedSettings = unstable_cache(
         map.get("whatsappNumber"),
         defaultSettings.whatsappNumber,
       ),
-      bkashNumber: asString(map.get("bkashNumber"), defaultSettings.bkashNumber),
-      nagadNumber: asString(map.get("nagadNumber"), defaultSettings.nagadNumber),
+      bkashNumber:
+        typeof map.get("bkashNumber") === "string"
+          ? (map.get("bkashNumber") as string)
+          : defaultSettings.bkashNumber,
+      nagadNumber:
+        typeof map.get("nagadNumber") === "string"
+          ? (map.get("nagadNumber") as string)
+          : defaultSettings.nagadNumber,
       advancePercent: asNumber(
         map.get("advancePercent"),
         defaultSettings.advancePercent,
