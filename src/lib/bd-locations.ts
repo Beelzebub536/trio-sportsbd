@@ -115,9 +115,3 @@ export const districtsByDivision: Record<string, string[]> = Object.fromEntries(
 export function getDistricts(division: string): string[] {
   return districtsByDivision[division] ?? [];
 }
-
-export const isDivision = (value: string): boolean =>
-  bdDivisions.some((d) => d.name === value);
-
-export const isDistrictOf = (division: string, district: string): boolean =>
-  getDistricts(division).includes(district);

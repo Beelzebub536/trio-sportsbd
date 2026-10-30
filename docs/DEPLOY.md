@@ -161,7 +161,7 @@ overdue requests when used, so stock release does not depend only on the cron.
    (jpg/jpeg/png/webp) and a 5 MB maximum size.
 
 Without Cloudinary, the product form still works: paste image URLs instead. Add
-any new hostname to `images.remotePatterns` in `next.config.js`.
+any new hostname to `images.remotePatterns` in `next.config.mjs`.
 
 ## 9. Post-deploy checklist
 
@@ -205,6 +205,6 @@ any new hostname to `images.remotePatterns` in `next.config.js`.
 - **OAuth error `redirect_uri_mismatch`** — the callback URI in the Google or
   Facebook console must match exactly, including `http` vs `https`.
 - **Images from a new host don't render** — add the hostname to
-  `images.remotePatterns` in `next.config.js`.
+  `images.remotePatterns` in `next.config.mjs`.
 - **Uploads return "Cloudinary is not configured"** — the three `CLOUDINARY_*`
   variables are missing on the server; paste image URLs instead.

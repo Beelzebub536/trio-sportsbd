@@ -50,8 +50,14 @@ export async function mergeWishlistAction(productIds: number[]): Promise<void> {
   const unique = [...new Set(productIds)].filter(Number.isInteger).slice(0, 200);
   if (unique.length === 0) return;
 
+  // A deleted product left in localStorage would fail the whole insert on its foreign key.
+  const existing = await prisma.product.findMany({
+    where: { id: { in: unique } },
+    select: { id: true },
+  });
+
   await prisma.wishlist.createMany({
-    data: unique.map((productId) => ({ userId: session.user.id, productId })),
+    data: existing.map(({ id }) => ({ userId: session.user.id, productId: id })),
     skipDuplicates: true,
   });
 }
