@@ -14,7 +14,7 @@ export const metadata = { title: "Order details" };
 export default async function AccountOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await requireUser();
   const id = Number((await params).id);

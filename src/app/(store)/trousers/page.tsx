@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default async function TrousersPage({
   searchParams,
 }: {
-  searchParams: RawSearchParams;
+  searchParams: Promise<RawSearchParams>;
 }) {
   const params = await searchParams;
 

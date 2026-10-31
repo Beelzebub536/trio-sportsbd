@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { next?: string | string[] };
+  searchParams: Promise<{ next?: string | string[] }>;
 }) {
   const params = await searchParams;
   const next = safeNext(params?.next);

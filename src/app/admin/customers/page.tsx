@@ -8,7 +8,7 @@ import { requireAdmin } from "@/lib/session";
 export default async function AdminCustomersPage({
   searchParams,
 }: {
-  searchParams: { q?: string };
+  searchParams: Promise<{ q?: string }>;
 }) {
   const session = await requireAdmin();
   const params = await searchParams;

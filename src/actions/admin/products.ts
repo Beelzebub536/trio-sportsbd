@@ -27,7 +27,7 @@ export async function saveProduct(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.errors[0]?.message ?? "Invalid product data",
+      error: parsed.error.issues[0]?.message ?? "Invalid product data",
     };
   }
   const data = parsed.data;
@@ -122,8 +122,8 @@ export async function saveProduct(
     revalidatePath("/shop");
     revalidatePath("/");
     revalidatePath(`/product/${data.slug}`);
-    revalidateTag(CATALOG_TAG);
-    revalidateTag(PRODUCT_DETAIL_TAG);
+    revalidateTag(CATALOG_TAG, { expire: 0 });
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
 
     return { ok: true, id: productId };
   } catch (error) {
@@ -141,8 +141,8 @@ export async function toggleProductActive(
 ): Promise<AdminActionResult> {
   await requireAdminUser();
   await prisma.product.update({ where: { id }, data: { isActive } });
-  revalidateTag(CATALOG_TAG);
-  revalidateTag(PRODUCT_DETAIL_TAG);
+  revalidateTag(CATALOG_TAG, { expire: 0 });
+  revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
   revalidatePath("/admin/products");
   revalidatePath("/shop");
   return { ok: true };
@@ -159,8 +159,8 @@ export async function deleteProduct(id: number): Promise<AdminActionResult> {
       prisma.productVariant.deleteMany({ where: { productId: id } }),
       prisma.product.delete({ where: { id } }),
     ]);
-    revalidateTag(CATALOG_TAG);
-    revalidateTag(PRODUCT_DETAIL_TAG);
+    revalidateTag(CATALOG_TAG, { expire: 0 });
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
     revalidatePath("/admin/products");
     revalidatePath("/shop");
     return { ok: true };

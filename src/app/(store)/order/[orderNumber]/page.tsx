@@ -19,8 +19,8 @@ export async function generateMetadata({
   params,
   searchParams,
 }: {
-  params: { orderNumber: string };
-  searchParams: { token?: string };
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ token?: string }>;
 }): Promise<Metadata> {
   const [{ orderNumber }, { token }] = await Promise.all([params, searchParams]);
   const order = await prisma.order.findUnique({
@@ -52,8 +52,8 @@ export default async function OrderPage({
   params,
   searchParams,
 }: {
-  params: { orderNumber: string };
-  searchParams: { token?: string };
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ token?: string }>;
 }) {
   const { orderNumber } = await params;
   const { token } = await searchParams;

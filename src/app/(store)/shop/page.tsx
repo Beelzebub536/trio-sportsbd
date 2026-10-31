@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: RawSearchParams;
+  searchParams: Promise<RawSearchParams>;
 }) {
   const params = await searchParams;
 

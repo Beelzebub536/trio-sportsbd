@@ -13,7 +13,7 @@ import { requireAdmin } from "@/lib/session";
 export default async function AdminOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   await requireAdmin();
   await expireStalePendingOrders();

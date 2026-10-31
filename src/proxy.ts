@@ -6,9 +6,9 @@ import { getSessionCookie } from "better-auth/cookies";
  * cookie (no database call). Real authorization happens in server code via
  * `requireUser()` / `requireAdmin()`.
  *
- * Next.js 14 uses `middleware.ts`; Next.js 16+ renames this to `proxy.ts`.
+ * Next.js 16 calls this file `proxy.ts` (formerly `middleware.ts`).
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
   const sessionCookie = getSessionCookie(request);
 

@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/session";
 export default async function EditProductPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   await requireAdmin();
 

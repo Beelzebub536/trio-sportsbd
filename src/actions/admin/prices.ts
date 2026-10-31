@@ -52,7 +52,7 @@ export async function savePriceBatch(values: {
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.errors[0]?.message ?? "Invalid price changes",
+      error: parsed.error.issues[0]?.message ?? "Invalid price changes",
     };
   }
   const { label, edits } = parsed.data;
@@ -144,8 +144,8 @@ export async function savePriceBatch(values: {
     });
 
     revalidateStorefront();
-    revalidateTag(CATALOG_TAG);
-    revalidateTag(PRODUCT_DETAIL_TAG);
+    revalidateTag(CATALOG_TAG, { expire: 0 });
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
     revalidatePath("/admin/prices");
     revalidatePath("/admin/prices/history");
 
@@ -233,8 +233,8 @@ export async function undoBatch(batchId: number): Promise<PriceActionResult> {
     });
 
     revalidateStorefront();
-    revalidateTag(CATALOG_TAG);
-    revalidateTag(PRODUCT_DETAIL_TAG);
+    revalidateTag(CATALOG_TAG, { expire: 0 });
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
     revalidatePath("/admin/prices");
     revalidatePath("/admin/prices/history");
 

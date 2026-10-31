@@ -129,7 +129,7 @@ export async function updateOrderStatus(
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/account/orders");
-  if (status === "CANCELLED") revalidateTag(PRODUCT_DETAIL_TAG);
+  if (status === "CANCELLED") revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
   return { ok: true };
 }
 
@@ -200,8 +200,8 @@ export async function updateAdvanceStatus(
   revalidatePath("/admin/orders");
   revalidatePath(`/admin/orders/${id}`);
   revalidatePath("/account/orders");
-  if (advanceStatus === "REJECTED") revalidateTag(CATALOG_TAG);
-  if (advanceStatus === "REJECTED") revalidateTag(PRODUCT_DETAIL_TAG);
+  if (advanceStatus === "REJECTED") revalidateTag(CATALOG_TAG, { expire: 0 });
+  if (advanceStatus === "REJECTED") revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
   return { ok: true };
 }
 

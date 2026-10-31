@@ -18,7 +18,7 @@ type PageParams = { slug: string };
 export async function generateMetadata({
   params,
 }: {
-  params: PageParams;
+  params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -32,7 +32,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProductPage({ params }: { params: PageParams }) {
+export default async function ProductPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = await params;
   const settingsPromise = getSettings();
   const sessionPromise = getSession();

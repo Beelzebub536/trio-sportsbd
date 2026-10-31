@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function SearchPage({
   searchParams,
 }: {
-  searchParams: RawSearchParams;
+  searchParams: Promise<RawSearchParams>;
 }) {
   const params = await searchParams;
   const query = typeof params.q === "string" ? params.q.trim() : "";

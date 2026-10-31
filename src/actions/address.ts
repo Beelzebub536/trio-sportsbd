@@ -15,7 +15,7 @@ export async function saveAddress(
   const userId = await requireUserId();
   const parsed = addressSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.errors[0]?.message ?? "Invalid address" };
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid address" };
   }
   const data = parsed.data;
 
