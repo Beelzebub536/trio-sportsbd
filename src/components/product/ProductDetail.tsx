@@ -218,7 +218,7 @@ export default function ProductDetail({
                       setQty(1);
                     }}
                     className={cn(
-                      "press h-12 w-full border text-sm font-bold uppercase",
+                      "press h-12 w-full border text-sm font-bold",
                       disabled
                         ? "cursor-not-allowed border-border bg-secondary text-muted-foreground line-through"
                         : selectedSize === size
@@ -294,7 +294,7 @@ export default function ProductDetail({
 
         <Accordion type="single" collapsible className="mt-8 border-t border-border">
           <AccordionItem value="description">
-            <AccordionTrigger className="font-display text-xl font-bold uppercase">
+            <AccordionTrigger className="font-display text-xl font-bold">
               Description
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground">
@@ -302,7 +302,7 @@ export default function ProductDetail({
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="size-guide">
-            <AccordionTrigger className="font-display text-xl font-bold uppercase">
+            <AccordionTrigger className="font-display text-xl font-bold">
               Size guide
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground">
@@ -315,7 +315,7 @@ export default function ProductDetail({
             </AccordionContent>
           </AccordionItem>
           <AccordionItem value="shipping" className="border-b-0">
-            <AccordionTrigger className="font-display text-xl font-bold uppercase">
+            <AccordionTrigger className="font-display text-xl font-bold">
               Shipping &amp; returns
             </AccordionTrigger>
             <AccordionContent className="text-sm text-muted-foreground">

@@ -17,7 +17,7 @@ export default async function AccountOverviewPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h1 className="text-3xl font-bold uppercase leading-none md:text-4xl">
+        <h1 className="text-3xl font-bold leading-none md:text-4xl">
           Hello, {session.user.name.split(" ")[0]}
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -26,7 +26,7 @@ export default async function AccountOverviewPage() {
       </header>
 
       <section>
-        <h2 className="text-sm font-bold uppercase tracking-widest">
+        <h2 className="text-base font-semibold">
           Last order
         </h2>
         {lastOrder ? (
@@ -35,7 +35,7 @@ export default async function AccountOverviewPage() {
               <div>
                 <Link
                   href={`/account/orders/${lastOrder.id}`}
-                  className="font-semibold uppercase hover:underline"
+                  className="font-semibold hover:underline"
                 >
                   {lastOrder.orderNumber}
                 </Link>
@@ -53,7 +53,7 @@ export default async function AccountOverviewPage() {
             </p>
             <Link
               href={`/account/orders/${lastOrder.id}`}
-              className="mt-3 inline-block text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+              className="mt-3 inline-block text-sm font-semibold underline underline-offset-4 hover:decoration-2"
             >
               View order
             </Link>
@@ -80,7 +80,7 @@ export default async function AccountOverviewPage() {
             href={card.href}
             className="border border-border p-5 transition-colors hover:border-black"
           >
-            <h3 className="text-sm font-bold uppercase tracking-wide">
+            <h3 className="text-sm font-bold">
               {card.title}
             </h3>
             <p className="mt-1 text-sm text-muted-foreground">{card.body}</p>

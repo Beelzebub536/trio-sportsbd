@@ -126,9 +126,9 @@ export default function AddressManager({
         {addresses.map((address) => (
           <li key={address.id} className="border border-border p-4 text-sm">
             <div className="flex items-start justify-between gap-2">
-              <p className="font-semibold uppercase">{address.fullName}</p>
+              <p className="font-semibold">{address.fullName}</p>
               {address.isDefault && (
-                <span className="bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">
+                <span className="bg-primary px-2 py-0.5 text-xs font-semibold text-primary-foreground">
                   Default
                 </span>
               )}
@@ -138,7 +138,7 @@ export default function AddressManager({
               {address.line1}, {address.upazila}, {address.district},{" "}
               {address.division}
             </p>
-            <div className="mt-3 flex flex-wrap gap-3 text-xs font-bold uppercase tracking-widest">
+            <div className="mt-3 flex flex-wrap gap-3 text-sm font-semibold">
               <button
                 type="button"
                 className="underline underline-offset-4 hover:decoration-2"
@@ -175,7 +175,7 @@ export default function AddressManager({
           className="space-y-4 border border-border p-5"
           noValidate
         >
-          <h2 className="text-sm font-bold uppercase tracking-widest">
+          <h2 className="text-base font-semibold">
             {editing ? "Edit address" : "New address"}
           </h2>
 

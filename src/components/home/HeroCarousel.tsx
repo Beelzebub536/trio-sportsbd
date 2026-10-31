@@ -19,10 +19,10 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
   };
 
   return (
-    <section aria-label="Featured collections" className="relative mx-auto max-w-7xl md:px-4">
+    <section aria-label="Featured collections" className="relative mx-auto max-w-7xl px-4">
       <div
         ref={trackRef}
-        className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
+        className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth rounded-3xl"
       >
         {banners.map((banner, index) => (
           <div
@@ -39,7 +39,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--pitch-dark)/0.9)] via-[hsl(var(--pitch-dark)/0.5)] to-transparent" />
               <div className="absolute inset-0 flex max-w-xl flex-col justify-center gap-3 p-6 text-white md:p-16">
-                <h2 className="text-4xl md:text-7xl">
+                <h2 className="text-3xl md:text-6xl">
                   {banner.title}
                 </h2>
                 {banner.subtitle && (
@@ -49,7 +49,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
                 )}
                 <Link
                   href={banner.linkUrl}
-                  className="press mt-2 inline-flex h-12 w-fit items-center bg-white px-6 text-sm font-bold uppercase tracking-wide text-pitch-dark hover:bg-white/90"
+                  className="press mt-2 inline-flex h-12 w-fit items-center rounded-full bg-white px-6 text-sm font-semibold text-background hover:bg-white/90"
                 >
                   Shop now
                 </Link>
@@ -65,7 +65,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
             type="button"
             aria-label="Previous slide"
             onClick={() => scroll(-1)}
-            className="press absolute left-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/90 hover:bg-white md:flex"
+            className="press absolute left-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 md:flex"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -73,7 +73,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
             type="button"
             aria-label="Next slide"
             onClick={() => scroll(1)}
-            className="press absolute right-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/90 hover:bg-white md:flex"
+            className="press absolute right-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 md:flex"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

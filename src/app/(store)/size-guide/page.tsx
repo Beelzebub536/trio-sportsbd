@@ -46,7 +46,7 @@ export default function SizeGuidePage() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-foreground">
+            <tr className="border-b border-border text-left text-sm text-foreground">
               <th className="py-2 pr-4">Size</th>
               <th className="py-2 pr-4">Chest (in)</th>
               <th className="py-2 pr-4">Waist (in)</th>
@@ -70,7 +70,7 @@ export default function SizeGuidePage() {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className="border-b border-border text-left text-xs uppercase tracking-widest text-foreground">
+            <tr className="border-b border-border text-left text-sm text-foreground">
               <th className="py-2 pr-4">Size</th>
               <th className="py-2 pr-4">Age</th>
               <th className="py-2 pr-4">Chest (in)</th>

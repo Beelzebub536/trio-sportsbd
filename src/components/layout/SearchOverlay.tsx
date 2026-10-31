@@ -131,7 +131,7 @@ export default function SearchOverlay({
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold uppercase">
+                      <span className="block truncate text-sm font-semibold">
                         {item.name}
                       </span>
                       <span className="block text-xs text-muted-foreground">
@@ -148,7 +148,7 @@ export default function SearchOverlay({
                 <Link
                   href={`/search?q=${encodeURIComponent(query.trim())}`}
                   onClick={() => onOpenChange(false)}
-                  className="block bg-secondary px-4 py-3 text-center text-xs font-bold uppercase tracking-widest hover:underline"
+                  className="block bg-secondary px-4 py-3 text-center text-sm font-semibold hover:underline"
                 >
                   See all results
                 </Link>

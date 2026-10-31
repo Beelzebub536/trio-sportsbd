@@ -2,30 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Stadium palette (see docs/superpowers/specs/2026-11-01-stadium-redesign-design.md). HSL triplets feed Tailwind tokens. */
+/* Night-match palette (dark-first). HSL triplets feed Tailwind tokens; see tailwind.config.ts. */
 :root {
-  --background: 0 0% 100%;
-  --foreground: 150 16% 5%; /* ink #0B0F0D */
-  --card: 0 0% 100%;
-  --card-foreground: 150 16% 5%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 150 16% 5%;
-  --primary: 163 100% 21%; /* pitch green #006A4E */
-  --primary-foreground: 0 0% 100%;
-  --pitch-dark: 164 100% 11%; /* #00382A */
-  --secondary: 100 14% 95%; /* chalk #F3F5F2 */
-  --secondary-foreground: 150 16% 5%;
-  --muted: 100 14% 95%;
-  --muted-foreground: 147 6% 38%; /* #5B6660 */
-  --accent: 100 14% 95%;
-  --accent-foreground: 150 16% 5%;
-  --destructive: 349 100% 45%; /* flag red #E4002B */
+  color-scheme: dark;
+  --background: 160 14% 6%; /* #0D1210 */
+  --foreground: 60 9% 96%; /* #F5F5F2 */
+  --card: 160 10% 10%; /* #171C1A */
+  --card-foreground: 60 9% 96%;
+  --popover: 160 10% 10%;
+  --popover-foreground: 60 9% 96%;
+  --primary: 151 70% 46%; /* floodlight green #23C47B */
+  --primary-foreground: 160 30% 6%;
+  --pitch-dark: 160 30% 9%;
+  --secondary: 160 8% 15%; /* raised surface */
+  --secondary-foreground: 60 9% 96%;
+  --muted: 160 8% 15%;
+  --muted-foreground: 150 6% 66%;
+  --accent: 160 8% 15%;
+  --accent-foreground: 60 9% 96%;
+  --destructive: 350 86% 56%; /* sale red #EE3355 */
   --destructive-foreground: 0 0% 100%;
-  --border: 135 9% 87%; /* #DCE2DD */
-  --input: 135 9% 80%;
-  --ring: 163 100% 21%;
-  --radius: 0rem;
-  --brand-sale: #e4002b;
+  --border: 160 8% 19%;
+  --input: 160 8% 24%;
+  --ring: 151 70% 46%;
+  --radius: 0.75rem;
+  --brand-sale: #ee3355;
   --tabbar-h: 0px;
 }
 
@@ -50,11 +51,10 @@
   h2,
   h3,
   h4 {
-    font-family: var(--font-display), "Arial Narrow", sans-serif;
+    font-family: var(--font-display), system-ui, sans-serif;
     font-weight: 800;
-    letter-spacing: -0.01em;
-    line-height: 0.95;
-    text-transform: uppercase;
+    letter-spacing: -0.035em;
+    line-height: 1;
     text-wrap: balance;
   }
 
@@ -72,14 +72,12 @@
 }
 
 @layer components {
-  /* Diagonal mown-grass stripes for green surfaces; pure CSS, no image request. */
-  .pitch-stripes {
+  /* Floodlit surface: deep green glow on charcoal, used for bands and panels. */
+  .floodlight {
     background-color: hsl(var(--pitch-dark));
-    background-image: repeating-linear-gradient(
-      90deg,
-      hsl(var(--primary) / 0.35) 0 80px,
-      transparent 80px 160px
-    );
+    background-image:
+      radial-gradient(120% 90% at 85% 0%, hsl(var(--primary) / 0.28), transparent 60%),
+      radial-gradient(80% 70% at 0% 100%, hsl(var(--primary) / 0.12), transparent 60%);
   }
 
   .price {
@@ -105,15 +103,8 @@
     position: absolute;
     inset: 0;
     transform: translateX(-100%);
-    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.6), transparent);
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.06), transparent);
     animation: shimmer 1.4s ease-in-out infinite;
-  }
-
-  .ticker-track {
-    animation: ticker 28s linear infinite;
-  }
-  .ticker:hover .ticker-track {
-    animation-play-state: paused;
   }
 
   /* Rotating announcement messages on phones (3 items, 4s each). */
@@ -201,6 +192,40 @@
   }
 }
 
+/* First-visit intro: hidden unless the inline boot script marked this visit (see FirstVisitIntro). */
+.intro {
+  display: none;
+}
+html[data-intro]:has(.intro) {
+  overflow: hidden;
+}
+html[data-intro] .intro {
+  display: block;
+  /* Failsafe: never trap the visitor if the script fails to finish. */
+  animation: intro-failsafe 0s linear 7s forwards;
+}
+
+/* Off-white backdrop over a warmer ground; the mask opens a growing hole for the reveal. */
+.intro-ground {
+  background:
+    radial-gradient(140% 60% at 50% 100%, rgb(120 100 70 / 0.18), transparent 70%),
+    linear-gradient(to bottom, #f7f5f0 0%, #f1ede5 55%, #e7e1d5 63%, #ddd5c6 100%);
+  --mask: radial-gradient(
+    circle at 55% 38%,
+    transparent var(--hole),
+    #000 calc(var(--hole) + 1px)
+  );
+  -webkit-mask-image: var(--mask);
+  mask-image: var(--mask);
+}
+
+@keyframes intro-failsafe {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 @keyframes pop {
   from {
     transform: scale(0.4);
@@ -210,12 +235,6 @@
 @keyframes shimmer {
   to {
     transform: translateX(100%);
-  }
-}
-
-@keyframes ticker {
-  to {
-    transform: translateX(-50%);
   }
 }
 

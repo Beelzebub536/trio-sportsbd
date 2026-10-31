@@ -26,7 +26,7 @@ export default function AnnouncementBar({
   ];
 
   return (
-    <div className="bg-pitch-dark text-xs font-medium text-white">
+    <div className="bg-primary text-xs font-semibold text-primary-foreground">
       {/* Phones: one line that rotates; larger screens: all three side by side. */}
       <div className="rotate-msg grid h-9 place-items-center px-4 text-center md:hidden">
         {messages}

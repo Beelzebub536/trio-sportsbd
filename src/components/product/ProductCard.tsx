@@ -31,7 +31,7 @@ export default function ProductCard({
     <article className="group relative flex flex-col">
       <Link
         href={`/product/${product.slug}`}
-        className="press relative block aspect-[4/5] overflow-hidden bg-secondary"
+        className="press relative block aspect-[4/5] overflow-hidden rounded-2xl bg-card"
         aria-label={product.name}
       >
         {product.image ? (
@@ -72,7 +72,7 @@ export default function ProductCard({
           </span>
         )}
         {showNew && (
-          <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-white">
+          <span className="absolute left-2 top-2 rounded-full bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground">
             New
           </span>
         )}
@@ -86,7 +86,7 @@ export default function ProductCard({
       />
 
       <div className="mt-3 space-y-1">
-        <h3 className="font-display text-lg font-bold uppercase leading-[1.05] md:text-xl">
+        <h3 className="text-[15px] font-semibold leading-snug">
           <Link href={`/product/${product.slug}`} className="hover:text-primary">
             {product.name}
           </Link>

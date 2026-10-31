@@ -22,7 +22,7 @@ export default function ProductGrid({
         </p>
         <Link
           href="/shop"
-          className="press mt-2 inline-flex h-12 items-center bg-primary px-6 text-sm font-bold uppercase tracking-wide text-white hover:bg-pitch-dark"
+          className="press mt-2 inline-flex h-12 items-center bg-primary px-6 text-sm font-bold text-white hover:bg-pitch-dark"
         >
           Browse all products
         </Link>

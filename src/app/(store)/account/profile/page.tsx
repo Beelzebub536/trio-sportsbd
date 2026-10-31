@@ -10,7 +10,7 @@ export default async function AccountProfilePage() {
   return (
     <div className="space-y-10">
       <div>
-        <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+        <h1 className="text-2xl font-bold leading-none md:text-3xl">
           Profile
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -19,21 +19,21 @@ export default async function AccountProfilePage() {
       </div>
 
       <section>
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-widest">
+        <h2 className="mb-4 text-base font-semibold">
           Personal details
         </h2>
         <ProfileForm name={session.user.name} />
       </section>
 
       <section className="border-t border-border pt-8">
-        <h2 className="mb-4 text-sm font-bold uppercase tracking-widest">
+        <h2 className="mb-4 text-base font-semibold">
           Change password
         </h2>
         <PasswordForm />
       </section>
 
       <section className="border-t border-border pt-8">
-        <h2 className="mb-2 text-sm font-bold uppercase tracking-widest">
+        <h2 className="mb-2 text-base font-semibold">
           Delete your account
         </h2>
         <p className="max-w-md text-sm text-muted-foreground">

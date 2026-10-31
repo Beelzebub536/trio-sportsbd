@@ -51,7 +51,7 @@ export default function AccountMenu({ user }: { user: HeaderUser }) {
         <UserIcon className="h-5 w-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate text-xs uppercase tracking-widest text-muted-foreground">
+        <DropdownMenuLabel className="truncate text-sm text-muted-foreground">
           {user.name}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

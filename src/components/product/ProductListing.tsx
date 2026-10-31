@@ -56,7 +56,7 @@ function ActiveChips({
         <Link
           key={`${chip.label}-${chip.href}`}
           href={chip.href}
-          className="inline-flex items-center gap-1.5 bg-secondary px-3 py-1 text-xs uppercase tracking-wide transition-colors hover:bg-black hover:text-white"
+          className="inline-flex items-center gap-1.5 bg-secondary px-3 py-1 text-xs transition-colors hover:rounded-full bg-primary hover:text-primary-foreground"
         >
           {chip.label}
           <X className="h-3 w-3" />
@@ -133,7 +133,7 @@ async function ListingContent({
   return (
     <div>
       {(title || description) && (
-        <header className="pitch-stripes text-white">
+        <header className="floodlight text-white">
           <div className="mx-auto max-w-7xl px-4 py-10 md:py-14">
             {title && <h1 className="text-6xl md:text-8xl">{title}</h1>}
             {description && (

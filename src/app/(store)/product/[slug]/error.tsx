@@ -18,10 +18,10 @@ export default function ProductError({
 
   return (
     <main className="mx-auto flex max-w-xl flex-col items-center gap-4 px-4 py-24 text-center">
-      <p className="text-xs uppercase tracking-widest text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Product unavailable
       </p>
-      <h1 className="text-3xl font-bold uppercase">We could not load this product</h1>
+      <h1 className="text-3xl font-bold">We could not load this product</h1>
       <p className="text-sm text-muted-foreground">
         Please try again. Your bag and other products are still available.
       </p>

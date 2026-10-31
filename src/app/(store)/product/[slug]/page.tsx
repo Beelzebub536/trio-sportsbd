@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
     <div className="mx-auto max-w-7xl px-4 py-6">
       <nav
         aria-label="Breadcrumb"
-        className="mb-6 flex flex-wrap items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground"
+        className="mb-6 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
       >
         <Link href="/" className="hover:underline">
           Home

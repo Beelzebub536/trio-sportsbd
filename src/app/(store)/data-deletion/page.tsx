@@ -46,7 +46,7 @@ export default async function DataDeletionPage() {
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block bg-black px-5 py-3 text-xs font-bold uppercase tracking-widest text-white no-underline hover:opacity-90"
+          className="inline-block rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground no-underline hover:brightness-110"
         >
           Send the request on WhatsApp
         </a>

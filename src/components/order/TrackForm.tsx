@@ -77,10 +77,10 @@ export default function TrackForm() {
         <div className="max-w-2xl border border-border p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 Order {result.orderNumber}
               </p>
-              <p className="text-lg font-bold uppercase">{result.customerName}</p>
+              <p className="text-lg font-bold">{result.customerName}</p>
             </div>
             <OrderStatusBadge status={result.status} />
           </div>

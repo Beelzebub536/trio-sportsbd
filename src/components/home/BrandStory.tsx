@@ -9,30 +9,19 @@ const POINTS = [
 
 export default function BrandStory() {
   return (
-    <section className="bg-secondary">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-16 md:py-20 lg:grid-cols-[1fr_1.4fr] lg:gap-16">
-        <div>
-          <h2 className="text-5xl md:text-6xl">Built for the game. Made for Bangladesh.</h2>
-          <p className="mt-5 max-w-md text-base text-muted-foreground">
-            Match-day jerseys, training trousers and everyday accessories for players and fans,
-            with honest prices and delivery you can rely on.
-          </p>
-        </div>
-
-        <ul className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
-          {POINTS.map((point) => (
-            <li key={point.title} className="flex gap-4">
-              <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary text-white">
-                <point.icon className="h-6 w-6" aria-hidden />
-              </span>
-              <div>
-                <h3 className="text-2xl">{point.title}</h3>
-                <p className="mt-1 text-sm text-muted-foreground">{point.body}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-      </div>
+    <section className="mx-auto max-w-7xl px-4 py-12 md:py-16">
+      <h2 className="max-w-2xl text-3xl md:text-5xl">Built for the game. Made for Bangladesh.</h2>
+      <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {POINTS.map((point) => (
+          <li key={point.title} className="rounded-2xl border border-border bg-card p-5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary/15 text-primary">
+              <point.icon className="h-5 w-5" aria-hidden />
+            </span>
+            <h3 className="mt-4 text-lg">{point.title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{point.body}</p>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

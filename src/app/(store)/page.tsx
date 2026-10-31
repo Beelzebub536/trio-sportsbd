@@ -6,22 +6,22 @@ import HomeHero from "@/components/home/HomeHero";
 import HomeProductRow from "@/components/home/HomeProductRow";
 import HomeSectionSkeleton from "@/components/home/HomeSectionSkeleton";
 import HomeWhatsAppCta from "@/components/home/HomeWhatsAppCta";
+import CricketPromo from "@/components/home/CricketPromo";
+import PhotoHero from "@/components/home/PhotoHero";
 import SaleStrip from "@/components/home/SaleStrip";
-import StadiumHero from "@/components/home/StadiumHero";
-import Ticker from "@/components/home/Ticker";
 
 export default function HomePage() {
   return (
     <>
       {/* Static, data-free: paints immediately while the sections below stream in. */}
-      <StadiumHero />
-      <Ticker />
+      <PhotoHero />
       <Suspense fallback={<HomeSectionSkeleton kind="tiles" />}>
         <HomeCategories />
       </Suspense>
       <Suspense fallback={<HomeSectionSkeleton kind="row" />}>
         <HomeProductRow kind="new" title="New arrivals" href="/shop" />
       </Suspense>
+      <CricketPromo />
       <Suspense fallback={<HomeSectionSkeleton kind="hero" />}>
         <HomeHero />
       </Suspense>

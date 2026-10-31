@@ -9,22 +9,22 @@ export default function Footer({ settings }: { settings: StoreSettings }) {
   const whatsapp = toWhatsAppNumber(settings.whatsappNumber);
 
   return (
-    <footer className="pitch-stripes mt-16 overflow-hidden text-white">
+    <footer className="mt-16 overflow-hidden border-t border-border bg-card">
       <div className="mx-auto max-w-7xl px-4 pt-14">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.3fr_1fr_1fr_1fr]">
           <div>
-            <p className="font-display text-3xl font-extrabold uppercase leading-none">
+            <p className="font-display text-3xl font-extrabold leading-none tracking-tight">
               Kit up for match day.
             </p>
-            <p className="mt-3 max-w-xs text-sm text-white/75">{settings.storeAddress}</p>
+            <p className="mt-3 max-w-xs text-sm text-muted-foreground">{settings.storeAddress}</p>
             {settings.supportHours && (
-              <p className="mt-1 max-w-xs text-sm text-white/75">{settings.supportHours}</p>
+              <p className="mt-1 max-w-xs text-sm text-muted-foreground">{settings.supportHours}</p>
             )}
             <a
               href={`https://wa.me/${whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="press mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-white px-5 text-sm font-bold text-pitch-dark hover:bg-white/90"
+              className="press mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground hover:brightness-110"
             >
               <MessageCircle className="h-5 w-5" aria-hidden />
               WhatsApp {settings.whatsappNumber}
@@ -39,7 +39,7 @@ export default function Footer({ settings }: { settings: StoreSettings }) {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="inline-block py-1.5 text-sm text-white/80 hover:text-white hover:underline"
+                      className="inline-block py-1.5 text-sm text-muted-foreground hover:text-foreground hover:underline"
                     >
                       {link.label}
                     </Link>
@@ -52,14 +52,14 @@ export default function Footer({ settings }: { settings: StoreSettings }) {
 
         <p
           aria-hidden
-          className="mt-12 select-none font-display text-[26vw] font-extrabold uppercase leading-[0.75] tracking-tight text-white/10 lg:text-[18rem]"
+          className="mt-12 select-none font-display text-[26vw] font-extrabold leading-[0.75] tracking-tight text-foreground/[0.04] lg:text-[18rem]"
         >
           Trio
         </p>
       </div>
 
-      <div className="bg-pitch-dark">
-        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-5 text-xs text-white/70 sm:flex-row sm:items-center sm:justify-between">
+      <div className="border-t border-border">
+        <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
           <p>
             © {new Date().getFullYear()} {settings.storeName}
           </p>

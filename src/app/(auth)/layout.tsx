@@ -10,7 +10,7 @@ export default function AuthLayout({
   return (
     <div className="grid min-h-dvh lg:grid-cols-2">
       {/* Desktop-only brand panel; pure CSS so the sign-in page makes no extra image request. */}
-      <aside className="pitch-stripes relative hidden overflow-hidden text-white lg:block">
+      <aside className="floodlight relative hidden overflow-hidden text-white lg:block">
         <span
           aria-hidden
           className="pointer-events-none absolute -bottom-16 -right-10 select-none font-display text-[30rem] font-extrabold leading-none text-transparent [-webkit-text-stroke:2px_hsl(0_0%_100%/0.18)]"

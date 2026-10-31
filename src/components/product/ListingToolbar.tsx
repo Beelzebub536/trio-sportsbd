@@ -60,7 +60,7 @@ export default function ListingToolbar({
           </SheetTrigger>
           <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
             <SheetHeader className="text-left">
-              <SheetTitle className="text-lg font-bold uppercase">
+              <SheetTitle className="text-lg font-bold">
                 Filters
               </SheetTitle>
             </SheetHeader>

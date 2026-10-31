@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, Inter } from "next/font/google";
+import { Archivo, Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { INTRO_BOOT } from "@/lib/intro";
 import { SITE_DESCRIPTION, SITE_NAME, siteUrl } from "@/lib/seo";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
-const display = Barlow_Condensed({
+const display = Archivo({
   weight: ["700", "800"],
   subsets: ["latin"],
   display: "swap",
@@ -50,8 +52,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={display.variable}>
+    // suppressHydrationWarning: the intro boot script may add data-intro before hydration.
+    <html lang="en" className={display.variable} suppressHydrationWarning>
       <body className={inter.className}>
+        {/* Runs before first paint so returning visitors never see the intro flash. */}
+        <Script id="intro-boot" strategy="beforeInteractive">
+          {INTRO_BOOT}
+        </Script>
         {children}
         <Toaster position="top-center" richColors />
       </body>

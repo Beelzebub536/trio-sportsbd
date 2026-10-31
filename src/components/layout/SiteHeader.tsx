@@ -54,8 +54,8 @@ export default function SiteHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 bg-white transition-shadow duration-200",
-        scrolled ? "shadow-[0_1px_0_hsl(var(--border)),0_8px_24px_hsl(var(--pitch-dark)/0.06)]" : "shadow-[0_1px_0_hsl(var(--border))]",
+        "sticky top-0 z-40 bg-background transition-shadow duration-200",
+        scrolled ? "shadow-[0_1px_0_hsl(var(--border)),0_12px_32px_rgb(0_0_0/0.45)]" : "shadow-[0_1px_0_hsl(var(--border))]",
       )}
     >
       <div
@@ -87,27 +87,27 @@ export default function SiteHeader({
                   <Link
                     href={item.href}
                     className={cn(
-                      "relative py-2 font-display text-[17px] font-bold uppercase tracking-wide after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 group-hover:after:scale-x-100 group-focus-within:after:scale-x-100",
+                      "relative py-2 text-[15px] font-semibold after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 group-hover:after:scale-x-100 group-focus-within:after:scale-x-100",
                       isSale && "text-sale",
                     )}
                   >
                     {item.label}
                   </Link>
                   {children.length > 0 && (
-                    <div className="invisible absolute left-1/2 top-full z-50 w-[560px] -translate-x-1/2 translate-y-2 border-t-4 border-primary bg-white p-6 opacity-0 shadow-[0_24px_48px_hsl(var(--pitch-dark)/0.14)] transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                    <div className="invisible absolute left-1/2 top-full z-50 w-[560px] -translate-x-1/2 translate-y-2 rounded-2xl border border-border bg-card p-6 opacity-0 shadow-[0_24px_48px_rgb(0_0_0/0.5)] transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
                       <div className="grid grid-cols-[1fr_1fr_160px] gap-6">
                         {children.map((child) => (
                           <Link
                             key={child.id}
                             href={`/shop?category=${encodeURIComponent(child.slug)}`}
-                            className="font-display text-lg font-bold uppercase leading-tight hover:text-primary"
+                            className="text-base font-semibold leading-tight hover:text-primary"
                           >
                             {child.name}
                           </Link>
                         ))}
                         <Link
                           href={item.href}
-                          className="pitch-stripes row-span-3 col-start-3 row-start-1 flex min-h-28 items-end p-3 font-display text-xl font-extrabold uppercase leading-none text-white"
+                          className="floodlight row-span-3 col-start-3 row-start-1 flex min-h-28 items-end rounded-xl p-3 font-display text-xl font-extrabold leading-none text-white"
                         >
                           Shop all {item.label.toLowerCase()}
                         </Link>

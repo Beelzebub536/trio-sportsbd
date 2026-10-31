@@ -37,7 +37,7 @@ export default function MobileTabBar({
   return (
     <nav
       aria-label="Quick"
-      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_hsl(var(--pitch-dark)/0.08)] lg:hidden"
+      className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_24px_rgb(0_0_0/0.4)] lg:hidden"
     >
       <ul className="flex h-16 items-stretch">
         {links.map(({ href, label, icon: Icon }) => (

@@ -54,7 +54,7 @@ export default function WishlistButton({
       onClick={handleClick}
       disabled={pending}
       className={cn(
-        "press inline-flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm hover:text-sale",
+        "press inline-flex h-10 w-10 items-center justify-center rounded-full bg-background/80 shadow-sm hover:text-sale",
         className,
       )}
     >

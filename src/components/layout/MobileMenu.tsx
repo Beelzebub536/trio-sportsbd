@@ -35,8 +35,8 @@ export default function MobileMenu({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-full overflow-y-auto p-0 sm:max-w-sm">
-        <SheetHeader className="pitch-stripes px-5 py-6 text-left">
-          <SheetTitle className="font-display text-3xl font-extrabold uppercase text-white">Shop the game</SheetTitle>
+        <SheetHeader className="floodlight px-5 py-6 text-left">
+          <SheetTitle className="font-display text-3xl font-extrabold text-white">Shop the game</SheetTitle>
         </SheetHeader>
 
         <nav aria-label="Mobile" className="px-5 py-4">
@@ -52,7 +52,7 @@ export default function MobileMenu({
                     <Link
                       href={item.href}
                       onClick={close}
-                      className={`press block py-4 font-display text-2xl font-bold uppercase ${item.href === "/sale" ? "text-sale" : ""}`}
+                      className={`press block py-4 font-display text-2xl font-bold ${item.href === "/sale" ? "text-sale" : ""}`}
                     >
                       {item.label}
                     </Link>
@@ -64,7 +64,7 @@ export default function MobileMenu({
                 <li key={item.label}>
                   <Accordion type="single" collapsible>
                     <AccordionItem value={item.label} className="border-0">
-                      <AccordionTrigger className="py-4 font-display text-2xl font-bold uppercase hover:no-underline">
+                      <AccordionTrigger className="py-4 font-display text-2xl font-bold hover:no-underline">
                         {item.label}
                       </AccordionTrigger>
                       <AccordionContent className="pb-2">

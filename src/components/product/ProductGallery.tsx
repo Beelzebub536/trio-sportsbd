@@ -107,7 +107,7 @@ export default function ProductGallery({
             />
             <span
               aria-hidden="true"
-              className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-2 bg-pitch-dark/80 px-3 py-2 text-[10px] font-bold uppercase tracking-widest text-white"
+              className="pointer-events-none absolute bottom-3 right-3 inline-flex items-center gap-2 bg-pitch-dark/80 px-3 py-2 text-xs font-semibold text-white"
             >
               <Maximize2 className="h-3.5 w-3.5" /> View full size
             </span>
@@ -115,7 +115,7 @@ export default function ProductGallery({
         ))}
       </div>
       <Dialog open={viewFullSize} onOpenChange={setViewFullSize}>
-        <DialogContent className="h-[100dvh] w-screen max-w-none border-0 bg-black p-0 text-white sm:rounded-none">
+        <DialogContent className="h-[100dvh] w-screen max-w-none border-0 rounded-full bg-primary p-0 text-primary-foreground sm:rounded-none">
           <DialogTitle className="sr-only">
             {productName} — full-size image
           </DialogTitle>

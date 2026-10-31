@@ -40,7 +40,7 @@ export default function CartSheet({
     <Sheet open={isOpen} onOpenChange={(open) => (open ? undefined : close())}>
       <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
         <SheetHeader className="border-b border-border px-5 py-4 text-left">
-          <SheetTitle className="font-display text-3xl font-extrabold uppercase">
+          <SheetTitle className="font-display text-3xl font-extrabold">
             Your bag{hydrated && totalQty > 0 ? ` (${totalQty})` : ""}
           </SheetTitle>
         </SheetHeader>
@@ -100,7 +100,7 @@ export default function CartSheet({
                     <Link
                       href={`/product/${line.slug}`}
                       onClick={close}
-                      className="font-display text-lg font-bold uppercase leading-tight hover:text-primary"
+                      className="font-display text-lg font-bold leading-tight hover:text-primary"
                     >
                       {line.name}
                     </Link>
