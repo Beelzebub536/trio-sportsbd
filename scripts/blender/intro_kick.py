@@ -4,6 +4,9 @@ motion and flies over it, on an off-white studio ground.
 Run headless (does not touch any open Blender session):
   blender -b --factory-startup -P scripts/blender/intro_kick.py -- OUT_DIR WIDTH HEIGHT [START END [STEP]]
 Frames are written as OUT_DIR/f####.jpg; encode them with scripts/blender/encode_intro.mjs.
+
+In an open Blender session, exec this file under another __name__ and call build_scene(w, h) on an
+empty scene to get the same set-up for hand editing.
 """
 
 import math
@@ -208,4 +211,5 @@ def main():
     bpy.ops.render.render(animation=True)
 
 
-main()
+if __name__ == "__main__":  # headless render; importing it in a live session only defines build_scene
+    main()
