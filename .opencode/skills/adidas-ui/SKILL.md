@@ -2,20 +2,19 @@
 name: adidas-ui
 description: Design rules for the Adidas-inspired look and feel of trio-sportsbd. Load for any storefront or admin UI work.
 ---
-# Stadium UI rules (replaces the original Adidas look, 2026-11-01)
+# Night-match UI rules (dark theme, 2026-11-01; replaces the Adidas and Stadium looks)
 
-Full spec: `docs/superpowers/specs/2026-11-01-stadium-redesign-design.md`. Tokens live in `src/app/globals.css` and are mapped in `tailwind.config.ts`; never hard-code hex values in components.
+Tokens live in `src/app/globals.css` (dark-first) and are mapped in `tailwind.config.ts`; never hard-code hex values in components.
 
 ## Look
-- Palette: pitch green `primary` (#006A4E), `pitch-dark` (#00382A) for dark bands, flag red `sale`/`destructive` (#E4002B) only for sale, discounts and errors, ink `foreground`, chalk `secondary` surfaces, `muted-foreground` text. No neon accent.
-- Display type: Barlow Condensed 700/800 via `font-display` (loaded once in the root layout); headings are uppercase automatically. Body: Inter 16px. Prices use the `price` class (tabular numerals).
-- Sharp corners by default; `rounded-full` only for pills (badges, chips, wishlist heart, WhatsApp pill).
-- Signature motifs: `pitch-stripes` class for green surfaces, outlined jersey numerals (`-webkit-text-stroke`) as decoration. Spend boldness in one place per page.
-- Avoid: tracked-out ALL-CAPS eyebrow labels, `->` arrows on buttons, `A · B` meta strings.
-- Buttons: shadcn `Button` (green default, outline = ink border). Add the `press` class to tappable custom elements. Touch targets >= 44px.
+- Dark charcoal surfaces (`background`, `card`, `secondary`), off-white text, floodlight green `primary` for CTAs and active states (dark text on it), `sale`/`destructive` red only for sale, discounts and errors. `floodlight` class = green-glow panel.
+- Type: Archivo 700/800 (`font-display`) for headings in sentence case with tight tracking; Inter body 16px. No all-caps labels, no tracked-out eyebrows. Prices use the `price` class.
+- Shape: rounded (`--radius` 0.75rem), pill buttons (`rounded-full`), photo tiles `rounded-2xl`, bands `rounded-3xl`.
+- Imagery: editorial photos from `src/lib/photos.ts` (Unsplash, no third-party logos) behind dark gradients for legibility.
 - Phones: fixed bottom tab bar (`MobileTabBar`), hidden on product/cart/checkout; product page uses `StickyBuyBar`. Store layout pads for it via `--tabbar-h`.
-- Motion: CSS for hover/press/hero; GSAP only through `<Reveal>` / `loadGsap()` (lazy, skipped for reduced-motion and Save-Data). Never hide content that is already on screen.
-- Loading: keep every `Suspense` fallback; skeletons use `Skeleton` (chalk + shimmer) and `LoadingSurface`.
+- Motion: CSS for hover/press; GSAP only through `<Reveal>` / `loadGsap()` (lazy; skipped for reduced motion and Save-Data). Never hide content already on screen.
+- First-visit intro: Blender render in `public/intro/` (source `scripts/blender/intro_kick.py`, encode with `scripts/blender/encode_intro.mjs`), played by `FirstVisitIntro`; boot logic in `src/lib/intro.ts`. `?intro=1` previews it.
+- Loading: keep every `Suspense` fallback; skeletons use `Skeleton` (shimmer) and `LoadingSurface`.
 
 ## Components
 - Announcement bar (black, small white text, "Free delivery over ৳X" from settings) above the header.

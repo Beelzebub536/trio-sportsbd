@@ -1,11 +1,11 @@
 # trio-sportsbd - agent rules
 
-E-commerce site for sports jerseys, trousers and accessories (Bangladesh). "Stadium" UI (see `docs/superpowers/specs/2026-11-01-stadium-redesign-design.md`). Free-tier only, deployed on Vercel.
+E-commerce site for sports jerseys, trousers and accessories (Bangladesh). Dark "night match" UI (rules in the `adidas-ui` skill). Free-tier only, deployed on Vercel.
 
 ## Start of every session (mandatory)
 1. Read `docs/PROGRESS.md` (what is done, what is next, known issues).
 2. Read ONLY the section of `docs/PLAN.md` / `docs/PROMPTS.md` relevant to the current task.
-3. Load the skills you need: `stack-gotchas` (always), `adidas-ui` (any UI work; now describes the Stadium design), `orders-and-pricing` (cart, checkout, orders, admin prices).
+3. Load the skills you need: `stack-gotchas` (always), `adidas-ui` (any UI work; now describes the dark night-match design), `orders-and-pricing` (cart, checkout, orders, admin prices).
 
 ## Environment
 - Windows 11, PowerShell, Node 22 LTS, npm. Never use bash-only commands (`rm -rf`, `cp`, `export`, `&&` chains that assume bash). Use npm scripts or small Node scripts for anything file-related.

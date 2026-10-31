@@ -205,18 +205,19 @@ html[data-intro] .intro {
   animation: intro-failsafe 0s linear 7s forwards;
 }
 
-/* Off-white backdrop over a warmer ground; the mask opens a growing hole for the reveal. */
-.intro-ground {
-  background:
-    radial-gradient(140% 60% at 50% 100%, rgb(120 100 70 / 0.18), transparent 70%),
-    linear-gradient(to bottom, #f7f5f0 0%, #f1ede5 55%, #e7e1d5 63%, #ddd5c6 100%);
-  --mask: radial-gradient(
-    circle at 55% 38%,
-    transparent var(--hole),
-    #000 calc(var(--hole) + 1px)
-  );
-  -webkit-mask-image: var(--mask);
-  mask-image: var(--mask);
+/* Reveal: a hole opens from where the ball leaves frame (top-right) and the store shows through. */
+@property --hole {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -10px;
+}
+.intro-stage {
+  -webkit-mask-image: radial-gradient(circle at 80% 15%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  mask-image: radial-gradient(circle at 80% 15%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  transition: --hole 0.9s cubic-bezier(0.55, 0, 0.75, 0.2);
+}
+.intro-reveal {
+  --hole: 170vmax;
 }
 
 @keyframes intro-failsafe {
