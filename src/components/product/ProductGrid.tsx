@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import Reveal from "@/components/motion/Reveal";
 import ProductCard from "@/components/product/ProductCard";
 import type { ProductCardData } from "@/lib/queries/products";
 
@@ -15,13 +16,13 @@ export default function ProductGrid({
   if (products.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-20 text-center">
-        <h2 className="text-xl font-bold uppercase">No products found</h2>
+        <h2 className="text-4xl">No products found</h2>
         <p className="max-w-md text-sm text-muted-foreground">
           Try removing a filter or two, or browse everything in the shop.
         </p>
         <Link
           href="/shop"
-          className="mt-2 bg-black px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-white hover:opacity-90"
+          className="press mt-2 inline-flex h-12 items-center bg-primary px-6 text-sm font-bold uppercase tracking-wide text-white hover:bg-pitch-dark"
         >
           Browse all products
         </Link>
@@ -30,7 +31,7 @@ export default function ProductGrid({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-3 xl:grid-cols-4">
+    <Reveal className="grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-4 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((product, index) => (
         <ProductCard
           key={product.id}
@@ -40,6 +41,6 @@ export default function ProductGrid({
           priority={index < 4}
         />
       ))}
-    </div>
+    </Reveal>
   );
 }

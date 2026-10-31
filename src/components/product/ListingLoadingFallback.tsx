@@ -35,7 +35,8 @@ export default function ListingLoadingFallback() {
 
   return (
     <LoadingSurface className="min-h-[70vh]" label="Updating products">
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="pitch-stripes h-40 md:h-56" />
+      <div className="mx-auto max-w-7xl px-4 py-6">
         <CachedListingPreview products={preview.products} />
       </div>
     </LoadingSurface>

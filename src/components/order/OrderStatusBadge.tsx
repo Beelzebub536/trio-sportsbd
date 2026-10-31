@@ -14,8 +14,8 @@ const STYLES: Record<string, string> = {
   PENDING: "bg-secondary text-foreground",
   CONFIRMED: "bg-black text-white",
   PROCESSING: "bg-black text-white",
-  SHIPPED: "bg-[var(--brand-accent)] text-black",
-  DELIVERED: "bg-[var(--brand-accent)] text-black",
+  SHIPPED: "bg-primary text-primary-foreground",
+  DELIVERED: "bg-primary text-primary-foreground",
   CANCELLED: "bg-[var(--brand-sale)] text-white",
   RETURNED: "bg-[var(--brand-sale)] text-white",
 };

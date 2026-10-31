@@ -2,14 +2,20 @@
 name: adidas-ui
 description: Design rules for the Adidas-inspired look and feel of trio-sportsbd. Load for any storefront or admin UI work.
 ---
-# Adidas-style UI rules
+# Stadium UI rules (replaces the original Adidas look, 2026-11-01)
+
+Full spec: `docs/superpowers/specs/2026-11-01-stadium-redesign-design.md`. Tokens live in `src/app/globals.css` and are mapped in `tailwind.config.ts`; never hard-code hex values in components.
 
 ## Look
-- Palette: black `#000`, white `#fff`, light grey surfaces `#ecefef`, mid grey text `#767677`, ONE accent (electric green `#c4f000` or red `#e4002b`; pick one in `globals.css` tokens and reuse). Sale prices in red.
-- Sharp corners everywhere (`--radius: 0`). Buttons are rectangular, black fill with white text, with a small arrow icon on the right (`->`); hover shifts the arrow. Secondary button = white with black 1px border.
-- Typography: headings in a bold condensed uppercase face (Barlow Condensed or Oswald, weights 700-800, tight tracking) loaded with `next/font/google`; body in Inter. Huge hero headings; small uppercase labels (12px, tracking wide).
-- Lots of whitespace, edge-to-edge imagery, grid of product cards with no borders or shadows. Links use a 2px underline that thickens on hover.
-- Motion: subtle only (150-250 ms). Respect `prefers-reduced-motion`.
+- Palette: pitch green `primary` (#006A4E), `pitch-dark` (#00382A) for dark bands, flag red `sale`/`destructive` (#E4002B) only for sale, discounts and errors, ink `foreground`, chalk `secondary` surfaces, `muted-foreground` text. No neon accent.
+- Display type: Barlow Condensed 700/800 via `font-display` (loaded once in the root layout); headings are uppercase automatically. Body: Inter 16px. Prices use the `price` class (tabular numerals).
+- Sharp corners by default; `rounded-full` only for pills (badges, chips, wishlist heart, WhatsApp pill).
+- Signature motifs: `pitch-stripes` class for green surfaces, outlined jersey numerals (`-webkit-text-stroke`) as decoration. Spend boldness in one place per page.
+- Avoid: tracked-out ALL-CAPS eyebrow labels, `->` arrows on buttons, `A · B` meta strings.
+- Buttons: shadcn `Button` (green default, outline = ink border). Add the `press` class to tappable custom elements. Touch targets >= 44px.
+- Phones: fixed bottom tab bar (`MobileTabBar`), hidden on product/cart/checkout; product page uses `StickyBuyBar`. Store layout pads for it via `--tabbar-h`.
+- Motion: CSS for hover/press/hero; GSAP only through `<Reveal>` / `loadGsap()` (lazy, skipped for reduced-motion and Save-Data). Never hide content that is already on screen.
+- Loading: keep every `Suspense` fallback; skeletons use `Skeleton` (chalk + shimmer) and `LoadingSurface`.
 
 ## Components
 - Announcement bar (black, small white text, "Free delivery over ৳X" from settings) above the header.

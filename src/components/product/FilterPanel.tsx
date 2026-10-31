@@ -50,7 +50,7 @@ export default function FilterPanel({
       >
         {categoryOptions.length > 0 && (
           <AccordionItem value="category">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Category
             </AccordionTrigger>
             <AccordionContent>
@@ -76,7 +76,7 @@ export default function FilterPanel({
 
         {showGender && (
           <AccordionItem value="gender">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Gender
             </AccordionTrigger>
             <AccordionContent>
@@ -102,7 +102,7 @@ export default function FilterPanel({
 
         {facets.sizes.length > 0 && (
           <AccordionItem value="size">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Size
             </AccordionTrigger>
             <AccordionContent>
@@ -128,7 +128,7 @@ export default function FilterPanel({
 
         {facets.colors.length > 0 && (
           <AccordionItem value="color">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Colour
             </AccordionTrigger>
             <AccordionContent>
@@ -158,7 +158,7 @@ export default function FilterPanel({
         )}
 
         <AccordionItem value="price">
-          <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+          <AccordionTrigger className="font-display text-lg font-bold uppercase">
             Price
           </AccordionTrigger>
           <AccordionContent>
@@ -190,7 +190,7 @@ export default function FilterPanel({
 
         {facets.brands.length > 0 && (
           <AccordionItem value="brand">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Brand
             </AccordionTrigger>
             <AccordionContent>
@@ -216,7 +216,7 @@ export default function FilterPanel({
 
         {showOnSale && (
           <AccordionItem value="sale" className="border-b-0">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold uppercase">
               Offers
             </AccordionTrigger>
             <AccordionContent>
@@ -241,7 +241,7 @@ export default function FilterPanel({
         </Button>
         <Link
           href={action}
-          className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+          className="py-2 text-sm font-semibold text-primary underline underline-offset-4 hover:decoration-2"
         >
           Clear all
         </Link>

@@ -9,29 +9,30 @@ export default function AnnouncementBar({
   whatsappNumber: string;
   onlinePaymentsEnabled: boolean;
 }) {
+  const messages = [
+    <span key="ship">Free delivery on orders over {formatBDT(freeShippingThreshold)}</span>,
+    <span key="pay">
+      {onlinePaymentsEnabled ? "Cash on delivery or online payment" : "Cash on delivery across Bangladesh"}
+    </span>,
+    <a
+      key="wa"
+      href={`https://wa.me/${whatsappNumber}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="underline underline-offset-2 hover:no-underline"
+    >
+      Questions? WhatsApp us
+    </a>,
+  ];
+
   return (
-    <div className="bg-black text-white">
-      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-4 gap-y-1 px-4 py-2 text-center text-[11px] uppercase tracking-widest md:text-xs">
-        <span>Free delivery on orders over {formatBDT(freeShippingThreshold)}</span>
-        <span aria-hidden className="hidden text-white/40 md:inline">
-          |
-        </span>
-        <span>
-          {onlinePaymentsEnabled
-            ? "Cash on delivery · online payment at checkout"
-            : "Cash on delivery · WhatsApp order confirmation"}
-        </span>
-        <span aria-hidden className="hidden text-white/40 md:inline">
-          |
-        </span>
-        <a
-          href={`https://wa.me/${whatsappNumber}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline underline-offset-2 hover:no-underline"
-        >
-          WhatsApp us
-        </a>
+    <div className="bg-pitch-dark text-xs font-medium text-white">
+      {/* Phones: one line that rotates; larger screens: all three side by side. */}
+      <div className="rotate-msg grid h-9 place-items-center px-4 text-center md:hidden">
+        {messages}
+      </div>
+      <div className="mx-auto hidden h-9 max-w-7xl items-center justify-center gap-10 px-4 md:flex">
+        {messages}
       </div>
     </div>
   );

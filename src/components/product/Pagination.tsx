@@ -20,7 +20,7 @@ export default function Pagination({
       {page > 1 && (
         <Link
           href={buildHref(page - 1)}
-          className="border border-border px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-secondary"
+          className="press inline-flex h-12 items-center border border-foreground px-5 text-sm font-bold uppercase tracking-wide hover:bg-foreground hover:text-background"
         >
           Prev
         </Link>
@@ -45,7 +45,7 @@ export default function Pagination({
       {page < pageCount && (
         <Link
           href={buildHref(page + 1)}
-          className="border border-border px-3 py-2 text-xs font-bold uppercase tracking-widest hover:bg-secondary"
+          className="press inline-flex h-12 items-center border border-foreground px-5 text-sm font-bold uppercase tracking-wide hover:bg-foreground hover:text-background"
         >
           Next
         </Link>

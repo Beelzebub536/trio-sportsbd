@@ -2,115 +2,249 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Stadium palette (see docs/superpowers/specs/2026-11-01-stadium-redesign-design.md). HSL triplets feed Tailwind tokens. */
 :root {
-  /* Adidas color palette */
   --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
+  --foreground: 150 16% 5%; /* ink #0B0F0D */
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 0%;
+  --card-foreground: 150 16% 5%;
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 0%;
-  --primary: 0 0% 0%;
+  --popover-foreground: 150 16% 5%;
+  --primary: 163 100% 21%; /* pitch green #006A4E */
   --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 93%;
-  --secondary-foreground: 0 0% 0%;
-  --muted: 0 0% 93%;
-  --muted-foreground: 0 0% 46%;
-  --accent: 0 0% 93%;
-  --accent-foreground: 0 0% 0%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  /* Sharp corners */
+  --pitch-dark: 164 100% 11%; /* #00382A */
+  --secondary: 100 14% 95%; /* chalk #F3F5F2 */
+  --secondary-foreground: 150 16% 5%;
+  --muted: 100 14% 95%;
+  --muted-foreground: 147 6% 38%; /* #5B6660 */
+  --accent: 100 14% 95%;
+  --accent-foreground: 150 16% 5%;
+  --destructive: 349 100% 45%; /* flag red #E4002B */
+  --destructive-foreground: 0 0% 100%;
+  --border: 135 9% 87%; /* #DCE2DD */
+  --input: 135 9% 80%;
+  --ring: 163 100% 21%;
   --radius: 0rem;
-  /* Brand colors */
-  --brand-black: #000000;
-  --brand-white: #FFFFFF;
-  --brand-accent: #C4F000; /* Electric green */
-  --brand-sale: #E4002B; /* Red for sale prices */
-  /* Typography */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-condensed: "Barlow Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --brand-sale: #e4002b;
+  --tabbar-h: 0px;
 }
 
-.dark {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 9%;
-  --secondary: 0 0% 14.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --accent: 0 0% 14.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 14.9%;
-  --input: 0 0% 14.9%;
-  --ring: 0 0% 83.1%;
+@media (max-width: 1023px) {
+  :root {
+    --tabbar-h: calc(64px + env(safe-area-inset-bottom));
+  }
 }
 
-body {
-  color: hsl(var(--foreground));
-  background-color: hsl(var(--background));
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), "Arial Narrow", sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+    text-transform: uppercase;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
 }
 
-/* High-performance font optimization */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  text-transform: uppercase;
+@layer components {
+  /* Diagonal mown-grass stripes for green surfaces; pure CSS, no image request. */
+  .pitch-stripes {
+    background-color: hsl(var(--pitch-dark));
+    background-image: repeating-linear-gradient(
+      90deg,
+      hsl(var(--primary) / 0.35) 0 80px,
+      transparent 80px 160px
+    );
+  }
+
+  .price {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Press feedback: answers the tap without shifting layout. */
+  .press {
+    transition-property: transform, color, background-color, border-color, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.6), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  .ticker-track {
+    animation: ticker 28s linear infinite;
+  }
+  .ticker:hover .ticker-track {
+    animation-play-state: paused;
+  }
+
+  /* Rotating announcement messages on phones (3 items, 4s each). */
+  .rotate-msg > * {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    animation: rotate-msg 12s infinite;
+  }
+  .rotate-msg > *:nth-child(2) {
+    animation-delay: 4s;
+  }
+  .rotate-msg > *:nth-child(3) {
+    animation-delay: 8s;
+  }
+
+  .hero-in {
+    animation: hero-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
 }
 
-/* Reduce layout shift for images */
+/*
+ * Minimal stand-in for the tailwindcss-animate classes used by the shadcn sheet/dialog/menus
+ * (that plugin was never installed). Uses individual translate/scale properties so it composes
+ * with Tailwind's transform-based centring. Exit runs ~65% of enter.
+ */
+@layer utilities {
+  .animate-in {
+    animation: enter 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .animate-out {
+    animation: exit 170ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  .fade-in-0 {
+    --enter-opacity: 0;
+  }
+  .fade-out-0 {
+    --exit-opacity: 0;
+  }
+  .zoom-in-95 {
+    --enter-scale: 0.95;
+  }
+  .zoom-out-95 {
+    --exit-scale: 0.95;
+  }
+  .slide-in-from-left {
+    --enter-x: -100%;
+  }
+  .slide-out-to-left {
+    --exit-x: -100%;
+  }
+  .slide-in-from-right {
+    --enter-x: 100%;
+  }
+  .slide-out-to-right {
+    --exit-x: 100%;
+  }
+  .slide-in-from-top {
+    --enter-y: -100%;
+  }
+  .slide-out-to-top {
+    --exit-y: -100%;
+  }
+  .slide-in-from-bottom {
+    --enter-y: 100%;
+  }
+  .slide-out-to-bottom {
+    --exit-y: 100%;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    translate: var(--enter-x, 0) var(--enter-y, 0);
+    scale: var(--enter-scale, 1);
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--exit-opacity, 1);
+    translate: var(--exit-x, 0) var(--exit-y, 0);
+    scale: var(--exit-scale, 1);
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ticker {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes rotate-msg {
+  0%,
+  30% {
+    opacity: 1;
+    visibility: visible;
+  }
+  33%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Improve focus states */
-:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground));
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
-}
-
-/* Respect the visitor's motion preference */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -123,5 +257,14 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Without rotation, show only the first announcement. */
+  .rotate-msg > *:first-child {
+    opacity: 1;
+    visibility: visible;
+  }
+  .shimmer::after {
+    display: none;
   }
 }

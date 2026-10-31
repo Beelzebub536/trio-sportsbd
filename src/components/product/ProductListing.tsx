@@ -64,7 +64,7 @@ function ActiveChips({
       ))}
       <Link
         href={basePath}
-        className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+        className="py-2 text-sm font-semibold text-primary underline underline-offset-4 hover:decoration-2"
       >
         Clear all
       </Link>
@@ -131,21 +131,19 @@ async function ListingContent({
   );
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8">
+    <div>
       {(title || description) && (
-        <header className="mb-6">
-          {title && (
-            <h1 className="text-3xl font-bold uppercase leading-none md:text-4xl">
-              {title}
-            </h1>
-          )}
-          {description && (
-            <p className="mt-2 max-w-2xl text-sm text-muted-foreground">
-              {description}
-            </p>
-          )}
+        <header className="pitch-stripes text-white">
+          <div className="mx-auto max-w-7xl px-4 py-10 md:py-14">
+            {title && <h1 className="text-6xl md:text-8xl">{title}</h1>}
+            {description && (
+              <p className="mt-3 max-w-2xl text-base text-white/85">{description}</p>
+            )}
+          </div>
         </header>
       )}
+
+      <div className="mx-auto max-w-7xl px-4 py-6">
 
       <ListingToolbar total={result.total} sort={sort} filterPanel={filterPanel} />
       <ActiveChips chips={chips} basePath={basePath} />
@@ -175,6 +173,7 @@ async function ListingContent({
             }
           />
         </div>
+      </div>
       </div>
     </div>
   );

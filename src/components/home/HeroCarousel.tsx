@@ -3,7 +3,7 @@
 import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import type { BannerData } from "@/lib/queries/banners";
 
@@ -19,7 +19,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
   };
 
   return (
-    <section aria-label="Featured collections" className="relative">
+    <section aria-label="Featured collections" className="relative mx-auto max-w-7xl md:px-4">
       <div
         ref={trackRef}
         className="flex snap-x snap-mandatory overflow-x-auto scroll-smooth"
@@ -29,18 +29,17 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
             key={banner.id}
             className="relative w-full shrink-0 snap-center"
           >
-            <div className="relative aspect-[4/5] w-full sm:aspect-[16/9] lg:aspect-[21/9]">
+            <div className="relative aspect-[16/10] w-full bg-pitch-dark sm:aspect-[16/9] lg:aspect-[21/9]">
               <Image
                 src={banner.imageUrl}
                 alt={banner.title}
                 fill
-                priority={index === 0}
-                sizes="100vw"
+                                sizes="100vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/35 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[hsl(var(--pitch-dark)/0.9)] via-[hsl(var(--pitch-dark)/0.5)] to-transparent" />
               <div className="absolute inset-0 flex max-w-xl flex-col justify-center gap-3 p-6 text-white md:p-16">
-                <h2 className="text-3xl font-bold uppercase leading-[0.95] md:text-6xl">
+                <h2 className="text-4xl md:text-7xl">
                   {banner.title}
                 </h2>
                 {banner.subtitle && (
@@ -50,9 +49,9 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
                 )}
                 <Link
                   href={banner.linkUrl}
-                  className="mt-1 inline-flex w-fit items-center gap-2 bg-white px-5 py-2.5 text-xs font-bold uppercase tracking-widest text-black transition-colors hover:bg-[var(--brand-accent)]"
+                  className="press mt-2 inline-flex h-12 w-fit items-center bg-white px-6 text-sm font-bold uppercase tracking-wide text-pitch-dark hover:bg-white/90"
                 >
-                  Shop now <ArrowRight className="h-4 w-4" />
+                  Shop now
                 </Link>
               </div>
             </div>
@@ -66,7 +65,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
             type="button"
             aria-label="Previous slide"
             onClick={() => scroll(-1)}
-            className="absolute left-2 top-1/2 hidden -translate-y-1/2 bg-white/85 p-2 hover:bg-white md:block"
+            className="press absolute left-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/90 hover:bg-white md:flex"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -74,7 +73,7 @@ export default function HeroCarousel({ banners }: { banners: BannerData[] }) {
             type="button"
             aria-label="Next slide"
             onClick={() => scroll(1)}
-            className="absolute right-2 top-1/2 hidden -translate-y-1/2 bg-white/85 p-2 hover:bg-white md:block"
+            className="press absolute right-6 top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center bg-white/90 hover:bg-white md:flex"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

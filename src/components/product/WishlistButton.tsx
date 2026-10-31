@@ -54,14 +54,14 @@ export default function WishlistButton({
       onClick={handleClick}
       disabled={pending}
       className={cn(
-        "inline-flex h-9 w-9 items-center justify-center bg-white/85 backdrop-blur transition-colors hover:bg-white",
+        "press inline-flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm hover:text-sale",
         className,
       )}
     >
       <Heart
         className={cn(
-          "h-4 w-4",
-          isSaved ? "fill-[var(--brand-sale)] text-[var(--brand-sale)]" : "text-black",
+          "h-5 w-5",
+          isSaved ? "fill-sale text-sale" : "text-foreground",
         )}
       />
     </button>

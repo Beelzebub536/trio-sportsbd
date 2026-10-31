@@ -106,7 +106,7 @@ export default async function OrderPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="flex items-center gap-3">
-        <CheckCircle2 className="h-8 w-8 text-[var(--brand-accent)]" aria-hidden />
+        <CheckCircle2 className="h-8 w-8 text-primary" aria-hidden />
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             Order placed

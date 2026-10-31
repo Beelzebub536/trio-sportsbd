@@ -35,8 +35,8 @@ export default function MobileMenu({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="w-full overflow-y-auto p-0 sm:max-w-sm">
-        <SheetHeader className="border-b border-border px-5 py-4 text-left">
-          <SheetTitle className="text-lg font-bold uppercase">Menu</SheetTitle>
+        <SheetHeader className="pitch-stripes px-5 py-6 text-left">
+          <SheetTitle className="font-display text-3xl font-extrabold uppercase text-white">Shop the game</SheetTitle>
         </SheetHeader>
 
         <nav aria-label="Mobile" className="px-5 py-4">
@@ -52,7 +52,7 @@ export default function MobileMenu({
                     <Link
                       href={item.href}
                       onClick={close}
-                      className="block py-4 text-sm font-bold uppercase tracking-wide"
+                      className={`press block py-4 font-display text-2xl font-bold uppercase ${item.href === "/sale" ? "text-sale" : ""}`}
                     >
                       {item.label}
                     </Link>
@@ -64,7 +64,7 @@ export default function MobileMenu({
                 <li key={item.label}>
                   <Accordion type="single" collapsible>
                     <AccordionItem value={item.label} className="border-0">
-                      <AccordionTrigger className="py-4 text-sm font-bold uppercase tracking-wide hover:no-underline">
+                      <AccordionTrigger className="py-4 font-display text-2xl font-bold uppercase hover:no-underline">
                         {item.label}
                       </AccordionTrigger>
                       <AccordionContent className="pb-2">
@@ -73,7 +73,7 @@ export default function MobileMenu({
                             <Link
                               href={item.href}
                               onClick={close}
-                              className="block py-2 text-sm"
+                              className="block py-3 text-base"
                             >
                               All {item.label.toLowerCase()}
                             </Link>
@@ -83,7 +83,7 @@ export default function MobileMenu({
                               <Link
                                 href={`/shop?category=${encodeURIComponent(child.slug)}`}
                                 onClick={close}
-                                className="block py-2 text-sm text-muted-foreground"
+                                className="block py-3 text-base text-muted-foreground"
                               >
                                 {child.name}
                               </Link>
@@ -100,14 +100,14 @@ export default function MobileMenu({
         </nav>
 
         <div className="border-t border-border px-5 py-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-            Account
+          <p className="text-sm font-semibold text-muted-foreground">
+            Your account
           </p>
           <ul className="mt-2 space-y-1">
             {user ? (
               <>
                 <li>
-                  <Link href="/account" onClick={close} className="block py-2 text-sm">
+                  <Link href="/account" onClick={close} className="block py-3 text-base">
                     My account
                   </Link>
                 </li>
@@ -115,13 +115,13 @@ export default function MobileMenu({
                   <Link
                     href="/account/orders"
                     onClick={close}
-                    className="block py-2 text-sm"
+                    className="block py-3 text-base"
                   >
                     My orders
                   </Link>
                 </li>
                 <li>
-                  <Link href="/account/wishlist" onClick={close} className="block py-2 text-sm">
+                  <Link href="/account/wishlist" onClick={close} className="block py-3 text-base">
                     Wishlist
                   </Link>
                 </li>
@@ -129,19 +129,19 @@ export default function MobileMenu({
             ) : (
               <>
                 <li>
-                  <Link href="/wishlist" onClick={close} className="block py-2 text-sm">
+                  <Link href="/wishlist" onClick={close} className="block py-3 text-base">
                     Wishlist
                   </Link>
                 </li>
                 <li>
-                  <Link href="/login" onClick={close} className="block py-2 text-sm">
+                  <Link href="/login" onClick={close} className="block py-3 text-base">
                     Sign in / Create account
                   </Link>
                 </li>
               </>
             )}
             <li>
-              <Link href="/track" onClick={close} className="block py-2 text-sm">
+              <Link href="/track" onClick={close} className="block py-3 text-base">
                 Track an order
               </Link>
             </li>
@@ -149,13 +149,13 @@ export default function MobileMenu({
         </div>
 
         <div className="border-t border-border px-5 py-4">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          <p className="text-sm font-semibold text-muted-foreground">
             Help
           </p>
           <ul className="mt-2 space-y-1">
             {FOOTER_LINKS[1].links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} onClick={close} className="block py-2 text-sm">
+                <Link href={link.href} onClick={close} className="block py-3 text-base">
                   {link.label}
                 </Link>
               </li>

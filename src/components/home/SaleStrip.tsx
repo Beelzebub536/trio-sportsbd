@@ -1,26 +1,26 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 export default function SaleStrip() {
   return (
-    <section className="bg-black text-white">
-      <div className="mx-auto flex max-w-7xl flex-col items-start gap-4 px-4 py-10 md:flex-row md:items-center md:justify-between md:py-14">
+    <section className="relative isolate overflow-hidden bg-sale text-white">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-4 top-1/2 -z-10 -translate-y-1/2 select-none font-display text-[14rem] font-extrabold leading-none text-transparent [-webkit-text-stroke:2px_hsl(0_0%_100%/0.25)] md:text-[22rem]"
+      >
+        %
+      </span>
+      <div className="mx-auto flex max-w-7xl flex-col items-start gap-6 px-4 py-14 md:flex-row md:items-end md:justify-between md:py-20">
         <div>
-          <p className="text-xs uppercase tracking-[0.3em] text-white/60">
-            Limited time
-          </p>
-          <h2 className="mt-2 text-3xl font-bold uppercase leading-none md:text-5xl">
-            Sale — up to 30% off
-          </h2>
-          <p className="mt-3 max-w-lg text-sm text-white/75">
-            Selected jerseys, track pants and accessories. While stocks last.
+          <h2 className="text-6xl md:text-8xl">Up to 30% off</h2>
+          <p className="mt-3 max-w-md text-base text-white">
+            Selected jerseys, track pants and accessories, while stocks last.
           </p>
         </div>
         <Link
           href="/sale"
-          className="inline-flex items-center gap-2 bg-[var(--brand-accent)] px-6 py-3 text-xs font-bold uppercase tracking-widest text-black transition-opacity hover:opacity-90"
+          className="press inline-flex h-14 items-center bg-white px-8 text-sm font-bold uppercase tracking-wide text-sale hover:bg-white/90"
         >
-          Shop the sale <ArrowRight className="h-4 w-4" />
+          Shop the sale
         </Link>
       </div>
     </section>

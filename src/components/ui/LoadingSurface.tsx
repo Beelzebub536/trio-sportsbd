@@ -27,11 +27,11 @@ export default function LoadingSurface({
       </div>
       <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/55 px-4 backdrop-blur-[3px]">
         <div
-          className="flex items-center gap-3 border border-white/80 bg-white/95 px-5 py-3 shadow-[0_8px_30px_rgba(15,23,42,0.14)] ring-1 ring-black/5"
+          className="flex items-center gap-3 border-l-4 border-primary bg-white px-5 py-3 shadow-[0_8px_30px_hsl(var(--pitch-dark)/0.16)]"
           role="status"
         >
-          <LoaderCircle className="h-5 w-5 animate-spin text-slate-900" aria-hidden="true" />
-          <span className="text-xs font-bold uppercase tracking-widest text-slate-900">{label}</span>
+          <LoaderCircle className="h-5 w-5 animate-spin text-primary" aria-hidden="true" />
+          <span className="text-sm font-semibold text-foreground">{label}</span>
         </div>
       </div>
     </div>

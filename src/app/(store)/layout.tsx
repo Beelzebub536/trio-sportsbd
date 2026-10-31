@@ -16,7 +16,8 @@ export default function StoreLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-screen flex-col">
+    // Bottom padding keeps content clear of the mobile tab bar / sticky action bars.
+    <div className="flex min-h-dvh flex-col pb-[var(--tabbar-h)]">
       <Suspense fallback={<StoreChromeFallback />}>
         <StoreChrome />
       </Suspense>

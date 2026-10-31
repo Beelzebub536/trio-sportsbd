@@ -1,11 +1,11 @@
 # trio-sportsbd - agent rules
 
-E-commerce site for sports jerseys, trousers and accessories (Bangladesh). Adidas-style UI. Free-tier only, deployed on Vercel.
+E-commerce site for sports jerseys, trousers and accessories (Bangladesh). "Stadium" UI (see `docs/superpowers/specs/2026-11-01-stadium-redesign-design.md`). Free-tier only, deployed on Vercel.
 
 ## Start of every session (mandatory)
 1. Read `docs/PROGRESS.md` (what is done, what is next, known issues).
 2. Read ONLY the section of `docs/PLAN.md` / `docs/PROMPTS.md` relevant to the current task.
-3. Load the skills you need: `stack-gotchas` (always), `adidas-ui` (any UI work), `orders-and-pricing` (cart, checkout, orders, admin prices).
+3. Load the skills you need: `stack-gotchas` (always), `adidas-ui` (any UI work; now describes the Stadium design), `orders-and-pricing` (cart, checkout, orders, admin prices).
 
 ## Environment
 - Windows 11, PowerShell, Node 22 LTS, npm. Never use bash-only commands (`rm -rf`, `cp`, `export`, `&&` chains that assume bash). Use npm scripts or small Node scripts for anything file-related.
@@ -36,3 +36,13 @@ NOT in this project: email sending, Resend, Stripe, websockets, Redux, NextAuth,
 
 ## Definition of done (every task)
 Typecheck, lint and build pass; the feature works on `npm run dev`; PROGRESS.md updated; committed.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

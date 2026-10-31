@@ -128,7 +128,7 @@ export default function AddressManager({
             <div className="flex items-start justify-between gap-2">
               <p className="font-semibold uppercase">{address.fullName}</p>
               {address.isDefault && (
-                <span className="bg-[var(--brand-accent)] px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-black">
+                <span className="bg-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-primary-foreground">
                   Default
                 </span>
               )}

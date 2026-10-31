@@ -1,58 +1,48 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import type { CategoryNode } from "@/lib/queries/categories";
+import { cn } from "@/lib/utils";
 
-const FEATURED_SLUGS = ["jerseys", "trousers", "accessories"];
+const FEATURED = [
+  { slug: "jerseys", blurb: "Club, country and training", tone: "bg-primary text-white" },
+  { slug: "trousers", blurb: "Track pants and shorts", tone: "bg-foreground text-white" },
+  { slug: "accessories", blurb: "Bags, socks, gloves, caps", tone: "bg-secondary text-foreground" },
+];
 
-export default function CategoryTiles({
-  categories,
-}: {
-  categories: CategoryNode[];
-}) {
-  const featured = FEATURED_SLUGS.map((slug) =>
-    categories.find((category) => category.slug === slug),
-  ).filter((category): category is CategoryNode => Boolean(category));
-
+export default function CategoryTiles({ categories }: { categories: CategoryNode[] }) {
   const tiles = [
-    ...featured.map((category) => ({
-      name: category.name,
-      href: `/${category.slug}`,
-      image: category.image,
-      highlight: false,
-    })),
-    { name: "Sale", href: "/sale", image: null, highlight: true },
+    ...FEATURED.flatMap((tile) => {
+      const category = categories.find((item) => item.slug === tile.slug);
+      return category
+        ? [{ ...tile, name: category.name, href: `/${category.slug}` }]
+        : [];
+    }),
+    { slug: "sale", name: "Sale", blurb: "Up to 30% off", tone: "bg-sale text-white", href: "/sale" },
   ];
 
   return (
-    <section aria-label="Shop by category" className="mx-auto max-w-7xl px-4 py-8">
-      <h2 className="mb-4 text-2xl font-bold uppercase md:text-3xl">
+    <section aria-labelledby="shop-by-category" className="mx-auto max-w-7xl px-4 pt-12 md:pt-16">
+      <h2 id="shop-by-category" className="text-4xl md:text-5xl">
         Shop by category
       </h2>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-2 md:gap-3 lg:grid-cols-4">
         {tiles.map((tile) => (
           <Link
             key={tile.href}
             href={tile.href}
-            className="group relative block aspect-square overflow-hidden bg-black text-white"
+            className={cn(
+              "press group relative flex aspect-[4/5] flex-col justify-end overflow-hidden p-4 [container-type:inline-size] md:p-6",
+              tile.tone,
+            )}
           >
-            {tile.image && (
-              <Image
-                src={tile.image}
-                alt={tile.name}
-                fill
-                sizes="(max-width: 1024px) 50vw, 25vw"
-                className="object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
-              />
-            )}
-            <span className="absolute inset-0 flex items-end p-4">
-              <span className="text-lg font-bold uppercase tracking-wide md:text-2xl">
-                {tile.name}
-              </span>
+            <span className="font-display text-[clamp(1.5rem,15cqi,4rem)] font-extrabold uppercase leading-[0.85]">
+              {tile.name}
             </span>
-            {tile.highlight && (
-              <span className="absolute inset-0 border-2 border-[var(--brand-sale)]" />
-            )}
+            <span className="mt-2 text-sm opacity-80">{tile.blurb}</span>
+            <span
+              aria-hidden
+              className="absolute right-4 top-4 h-3 w-3 rotate-45 bg-current opacity-60 transition-transform duration-300 group-hover:rotate-[135deg]"
+            />
           </Link>
         ))}
       </div>
