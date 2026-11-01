@@ -16,8 +16,8 @@ const STYLES: Record<string, string> = {
   PROCESSING: "bg-primary text-primary-foreground",
   SHIPPED: "bg-primary text-primary-foreground",
   DELIVERED: "bg-primary text-primary-foreground",
-  CANCELLED: "bg-[var(--brand-sale)] text-white",
-  RETURNED: "bg-[var(--brand-sale)] text-white",
+  CANCELLED: "bg-sale text-white",
+  RETURNED: "bg-sale text-white",
 };
 
 export function statusLabel(status: string): string {

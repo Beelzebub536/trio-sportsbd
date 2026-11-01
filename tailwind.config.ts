@@ -23,13 +23,11 @@ const config: Config = {
         destructive: { DEFAULT: token("destructive"), foreground: token("destructive-foreground") },
         popover: { DEFAULT: token("popover"), foreground: token("popover-foreground") },
         card: { DEFAULT: token("card"), foreground: token("card-foreground") },
-        pitch: { DEFAULT: token("primary"), dark: token("pitch-dark") },
+        "pitch-dark": token("pitch-dark"),
         sale: token("destructive"),
-        chalk: token("secondary"),
-        ink: token("foreground"),
       },
       fontFamily: {
-        display: ["var(--font-display)", "Arial Narrow", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",

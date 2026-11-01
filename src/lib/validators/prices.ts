@@ -19,4 +19,3 @@ export const priceBatchSchema = z.object({
     .max(500, "Too many rows in one batch"),
 });
 
-export type PriceBatchValues = z.infer<typeof priceBatchSchema>;

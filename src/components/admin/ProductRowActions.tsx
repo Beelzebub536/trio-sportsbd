@@ -70,7 +70,7 @@ export default function ProductRowActions({
         aria-label={`Delete ${name}`}
         disabled={busy}
         onClick={handleDelete}
-        className="p-1.5 text-muted-foreground hover:text-[var(--brand-sale)]"
+        className="p-1.5 text-muted-foreground hover:text-sale"
       >
         <Trash2 className="h-4 w-4" />
       </button>

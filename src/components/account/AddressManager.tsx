@@ -159,7 +159,7 @@ export default function AddressManager({
               <button
                 type="button"
                 disabled={busy}
-                className="text-[var(--brand-sale)] underline underline-offset-4 hover:decoration-2"
+                className="text-sale underline underline-offset-4 hover:decoration-2"
                 onClick={() => handleDelete(address.id)}
               >
                 Delete

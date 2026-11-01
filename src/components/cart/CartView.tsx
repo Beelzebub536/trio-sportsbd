@@ -124,7 +124,7 @@ export default function CartView() {
                   <button
                     type="button"
                     aria-label={`Remove ${line.name}`}
-                    className="p-1 text-muted-foreground hover:text-[var(--brand-sale)]"
+                    className="p-1 text-muted-foreground hover:text-sale"
                     onClick={() => remove(line.variantId)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -143,7 +143,7 @@ export default function CartView() {
                     Checking availability…
                   </p>
                 ) : lowStock ? (
-                  <p className="mt-2 bg-secondary px-2 py-1 text-xs text-[var(--brand-sale)]">
+                  <p className="mt-2 bg-secondary px-2 py-1 text-xs text-sale">
                     Only {detail.stock} left — please reduce the quantity.
                   </p>
                 ) : null}
@@ -218,7 +218,7 @@ export default function CartView() {
             </p>
           )}
           {!pending && hasProblem && (
-            <p className="mt-2 text-xs text-[var(--brand-sale)]">
+            <p className="mt-2 text-xs text-sale">
               Please fix the highlighted items before checking out.
             </p>
           )}
