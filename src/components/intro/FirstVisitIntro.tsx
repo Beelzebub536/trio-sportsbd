@@ -4,8 +4,8 @@ import { useEffect, useRef } from "react";
 
 import { INTRO_SEEN_KEY } from "@/lib/intro";
 
-// The ball sweeps out over the top-right between ~2.8 s and 3.0 s of the 3.2 s render.
-const REVEAL_AT_SECONDS = 2.75;
+// The ball sweeps out over the top-right between ~2.8 s and 3.0 s (frame 90) of the 3.2 s render.
+const REVEAL_AT_SECONDS = 2.85;
 
 /**
  * First-visit kick-off, rendered in Blender (scripts/blender/intro_kick.py): a ball is struck,

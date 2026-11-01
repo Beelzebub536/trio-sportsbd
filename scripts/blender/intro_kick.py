@@ -9,6 +9,7 @@ In an open Blender session, exec this file under another __name__ and call build
 empty scene to get the same set-up for hand editing.
 """
 
+import bisect
 import math
 import sys
 
@@ -21,6 +22,11 @@ END = 96
 BALL_R = 0.11  # a size-5 ball is ~22 cm across
 KICK = 16  # frame the boot strikes the ball
 SPIN = 0.55  # sidespin in radians per frame at full speed (~2.6 turns a second)
+EXIT = 92  # frame by which the ball has flown out over the top-right corner
+# One cubic Bezier carries the whole flight, so the path can never kink. Control points are given in
+# screen space (x, y as 0..1 of the frame, depth in metres from the lens) so it frames the same way
+# in portrait and landscape: it swerves out left, curls back right at the lens and exits top-right.
+FLIGHT = [(0.24, 0.60, 1.8), (0.55, 0.50, 0.65), (1.35, 1.75, 0.18)]
 STUDIO = (0.90, 0.875, 0.83)  # warm off-white studio floor and wall
 AMBIENT = (0.96, 0.95, 0.93)
 
@@ -89,6 +95,12 @@ def slowmo(frame):
     return 1 - 0.7 * t * t * (3 - 2 * t)
 
 
+def clock(frame):
+    """Camera time since the kick: real frames scaled by the slow-motion ramp (plus a two-frame
+    launch). Flight and spin both run on it, so they slow down together."""
+    return sum(slowmo(f) * min(1.0, (f - KICK) / 2) for f in range(KICK + 1, frame + 1))
+
+
 def channelbag(obj):
     return obj.animation_data.action.layers[0].strips[0].channelbags[0]
 
@@ -99,14 +111,49 @@ def bake_spin(ball):
     bag = channelbag(ball)
     for curve in [c for c in bag.fcurves if c.data_path == "rotation_euler"]:
         bag.fcurves.remove(curve)
-    angle = 0.0
     for frame in range(1, END + 1):
-        if frame > KICK:
-            angle += SPIN * slowmo(frame) * min(1.0, (frame - KICK) / 2)  # spun up within two frames
+        angle = SPIN * clock(frame)
         ball.rotation_euler = (angle * 0.25, 0, -angle)  # sidespin for the curl plus a little topspin
         ball.keyframe_insert("rotation_euler", frame=frame)
     for curve in bag.fcurves:
         if curve.data_path == "rotation_euler":
+            for point in curve.keyframe_points:
+                point.interpolation = "LINEAR"
+
+
+def bake_flight(ball, scene, cam):
+    """Keys the ball on every frame along the single FLIGHT curve at constant speed in camera time."""
+    bag = channelbag(ball)
+    for curve in [c for c in bag.fcurves if c.data_path == "location"]:
+        bag.fcurves.remove(curve)
+    points = [Vector((0, 0, BALL_R))] + [screen_point(scene, cam, *c) for c in FLIGHT]
+
+    def at(u):
+        a = 1 - u
+        return points[0] * a**3 + points[1] * 3 * a * a * u + points[2] * 3 * a * u * u + points[3] * u**3
+
+    # Arc-length table so equal camera time means equal distance travelled.
+    steps = 800
+    samples = [at(i / steps) for i in range(steps + 1)]
+    lengths = [0.0]
+    for p, q in zip(samples, samples[1:]):
+        lengths.append(lengths[-1] + (q - p).length)
+    total, duration = lengths[-1], clock(EXIT)
+
+    for frame in range(1, END + 1):
+        if frame < KICK:
+            loc = points[0]
+        elif frame == KICK:
+            loc = Vector((0, 0, BALL_R * 0.84))  # squashed against the boot, bottom on the floor
+        else:
+            target = min(total * clock(frame) / duration, total)
+            i = min(bisect.bisect_left(lengths, target), steps)
+            span = lengths[i] - lengths[i - 1] if i else 1
+            loc = samples[i - 1].lerp(samples[i], (target - lengths[i - 1]) / span) if i else points[0]
+        ball.location = loc
+        ball.keyframe_insert("location", frame=frame)
+    for curve in bag.fcurves:
+        if curve.data_path == "location":
             for point in curve.keyframe_points:
                 point.interpolation = "LINEAR"
 
@@ -203,22 +250,7 @@ def build_scene(width, height):
     key(ball, 19, scale=(BALL_R * 0.95, BALL_R * 0.95, BALL_R * 1.07))
     key(ball, 23, scale=(BALL_R,) * 3)
 
-    # Flight planned in screen space (x, y in 0..1 of the frame, depth in metres from the lens), so
-    # it stays framed in both landscape and portrait: it swerves out left, curls back right as it
-    # rises at the lens, then leaves over the top-right corner. Keys are bunched between frames
-    # ~30 and ~80, which is what makes the approach play in slow motion.
-    path = [
-        (22, 0.40, 0.46, 2.55),
-        (30, 0.31, 0.52, 2.0),
-        (46, 0.33, 0.57, 1.45),
-        (66, 0.45, 0.59, 1.05),
-        (80, 0.57, 0.60, 0.72),
-        (86, 0.92, 1.05, 0.34),
-        (91, 2.4, 2.8, 0.3),  # fully out of frame before the last frames
-    ]
-    key(ball, KICK, location=(0, 0, BALL_R * 0.84))
-    for frame, sx, sy, depth in path:
-        key(ball, frame, location=screen_point(scene, cam, sx, sy, depth))
+    bake_flight(ball, scene, cam)
     bake_spin(ball)
 
     # Tiny camera jolt on impact so the strike has weight.
