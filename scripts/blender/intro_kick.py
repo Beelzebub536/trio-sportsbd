@@ -1,5 +1,6 @@
-"""Renders the first-visit intro: a scuffed football is kicked in a dark studio, swerves toward the
-camera in slow motion and flies straight into the lens, filling the frame so the site can be
+"""Renders the first-visit intro: a scuffed football is kicked in a dark studio under a glowing
+TRIO SPORTS BD sign, swerves wide to the left in slow motion, then breaks for the camera and flies
+straight into the lens (the camera shakes as it arrives), filling the frame so the site can be
 revealed from behind it.
 
 Run headless (does not touch any open Blender session):
@@ -12,11 +13,12 @@ empty scene to get the same set-up for hand editing.
 
 import bisect
 import math
+import os
 import sys
 
 import bmesh
 import bpy
-from mathutils import Vector
+from mathutils import Euler, Vector
 
 FPS = 30
 END = 96
@@ -28,11 +30,16 @@ SPIN_SLOWMO = 0.45  # spin keeps more of its speed than the flight does in slow 
 EXIT = 90  # frame the ball reaches the lens and fills the frame
 # One cubic Bezier carries the whole flight, so the path can never kink. Control points are given in
 # screen space (x, y as 0..1 of the frame, depth in metres from the lens) so it frames the same way
-# in portrait and landscape: one wide arc up and out to the left that curls back down into the
-# lens. The last control point sits on the lens axis so the ball glides into frame centre.
-FLIGHT = [(0.0, 0.85, 2.0), (0.62, 0.55, 1.0), (0.5, 0.5, 0.16)]
-STUDIO = (0.05, 0.06, 0.057)  # dark charcoal floor and wall, close to the site's background
-AMBIENT = (0.05, 0.06, 0.058)
+# in portrait and landscape: a wide swing out to the left that holds that line, then breaks late and
+# curls into the lens. The last control point sits on the lens axis so the ball glides into centre.
+FLIGHT = [(-0.15, 0.78, 2.0), (0.42, 0.56, 0.75), (0.5, 0.5, 0.16)]
+STUDIO = (0.09, 0.105, 0.1)  # dark (but not black) charcoal floor and wall
+AMBIENT = (0.1, 0.11, 0.105)
+CAMERA_PITCH = 92.5  # tilted up slightly so the arc has headroom
+BRAND_GREEN = (0.137, 0.769, 0.482)  # the site's primary, #23C47B
+SIGN_FONTS = [r"C:\Windows\Fonts\seguibl.ttf", "/System/Library/Fonts/Supplemental/Arial Black.ttf"]
+SHAKE_START, SHAKE_PEAK = 76, 88  # camera shake builds as the ball closes on the lens
+PORTRAIT_SWING = 0.6  # a phone frame is narrow next to the ball: scale the sideways swing to keep it in
 # Squash and wobble on the strike (horizontal, vertical scale): flattened against the boot, then a
 # quick damped jiggle as it leaves.
 SQUASH = [(14, 1.0, 1.0), (KICK, 1.22, 0.72), (18, 0.88, 1.18), (21, 1.08, 0.9), (25, 0.96, 1.05),
@@ -196,7 +203,8 @@ def bake_rig(rig, scene, cam):
     """Flight and squash live on the rig (world axes); the ball inside it only spins. The flight is
     one curve walked at constant speed in camera time."""
     rest = Vector((0, 0, REST_Z))
-    points = [rest] + [screen_point(scene, cam, *c) for c in FLIGHT]
+    swing = PORTRAIT_SWING if scene.render.resolution_y > scene.render.resolution_x else 1.0
+    points = [rest] + [screen_point(scene, cam, 0.5 + (x - 0.5) * swing, y, d) for x, y, d in FLIGHT]
 
     def at(u):
         a = 1 - u
@@ -273,6 +281,76 @@ def area_light(scene, name, location, rotation, energy, size, color=(1, 1, 1)):
     return add_object(scene, name, light, location, rotation)
 
 
+def aim(obj, target):
+    """Points a light or camera (which look down their local -Z) at a world position."""
+    obj.rotation_euler = (Vector(target) - obj.location).to_track_quat("-Z", "Y").to_euler()
+
+
+def glow_material(name, color, strength):
+    mat = material(name, (0, 0, 0), 0.5)
+    bsdf = mat.node_tree.nodes["Principled BSDF"]
+    bsdf.inputs["Emission Color"].default_value = (*srgb_to_linear(color), 1)
+    bsdf.inputs["Emission Strength"].default_value = strength
+    return mat
+
+
+def make_sign(scene):
+    """Lit TRIO SPORTS BD lettering on the back wall: green TRIO, white SPORTS BD, about a quarter of
+    the frame wide so it sets the scene without competing with the ball (focus keeps it soft)."""
+    font_path = next((p for p in SIGN_FONTS if os.path.exists(p)), None)
+    font = bpy.data.fonts.load(font_path, check_existing=True) if font_path else None
+    words = []
+    for text, color, strength in (("TRIO", BRAND_GREEN, 4.5), ("SPORTS BD", (1, 1, 1), 3.5)):
+        curve = bpy.data.curves.new(f"Sign {text}", "FONT")
+        curve.body, curve.size, curve.align_y = text, 0.42, "CENTER"
+        if font:
+            curve.font = font
+        curve.materials.append(glow_material(f"Sign {text}", color, strength))
+        words.append(add_object(scene, f"Sign {text.title()}", curve, rotation=(90, 0, 0)))
+    scene.view_layers[0].update()
+    gap = 0.22
+    total = sum(w.dimensions.x for w in words) + gap
+    # The cove curves up behind it: at this height the wall surface is ~6.4 m out, so stand in front.
+    x, wall_y, height = -total / 2, 6.0, 1.95
+    for word in words:
+        word.location = (x, wall_y, height)
+        x += word.dimensions.x + gap
+    return words
+
+
+def add_glow(scene):
+    """Soft bloom on the brightest parts (the sign and the ball's highlights) via the compositor."""
+    tree = bpy.data.node_groups.new("Intro Glow", "CompositorNodeTree")
+    tree.interface.new_socket("Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    layers = tree.nodes.new("CompositorNodeRLayers")
+    layers.scene = scene
+    glare = tree.nodes.new("CompositorNodeGlare")
+    glare.inputs["Type"].default_value = "Bloom"
+    glare.inputs["Threshold"].default_value = 0.85
+    glare.inputs["Strength"].default_value = 0.45
+    glare.inputs["Size"].default_value = 0.7
+    output = tree.nodes.new("NodeGroupOutput")
+    tree.links.new(layers.outputs["Image"], glare.inputs["Image"])
+    tree.links.new(glare.outputs["Image"], output.inputs[0])
+    scene.compositing_node_group = tree
+    scene.render.use_compositing = True
+
+
+def bake_shake(cam):
+    """Handheld-style shake that builds as the ball closes on the lens, peaking at impact."""
+    base = cam.rotation_euler.copy()
+
+    def rotation(frame):
+        t = min(max((frame - SHAKE_START) / (SHAKE_PEAK - SHAKE_START), 0.0), 1.0)
+        amp = math.radians(1.1) * t * t
+        pitch = amp * (math.sin(frame * 2.1) + 0.5 * math.sin(frame * 5.3 + 1.0))
+        yaw = amp * (math.sin(frame * 1.7 + 2.0) + 0.5 * math.sin(frame * 4.4))
+        roll = amp * 0.6 * math.sin(frame * 3.1 + 0.5)
+        return Euler((base.x + pitch, base.y + roll, base.z + yaw))
+
+    bake(cam, "rotation_euler", rotation)
+
+
 def build_scene(width, height):
     scene = bpy.context.scene
     view_layer = scene.view_layers[0]
@@ -296,15 +374,22 @@ def build_scene(width, height):
     if hasattr(world, "use_nodes"):
         world.use_nodes = True
     world.node_tree.nodes["Background"].inputs["Color"].default_value = (*srgb_to_linear(AMBIENT), 1)
-    world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.4
+    world.node_tree.nodes["Background"].inputs["Strength"].default_value = 0.5
 
     make_cove(scene)
-    # Overhead key along the flight line (a soft pool of light on the floor that keeps lighting the
-    # ball as it approaches) and a gentle fill from camera left.
-    area_light(scene, "Key Light", (-0.4, -1.4, 2.8), (12, -8, 0), 190, 2.6)
-    area_light(scene, "Fill Light", (-1.8, -3.0, 1.0), (75, 0, -55), 35, 2.0)
+    # Overhead key along the flight line, a gentle fill from camera left, and a rim from behind-left
+    # that outlines the ball's shadowed side so it never disappears into the background.
+    area_light(scene, "Key Light", (-0.4, -1.4, 2.8), (12, -8, 0), 210, 2.6)
+    area_light(scene, "Fill Light", (-1.8, -3.0, 1.0), (75, 0, -55), 45, 2.0)
+    rim = area_light(scene, "Rim Light", (-1.6, 1.2, 1.3), (0, 0, 0), 170, 1.0)
+    aim(rim, (-0.35, -1.0, 0.55))
+    # Soft wash on the back wall so the background reads as dark grey rather than black.
+    wash = area_light(scene, "Wall Light", (0, 2.0, 3.6), (0, 0, 0), 260, 5.0)
+    aim(wash, (0, 6.5, 1.6))
+    make_sign(scene)
+    add_glow(scene)
 
-    cam = add_object(scene, "Intro Camera", bpy.data.cameras.new("Intro Camera"), (0, -3.2, 0.34), (92.5, 0, 0))
+    cam = add_object(scene, "Intro Camera", bpy.data.cameras.new("Intro Camera"), (0, -3.2, 0.34), (CAMERA_PITCH, 0, 0))
     scene.camera = cam
     cam.data.lens = 35
     cam.data.sensor_fit = "AUTO"
@@ -319,11 +404,12 @@ def build_scene(width, height):
 
     # Shallow focus that follows the ball, like a real slow-motion camera.
     cam.data.dof.use_dof = True
-    cam.data.dof.aperture_fstop = 2.0
+    cam.data.dof.aperture_fstop = 2.8  # soft background, sign still readable early on
     cam.data.dof.focus_object = ball
 
-    bake_rig(rig, scene, cam)
+    bake_rig(rig, scene, cam)  # before the shake, so the path is planned against a steady frame
     bake_spin(ball)
+    bake_shake(cam)
 
     # Tiny camera jolt on impact so the strike has weight.
     for frame, loc in [(15, (0, -3.2, 0.34)), (16, (0.004, -3.2, 0.336)), (18, (0, -3.2, 0.34))]:

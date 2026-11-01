@@ -4,13 +4,13 @@ import { useEffect, useRef } from "react";
 
 import { INTRO_SEEN_KEY } from "@/lib/intro";
 
-// The ball sweeps out over the top-right between ~2.8 s and 3.0 s (frame 90) of the 3.2 s render.
-const REVEAL_AT_SECONDS = 2.85;
+// The ball flies into the lens and fills the whole frame from ~2.9 s (frame 88) of the 3.2 s render.
+const REVEAL_AT_SECONDS = 2.9;
 
 /**
  * First-visit kick-off, rendered in Blender (scripts/blender/intro_kick.py): a ball is struck,
- * swerves toward the camera in slow motion and flies over it, then the store is revealed where it
- * passed. Shown only when the boot script set `html[data-intro]` (see src/lib/intro.ts).
+ * swerves toward the camera in slow motion and flies into the lens; once it fills the frame, the
+ * store opens up from the centre behind it. Shown only when the boot script set `html[data-intro]` (see src/lib/intro.ts).
  */
 export default function FirstVisitIntro() {
   const stage = useRef<HTMLDivElement>(null);
@@ -67,7 +67,7 @@ export default function FirstVisitIntro() {
 
   return (
     <div className="intro fixed inset-0 z-[100]" onClick={() => finish.current()}>
-      <div ref={stage} aria-hidden className="intro-stage absolute inset-0 bg-[#ece7dd]">
+      <div ref={stage} aria-hidden className="intro-stage absolute inset-0 bg-[#101313]">
         <picture>
           <source media="(orientation: portrait)" srcSet="/intro/kick-portrait.webp" />
           <img src="/intro/kick-landscape.webp" alt="" className="absolute inset-0 h-full w-full object-cover" />
@@ -82,7 +82,7 @@ export default function FirstVisitIntro() {
       </div>
       <button
         type="button"
-        className="absolute bottom-[max(24px,env(safe-area-inset-bottom))] right-6 rounded-full bg-black/70 px-5 py-3 text-sm font-semibold text-white"
+        className="absolute bottom-[max(24px,env(safe-area-inset-bottom))] right-6 rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-semibold text-white"
       >
         Skip intro
       </button>

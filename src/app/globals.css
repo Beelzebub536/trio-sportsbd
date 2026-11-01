@@ -205,16 +205,16 @@ html[data-intro] .intro {
   animation: intro-failsafe 0s linear 7s forwards;
 }
 
-/* Reveal: a hole opens from where the ball leaves frame (top-right) and the store shows through. */
+/* Reveal: once the ball fills the frame, a hole opens from the centre and the store shows through. */
 @property --hole {
   syntax: "<length>";
   inherits: false;
   initial-value: -10px;
 }
 .intro-stage {
-  -webkit-mask-image: radial-gradient(circle at 80% 15%, transparent var(--hole), #000 calc(var(--hole) + 1px));
-  mask-image: radial-gradient(circle at 80% 15%, transparent var(--hole), #000 calc(var(--hole) + 1px));
-  transition: --hole 0.9s cubic-bezier(0.55, 0, 0.75, 0.2);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  transition: --hole 0.8s cubic-bezier(0.5, 0, 0.3, 1);
 }
 .intro-reveal {
   --hole: 170vmax;
