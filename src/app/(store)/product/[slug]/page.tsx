@@ -117,7 +117,8 @@ export default async function ProductPage({ params }: { params: Promise<PagePara
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // Escape "<" so admin-entered text like "</script>" cannot break out of the tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
     </div>
   );

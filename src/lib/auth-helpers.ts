@@ -14,14 +14,16 @@ export function getSocialProviders(): { google: boolean; facebook: boolean } {
   };
 }
 
-/** Only allow same-site relative paths as a redirect target (no open redirect). */
+/**
+ * Only allow same-site relative paths as a redirect target (no open redirect). Resolving against a
+ * dummy origin mirrors how browsers read it, so `/\evil.com`, `/\t/evil.com` etc. are rejected.
+ */
 export function safeNext(value: unknown): string {
-  if (
-    typeof value === "string" &&
-    value.startsWith("/") &&
-    !value.startsWith("//")
-  ) {
-    return value;
+  if (typeof value !== "string" || !value.startsWith("/")) return "/";
+  try {
+    const url = new URL(value, "https://same.invalid");
+    return url.origin === "https://same.invalid" ? url.pathname + url.search + url.hash : "/";
+  } catch {
+    return "/";
   }
-  return "/";
 }

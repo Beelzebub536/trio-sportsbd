@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { effectivePrice } from "@/lib/format";
 import { searchProductCards } from "@/lib/queries/products";
 
 export const dynamic = "force-dynamic";
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
           name: item.name,
           slug: item.slug,
           image: item.image,
-          price: item.salePrice ?? item.basePrice,
+          price: effectivePrice(item.basePrice, item.salePrice),
           categoryName: item.categoryName,
         })),
       },

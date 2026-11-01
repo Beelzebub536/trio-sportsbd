@@ -12,7 +12,8 @@
     "postinstall": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "test:security": "tsx scripts/check-safe-next.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.9.2",
