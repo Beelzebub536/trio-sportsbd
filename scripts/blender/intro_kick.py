@@ -19,6 +19,8 @@ from mathutils import Vector
 FPS = 30
 END = 96
 BALL_R = 0.11  # a size-5 ball is ~22 cm across
+KICK = 16  # frame the boot strikes the ball
+SPIN = 0.55  # sidespin in radians per frame at full speed (~2.6 turns a second)
 STUDIO = (0.90, 0.875, 0.83)  # warm off-white studio floor and wall
 AMBIENT = (0.96, 0.95, 0.93)
 
@@ -69,6 +71,8 @@ def make_ball():
     cast = ball.modifiers.new("Round", "CAST")
     cast.cast_type = "SPHERE"
     cast.factor = 1.0
+    cast.use_radius_as_size = False  # otherwise `size` is ignored and the ball comes out ~15% small
+    cast.size = 1.0  # exact unit radius, so object scale == ball radius and it sits on the floor
     ball.scale = (BALL_R,) * 3
     for mat in (
         material("Leather", (0.93, 0.93, 0.91), 0.36, coat=0.35),
@@ -77,6 +81,34 @@ def make_ball():
     ):
         mesh.materials.append(mat)
     return ball
+
+
+def slowmo(frame):
+    """Playback speed: 1 is real time, easing smoothly down to 0.3 as the ball nears the lens."""
+    t = min(max((frame - 24) / 26, 0.0), 1.0)
+    return 1 - 0.7 * t * t * (3 - 2 * t)
+
+
+def channelbag(obj):
+    return obj.animation_data.action.layers[0].strips[0].channelbags[0]
+
+
+def bake_spin(ball):
+    """One continuous spin, keyed every frame: it starts on the kick and only ever eases down with the
+    slow-motion ramp, so it never stops and restarts the way sparse Bezier keys do."""
+    bag = channelbag(ball)
+    for curve in [c for c in bag.fcurves if c.data_path == "rotation_euler"]:
+        bag.fcurves.remove(curve)
+    angle = 0.0
+    for frame in range(1, END + 1):
+        if frame > KICK:
+            angle += SPIN * slowmo(frame) * min(1.0, (frame - KICK) / 2)  # spun up within two frames
+        ball.rotation_euler = (angle * 0.25, 0, -angle)  # sidespin for the curl plus a little topspin
+        ball.keyframe_insert("rotation_euler", frame=frame)
+    for curve in bag.fcurves:
+        if curve.data_path == "rotation_euler":
+            for point in curve.keyframe_points:
+                point.interpolation = "LINEAR"
 
 
 def key(obj, frame, **props):
@@ -164,9 +196,10 @@ def build_scene(width, height):
     rest = Vector((0, 0, BALL_R))
 
     # Rest, then the strike: squash against the boot, rebound, settle.
-    key(ball, 1, location=rest, scale=(BALL_R,) * 3, rotation_euler=(0, 0, 0))
+    key(ball, 1, location=rest, scale=(BALL_R,) * 3)
     key(ball, 14, location=rest, scale=(BALL_R,) * 3)
-    key(ball, 16, scale=(BALL_R * 1.12, BALL_R * 1.12, BALL_R * 0.84))
+    # Squashed against the boot: lower the centre with it so the bottom stays on the floor.
+    key(ball, KICK, scale=(BALL_R * 1.12, BALL_R * 1.12, BALL_R * 0.84))
     key(ball, 19, scale=(BALL_R * 0.95, BALL_R * 0.95, BALL_R * 1.07))
     key(ball, 23, scale=(BALL_R,) * 3)
 
@@ -183,12 +216,10 @@ def build_scene(width, height):
         (86, 0.92, 1.05, 0.34),
         (91, 2.4, 2.8, 0.3),  # fully out of frame before the last frames
     ]
-    key(ball, 16, location=rest)
+    key(ball, KICK, location=(0, 0, BALL_R * 0.84))
     for frame, sx, sy, depth in path:
         key(ball, frame, location=screen_point(scene, cam, sx, sy, depth))
-    # Sidespin to match the curl, plus a little topspin.
-    for frame, z, x in [(16, 0, 0), (30, -7.5, 1.5), (80, -9.2, 2.0), (91, -13.0, 2.8)]:
-        key(ball, frame, rotation_euler=(x, 0, z))
+    bake_spin(ball)
 
     # Tiny camera jolt on impact so the strike has weight.
     key(cam, 15, location=(0, -3.2, 0.34))
