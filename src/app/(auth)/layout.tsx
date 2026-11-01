@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import Logo from "@/components/brand/Logo";
@@ -9,42 +8,33 @@ export default function AuthLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-2">
-      {/* Desktop-only black panel */}
-      <aside className="relative hidden overflow-hidden bg-black text-white lg:block">
-        <Image
-          src="https://placehold.co/1200x1600/000000/ffffff/png?text=TRIO+SPORTS+BD"
-          alt=""
-          fill
-          priority
-          sizes="50vw"
-          className="object-cover opacity-30"
-        />
-        <div className="relative z-10 flex h-full flex-col justify-between p-12">
-          <Link
-            href="/"
-            className="text-sm font-bold uppercase tracking-[0.2em] text-white/80 hover:text-white"
-          >
-            Trio Sports BD
+    <div className="grid min-h-dvh lg:grid-cols-2">
+      {/* Desktop-only brand panel; pure CSS so the sign-in page makes no extra image request. */}
+      <aside className="floodlight relative hidden overflow-hidden text-white lg:block">
+        <span
+          aria-hidden
+          className="pointer-events-none absolute -bottom-16 -right-10 select-none font-display text-[30rem] font-extrabold leading-none text-transparent [-webkit-text-stroke:2px_hsl(0_0%_100%/0.18)]"
+        >
+          10
+        </span>
+        <div className="relative flex h-full flex-col justify-between p-12">
+          <Link href="/" className="w-fit text-white hover:opacity-90">
+            <Logo className="text-3xl [&>span]:text-white/70" />
           </Link>
           <div>
-            <div className="mb-6 h-1 w-16 bg-[var(--brand-accent)]" aria-hidden />
-            <h2 className="text-5xl font-bold uppercase leading-[0.95] xl:text-6xl">
-              Built for the game
-            </h2>
-            <p className="mt-5 max-w-sm text-white/70">
-              Jerseys, trousers and accessories for athletes across Bangladesh.
-              Flexible checkout with order confirmation on WhatsApp.
+            <h2 className="text-7xl xl:text-8xl">Built for the game</h2>
+            <p className="mt-5 max-w-sm text-lg text-white/80">
+              Jerseys, trousers and accessories for players and fans across Bangladesh, with order
+              confirmation on WhatsApp.
             </p>
           </div>
         </div>
       </aside>
 
-      {/* Form column */}
       <main className="flex flex-col p-6 md:p-10">
-        <div className="lg:hidden">
+        <Link href="/" className="w-fit lg:hidden" aria-label="Trio Sports BD home">
           <Logo />
-        </div>
+        </Link>
         <div className="flex flex-1 items-center justify-center py-10">
           <div className="w-full max-w-md">{children}</div>
         </div>

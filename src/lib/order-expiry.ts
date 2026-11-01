@@ -71,8 +71,8 @@ export async function expireStalePendingOrders(now = new Date()) {
   });
 
   if (expired.length > 0) {
-    revalidateTag(PRODUCT_DETAIL_TAG);
-    revalidateTag(CATALOG_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
+    revalidateTag(CATALOG_TAG, { expire: 0 });
   }
   return { expiredCount: expired.length };
 }

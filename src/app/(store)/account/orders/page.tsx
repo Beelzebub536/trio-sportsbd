@@ -18,7 +18,7 @@ export default async function AccountOrdersPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+      <h1 className="text-2xl font-bold leading-none md:text-3xl">
         My orders
       </h1>
 
@@ -37,7 +37,7 @@ export default async function AccountOrdersPage() {
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/account/orders/${order.id}`}
-                  className="font-semibold uppercase hover:underline"
+                  className="font-semibold hover:underline"
                 >
                   {order.orderNumber}
                 </Link>
@@ -51,7 +51,7 @@ export default async function AccountOrdersPage() {
               <OrderStatusBadge status={order.status} />
               <Link
                 href={`/account/orders/${order.id}`}
-                className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+                className="text-sm font-semibold underline underline-offset-4 hover:decoration-2"
               >
                 View
               </Link>

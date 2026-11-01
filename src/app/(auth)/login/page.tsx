@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: { next?: string | string[] };
+  searchParams: Promise<{ next?: string | string[] }>;
 }) {
   const params = await searchParams;
   const next = safeNext(params?.next);
@@ -21,7 +21,7 @@ export default async function LoginPage({
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold uppercase tracking-tight md:text-4xl">
+        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
           Sign in
         </h1>
         <p className="mt-2 text-sm text-muted-foreground">

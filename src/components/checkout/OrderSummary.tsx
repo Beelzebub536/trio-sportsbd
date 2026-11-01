@@ -35,7 +35,7 @@ export default function OrderSummary({
 
   return (
     <div className="border border-border p-5">
-      <h2 className="text-sm font-bold uppercase tracking-widest">
+      <h2 className="text-base font-semibold">
         Order summary
       </h2>
 
@@ -75,7 +75,7 @@ export default function OrderSummary({
           </dd>
         </div>
         <div className="flex justify-between border-t border-border pt-2 text-base">
-          <dt className="font-bold uppercase">Total</dt>
+          <dt className="font-bold">Total</dt>
           <dd className="font-bold">{total == null ? "—" : formatBDT(total)}</dd>
         </div>
       </dl>

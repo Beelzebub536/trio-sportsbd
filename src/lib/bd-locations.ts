@@ -105,19 +105,3 @@ export const bdDivisions: Division[] = [
 
 /** Division names only, in official order. */
 export const divisions: string[] = bdDivisions.map((d) => d.name);
-
-/** Map of division name -> district names. */
-export const districtsByDivision: Record<string, string[]> = Object.fromEntries(
-  bdDivisions.map((d) => [d.name, d.districts]),
-);
-
-/** Return the districts for a division, or an empty list for an unknown name. */
-export function getDistricts(division: string): string[] {
-  return districtsByDivision[division] ?? [];
-}
-
-export const isDivision = (value: string): boolean =>
-  bdDivisions.some((d) => d.name === value);
-
-export const isDistrictOf = (division: string, district: string): boolean =>
-  getDistricts(division).includes(district);

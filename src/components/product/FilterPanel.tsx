@@ -50,7 +50,7 @@ export default function FilterPanel({
       >
         {categoryOptions.length > 0 && (
           <AccordionItem value="category">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Category
             </AccordionTrigger>
             <AccordionContent>
@@ -76,7 +76,7 @@ export default function FilterPanel({
 
         {showGender && (
           <AccordionItem value="gender">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Gender
             </AccordionTrigger>
             <AccordionContent>
@@ -102,14 +102,14 @@ export default function FilterPanel({
 
         {facets.sizes.length > 0 && (
           <AccordionItem value="size">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Size
             </AccordionTrigger>
             <AccordionContent>
               <ul className="flex flex-wrap gap-2">
                 {facets.sizes.map((size) => (
                   <li key={size}>
-                    <label className="flex cursor-pointer items-center gap-1.5 border border-border px-2 py-1 text-xs has-[:checked]:border-black has-[:checked]:bg-black has-[:checked]:text-white">
+                    <label className="flex cursor-pointer items-center gap-1.5 border border-border px-2 py-1 text-xs has-[:checked]:border-black has-[:checked]:rounded-full bg-primary has-[:checked]:text-primary-foreground">
                       <input
                         type="checkbox"
                         name="size"
@@ -128,7 +128,7 @@ export default function FilterPanel({
 
         {facets.colors.length > 0 && (
           <AccordionItem value="color">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Colour
             </AccordionTrigger>
             <AccordionContent>
@@ -158,7 +158,7 @@ export default function FilterPanel({
         )}
 
         <AccordionItem value="price">
-          <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+          <AccordionTrigger className="font-display text-lg font-bold">
             Price
           </AccordionTrigger>
           <AccordionContent>
@@ -190,7 +190,7 @@ export default function FilterPanel({
 
         {facets.brands.length > 0 && (
           <AccordionItem value="brand">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Brand
             </AccordionTrigger>
             <AccordionContent>
@@ -216,7 +216,7 @@ export default function FilterPanel({
 
         {showOnSale && (
           <AccordionItem value="sale" className="border-b-0">
-            <AccordionTrigger className="text-xs font-bold uppercase tracking-widest">
+            <AccordionTrigger className="font-display text-lg font-bold">
               Offers
             </AccordionTrigger>
             <AccordionContent>
@@ -241,7 +241,7 @@ export default function FilterPanel({
         </Button>
         <Link
           href={action}
-          className="text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+          className="py-2 text-sm font-semibold text-primary underline underline-offset-4 hover:decoration-2"
         >
           Clear all
         </Link>

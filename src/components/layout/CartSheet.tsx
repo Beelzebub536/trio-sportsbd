@@ -40,7 +40,7 @@ export default function CartSheet({
     <Sheet open={isOpen} onOpenChange={(open) => (open ? undefined : close())}>
       <SheetContent side="right" className="flex w-full flex-col p-0 sm:max-w-md">
         <SheetHeader className="border-b border-border px-5 py-4 text-left">
-          <SheetTitle className="text-lg font-bold uppercase">
+          <SheetTitle className="font-display text-3xl font-extrabold">
             Your bag{hydrated && totalQty > 0 ? ` (${totalQty})` : ""}
           </SheetTitle>
         </SheetHeader>
@@ -63,13 +63,13 @@ export default function CartSheet({
                   for free delivery
                 </p>
               ) : (
-                <p className="text-xs font-bold uppercase tracking-wide text-[var(--brand-sale)]">
+                <p className="text-sm font-semibold text-primary">
                   You&apos;ve unlocked free delivery
                 </p>
               )}
-              <div className="mt-2 h-1 w-full bg-secondary">
+              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
                 <div
-                  className="h-1 bg-black transition-all"
+                  className="h-full bg-primary transition-all duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -100,14 +100,14 @@ export default function CartSheet({
                     <Link
                       href={`/product/${line.slug}`}
                       onClick={close}
-                      className="text-xs font-semibold uppercase hover:underline"
+                      className="font-display text-lg font-bold leading-tight hover:text-primary"
                     >
                       {line.name}
                     </Link>
                     <p className="text-xs text-muted-foreground">
                       {line.color} · {line.size}
                     </p>
-                    <p className="mt-1 text-sm font-semibold">
+                    <p className="price mt-1 text-sm font-semibold">
                       {formatBDT(line.unitPrice)}
                     </p>
 
@@ -116,25 +116,25 @@ export default function CartSheet({
                         <button
                           type="button"
                           aria-label="Decrease quantity"
-                          className="p-1.5 hover:bg-secondary"
+                          className="press flex h-10 w-10 items-center justify-center hover:bg-secondary"
                           onClick={() => setQty(line.variantId, line.qty - 1)}
                         >
-                          <Minus className="h-3 w-3" />
+                          <Minus className="h-4 w-4" />
                         </button>
-                        <span className="w-8 text-center text-xs">{line.qty}</span>
+                        <span className="price w-8 text-center text-sm font-semibold">{line.qty}</span>
                         <button
                           type="button"
                           aria-label="Increase quantity"
-                          className="p-1.5 hover:bg-secondary"
+                          className="press flex h-10 w-10 items-center justify-center hover:bg-secondary"
                           onClick={() => setQty(line.variantId, line.qty + 1)}
                         >
-                          <Plus className="h-3 w-3" />
+                          <Plus className="h-4 w-4" />
                         </button>
                       </div>
                       <button
                         type="button"
                         aria-label={`Remove ${line.name}`}
-                        className="p-1.5 text-muted-foreground hover:text-[var(--brand-sale)]"
+                        className="press flex h-10 w-10 items-center justify-center text-muted-foreground hover:text-sale"
                         onClick={() => remove(line.variantId)}
                       >
                         <Trash2 className="h-4 w-4" />
@@ -147,8 +147,8 @@ export default function CartSheet({
 
             <div className="border-t border-border px-5 py-4">
               <div className="flex items-center justify-between text-sm">
-                <span className="uppercase tracking-wide">Subtotal</span>
-                <span className="font-bold">{formatBDT(subtotal)}</span>
+                <span className="font-semibold">Subtotal</span>
+                <span className="price text-lg font-bold">{formatBDT(subtotal)}</span>
               </div>
               <p className="mt-1 text-xs text-muted-foreground">
                 Final prices and delivery are confirmed at checkout.

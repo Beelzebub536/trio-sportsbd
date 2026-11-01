@@ -17,10 +17,10 @@ export default function GlobalError({
 
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center justify-center gap-4 px-4 py-24 text-center">
-      <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Something went wrong
       </p>
-      <h1 className="text-3xl font-bold uppercase leading-none md:text-5xl">
+      <h1 className="text-3xl font-bold leading-none md:text-5xl">
         We hit a problem
       </h1>
       <p className="text-sm text-muted-foreground">

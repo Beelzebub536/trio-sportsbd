@@ -3,10 +3,10 @@ import Link from "next/link";
 export default function NotFoundContent() {
   return (
     <div className="mx-auto flex max-w-xl flex-col items-center justify-center gap-4 px-4 py-24 text-center">
-      <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
+      <p className="text-sm text-muted-foreground">
         Error 404
       </p>
-      <h1 className="text-4xl font-bold uppercase leading-none md:text-6xl">
+      <h1 className="text-4xl font-bold leading-none md:text-6xl">
         Page not found
       </h1>
       <p className="text-sm text-muted-foreground">
@@ -15,13 +15,13 @@ export default function NotFoundContent() {
       <div className="mt-2 flex flex-wrap justify-center gap-3">
         <Link
           href="/"
-          className="bg-black px-5 py-3 text-xs font-bold uppercase tracking-widest text-white hover:opacity-90"
+          className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
         >
           Go home
         </Link>
         <Link
           href="/shop"
-          className="border border-black px-5 py-3 text-xs font-bold uppercase tracking-widest hover:bg-secondary"
+          className="rounded-full border border-input px-5 py-3 text-sm font-semibold hover:bg-secondary"
         >
           Shop all
         </Link>

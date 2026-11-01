@@ -18,7 +18,7 @@ export async function saveSettings(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.errors[0]?.message ?? "Invalid settings",
+      error: parsed.error.issues[0]?.message ?? "Invalid settings",
     };
   }
 
@@ -35,7 +35,7 @@ export async function saveSettings(
       ),
     );
 
-    revalidateTag(SETTINGS_TAG);
+    revalidateTag(SETTINGS_TAG, { expire: 0 });
     revalidatePath("/admin/settings");
     revalidatePath("/");
     return { ok: true };

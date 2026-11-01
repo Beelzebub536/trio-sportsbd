@@ -1,23 +1,30 @@
 "use client";
 
-import { useState } from "react";
-import { Heart, Search, ShoppingBag } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Heart, Menu, Search, ShoppingBag } from "lucide-react";
+import dynamic from "next/dynamic";
 import Link from "next/link";
 
 import Logo from "@/components/brand/Logo";
-import MobileMenu from "@/components/layout/MobileMenu";
 import AccountMenu from "@/components/layout/AccountMenu";
-import CartSheet from "@/components/layout/CartSheet";
-import SearchOverlay from "@/components/layout/SearchOverlay";
-import { useHydrated } from "@/lib/hooks";
+import BagCount from "@/components/layout/BagCount";
+import MobileTabBar from "@/components/layout/MobileTabBar";
+
+// Drawers only open on a tap, so their Radix code loads after hydration instead of with first paint.
+const CartSheet = dynamic(() => import("@/components/layout/CartSheet"), { ssr: false });
+const MobileMenu = dynamic(() => import("@/components/layout/MobileMenu"), { ssr: false });
+const SearchOverlay = dynamic(() => import("@/components/layout/SearchOverlay"), { ssr: false });
 import { PRIMARY_NAV } from "@/lib/nav";
 import type { CategoryNode } from "@/lib/queries/categories";
-import { useCartCountValue, useCartStore } from "@/stores/cart";
+import { cn } from "@/lib/utils";
+import { useCartStore } from "@/stores/cart";
 
 export type HeaderUser = {
   name: string;
   role?: string | null;
 } | null;
+
+const iconButton = "press flex h-11 w-11 items-center justify-center hover:bg-secondary";
 
 export default function SiteHeader({
   categories,
@@ -30,62 +37,80 @@ export default function SiteHeader({
 }) {
   const [searchOpen, setSearchOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const hydrated = useHydrated();
-  const count = useCartCountValue();
+  const [scrolled, setScrolled] = useState(false);
   const openCart = useCartStore((state) => state.open);
+  const wishlistHref = user ? "/account/wishlist" : "/wishlist";
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const childrenFor = (slug: string | null) =>
     slug ? categories.find((category) => category.slug === slug)?.children ?? [] : [];
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-white">
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3">
+    <header
+      className={cn(
+        "sticky top-0 z-40 bg-background transition-shadow duration-200",
+        scrolled ? "shadow-[0_1px_0_hsl(var(--border)),0_12px_32px_rgb(0_0_0/0.45)]" : "shadow-[0_1px_0_hsl(var(--border))]",
+      )}
+    >
+      <div
+        className={cn(
+          "mx-auto flex max-w-7xl items-center gap-2 px-2 transition-[height] duration-200 sm:px-4",
+          scrolled ? "h-14" : "h-14 lg:h-[72px]",
+        )}
+      >
         <button
           type="button"
           aria-label="Open menu"
-          className="p-1 lg:hidden"
+          className={cn(iconButton, "lg:hidden")}
           onClick={() => setMobileOpen(true)}
         >
-          <span className="block h-0.5 w-6 bg-black" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-black" />
-          <span className="mt-1.5 block h-0.5 w-6 bg-black" />
+          <Menu className="h-6 w-6" />
         </button>
 
-        <Link href="/" className="shrink-0" aria-label="Trio Sports BD home">
-          <Logo variant="header" />
+        <Link href="/" className="press shrink-0 px-1" aria-label="Trio Sports BD home">
+          <Logo />
         </Link>
 
-        <nav aria-label="Main" className="mx-auto hidden lg:block">
-          <ul className="flex items-center gap-6">
+        <nav aria-label="Main" className="mx-auto hidden h-full lg:block">
+          <ul className="flex h-full items-center gap-7">
             {PRIMARY_NAV.map((item) => {
               const children = childrenFor(item.categorySlug);
+              const isSale = item.href === "/sale";
               return (
-                <li key={item.label} className="group relative">
+                <li key={item.label} className="group relative flex h-full items-center">
                   <Link
                     href={item.href}
-                    className="flex items-center gap-1 py-2 text-xs font-bold uppercase tracking-widest hover:underline hover:decoration-2 hover:underline-offset-4"
+                    className={cn(
+                      "relative py-2 text-[15px] font-semibold after:absolute after:inset-x-0 after:-bottom-0.5 after:h-[3px] after:origin-left after:scale-x-0 after:bg-current after:transition-transform after:duration-200 group-hover:after:scale-x-100 group-focus-within:after:scale-x-100",
+                      isSale && "text-sale",
+                    )}
                   >
                     {item.label}
                   </Link>
                   {children.length > 0 && (
-                    <div className="invisible absolute left-1/2 top-full z-50 w-[520px] -translate-x-1/2 border border-border bg-white p-6 opacity-0 shadow-lg transition-opacity duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
-                      <div className="grid grid-cols-2 gap-6">
+                    <div className="invisible absolute left-1/2 top-full z-50 w-[560px] -translate-x-1/2 translate-y-2 rounded-2xl border border-border bg-card p-6 opacity-0 shadow-[0_24px_48px_rgb(0_0_0/0.5)] transition duration-200 group-hover:visible group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:opacity-100">
+                      <div className="grid grid-cols-[1fr_1fr_160px] gap-6">
                         {children.map((child) => (
-                          <div key={child.id}>
-                            <Link
-                              href={`/shop?category=${encodeURIComponent(child.slug)}`}
-                              className="text-sm font-bold uppercase tracking-wide hover:underline"
-                            >
-                              {child.name}
-                            </Link>
-                            <Link
-                              href={`/shop?category=${encodeURIComponent(child.slug)}`}
-                              className="mt-2 block text-xs text-muted-foreground underline-offset-4 hover:underline"
-                            >
-                              Shop {child.name.toLowerCase()}
-                            </Link>
-                          </div>
+                          <Link
+                            key={child.id}
+                            href={`/shop?category=${encodeURIComponent(child.slug)}`}
+                            className="text-base font-semibold leading-tight hover:text-primary"
+                          >
+                            {child.name}
+                          </Link>
                         ))}
+                        <Link
+                          href={item.href}
+                          className="floodlight row-span-3 col-start-3 row-start-1 flex min-h-28 items-end rounded-xl p-3 font-display text-xl font-extrabold leading-none text-white"
+                        >
+                          Shop all {item.label.toLowerCase()}
+                        </Link>
                       </div>
                     </div>
                   )}
@@ -95,35 +120,27 @@ export default function SiteHeader({
           </ul>
         </nav>
 
-        <div className="ml-auto flex items-center gap-1">
+        <div className="ml-auto flex items-center">
           <button
             type="button"
             aria-label="Search"
-            className="p-2 hover:bg-secondary"
+            className={cn(iconButton, "hidden lg:flex")}
             onClick={() => setSearchOpen(true)}
           >
             <Search className="h-5 w-5" />
           </button>
-          <Link
-            href={user ? "/account/wishlist" : "/wishlist"}
-            aria-label="Wishlist"
-            className="hidden p-2 hover:bg-secondary sm:block"
-          >
+          <Link href={wishlistHref} aria-label="Wishlist" className={cn(iconButton, "hidden lg:flex")}>
             <Heart className="h-5 w-5" />
           </Link>
           <AccountMenu user={user} />
           <button
             type="button"
-            aria-label={`Open bag${hydrated && count > 0 ? `, ${count} ${count === 1 ? "item" : "items"}` : ""}`}
-            className="relative p-2 hover:bg-secondary"
+            className={cn(iconButton, "relative hidden lg:flex")}
             onClick={openCart}
           >
-            <ShoppingBag className="h-5 w-5" />
-            {hydrated && count > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center bg-[var(--brand-accent)] px-1 text-[10px] font-bold text-black">
-                {count}
-              </span>
-            )}
+            <ShoppingBag className="h-5 w-5" aria-hidden />
+            <span className="sr-only">Open bag</span>
+            <BagCount className="right-0.5 top-0.5" />
           </button>
         </div>
       </div>
@@ -136,6 +153,7 @@ export default function SiteHeader({
       />
       <SearchOverlay open={searchOpen} onOpenChange={setSearchOpen} />
       <CartSheet freeShippingThreshold={freeShippingThreshold} />
+      <MobileTabBar wishlistHref={wishlistHref} onSearch={() => setSearchOpen(true)} />
     </header>
   );
 }

@@ -2,115 +2,268 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Night-match palette (dark-first). HSL triplets feed Tailwind tokens; see tailwind.config.ts. */
 :root {
-  /* Adidas color palette */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 0%;
-  --card: 0 0% 100%;
-  --card-foreground: 0 0% 0%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 0%;
-  --primary: 0 0% 0%;
-  --primary-foreground: 0 0% 100%;
-  --secondary: 0 0% 93%;
-  --secondary-foreground: 0 0% 0%;
-  --muted: 0 0% 93%;
-  --muted-foreground: 0 0% 46%;
-  --accent: 0 0% 93%;
-  --accent-foreground: 0 0% 0%;
-  --destructive: 0 84.2% 60.2%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 89.8%;
-  --input: 0 0% 89.8%;
-  --ring: 0 0% 3.9%;
-  /* Sharp corners */
-  --radius: 0rem;
-  /* Brand colors */
-  --brand-black: #000000;
-  --brand-white: #FFFFFF;
-  --brand-accent: #C4F000; /* Electric green */
-  --brand-sale: #E4002B; /* Red for sale prices */
-  /* Typography */
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-condensed: "Barlow Condensed", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color-scheme: dark;
+  --background: 160 14% 6%; /* #0D1210 */
+  --foreground: 60 9% 96%; /* #F5F5F2 */
+  --card: 160 10% 10%; /* #171C1A */
+  --card-foreground: 60 9% 96%;
+  --popover: 160 10% 10%;
+  --popover-foreground: 60 9% 96%;
+  --primary: 151 70% 46%; /* floodlight green #23C47B */
+  --primary-foreground: 160 30% 6%;
+  --pitch-dark: 160 30% 9%;
+  --secondary: 160 8% 15%; /* raised surface */
+  --secondary-foreground: 60 9% 96%;
+  --muted: 160 8% 15%;
+  --muted-foreground: 150 6% 66%;
+  --accent: 160 8% 15%;
+  --accent-foreground: 60 9% 96%;
+  --destructive: 350 86% 56%; /* sale red #EE3355 */
+  --destructive-foreground: 0 0% 100%;
+  --border: 160 8% 19%;
+  --input: 160 8% 24%;
+  --ring: 151 70% 46%;
+  --radius: 0.75rem;
+  --tabbar-h: 0px;
 }
 
-.dark {
-  --background: 0 0% 3.9%;
-  --foreground: 0 0% 98%;
-  --card: 0 0% 3.9%;
-  --card-foreground: 0 0% 98%;
-  --popover: 0 0% 3.9%;
-  --popover-foreground: 0 0% 98%;
-  --primary: 0 0% 98%;
-  --primary-foreground: 0 0% 9%;
-  --secondary: 0 0% 14.9%;
-  --secondary-foreground: 0 0% 98%;
-  --muted: 0 0% 14.9%;
-  --muted-foreground: 0 0% 63.9%;
-  --accent: 0 0% 14.9%;
-  --accent-foreground: 0 0% 98%;
-  --destructive: 0 62.8% 30.6%;
-  --destructive-foreground: 0 0% 98%;
-  --border: 0 0% 14.9%;
-  --input: 0 0% 14.9%;
-  --ring: 0 0% 83.1%;
+@media (max-width: 1023px) {
+  :root {
+    --tabbar-h: calc(64px + env(safe-area-inset-bottom));
+  }
 }
 
-body {
-  color: hsl(var(--foreground));
-  background-color: hsl(var(--background));
-  font-family: var(--font-sans);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    line-height: 1.5;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), system-ui, sans-serif;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  :focus-visible {
+    outline: 2px solid hsl(var(--ring));
+    outline-offset: 2px;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
 }
 
-/* High-performance font optimization */
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--font-condensed);
-  font-weight: 700;
-  letter-spacing: -0.025em;
-  text-transform: uppercase;
+@layer components {
+  /* Floodlit surface: deep green glow on charcoal, used for bands and panels. */
+  .floodlight {
+    background-color: hsl(var(--pitch-dark));
+    background-image:
+      radial-gradient(120% 90% at 85% 0%, hsl(var(--primary) / 0.28), transparent 60%),
+      radial-gradient(80% 70% at 0% 100%, hsl(var(--primary) / 0.12), transparent 60%);
+  }
+
+  .price {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Press feedback: answers the tap without shifting layout. */
+  .press {
+    transition-property: transform, color, background-color, border-color, opacity;
+    transition-duration: 150ms;
+    transition-timing-function: ease-out;
+  }
+  .press:active {
+    transform: scale(0.97);
+  }
+
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, hsl(0 0% 100% / 0.06), transparent);
+    animation: shimmer 1.4s ease-in-out infinite;
+  }
+
+  /* Rotating announcement messages on phones (3 items, 4s each). */
+  .rotate-msg > * {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    animation: rotate-msg 12s infinite;
+  }
+  .rotate-msg > *:nth-child(2) {
+    animation-delay: 4s;
+  }
+  .rotate-msg > *:nth-child(3) {
+    animation-delay: 8s;
+  }
+
+  .hero-in {
+    animation: hero-in 700ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
 }
 
-/* Reduce layout shift for images */
+/*
+ * Minimal stand-in for the tailwindcss-animate classes used by the shadcn sheet/dialog/menus
+ * (that plugin was never installed). Uses individual translate/scale properties so it composes
+ * with Tailwind's transform-based centring. Exit runs ~65% of enter.
+ */
+@layer utilities {
+  .animate-in {
+    animation: enter 260ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .animate-out {
+    animation: exit 170ms cubic-bezier(0.4, 0, 1, 1) both;
+  }
+  .fade-in-0 {
+    --enter-opacity: 0;
+  }
+  .fade-out-0 {
+    --exit-opacity: 0;
+  }
+  .zoom-in-95 {
+    --enter-scale: 0.95;
+  }
+  .zoom-out-95 {
+    --exit-scale: 0.95;
+  }
+  .slide-in-from-left {
+    --enter-x: -100%;
+  }
+  .slide-out-to-left {
+    --exit-x: -100%;
+  }
+  .slide-in-from-right {
+    --enter-x: 100%;
+  }
+  .slide-out-to-right {
+    --exit-x: 100%;
+  }
+  .slide-in-from-top {
+    --enter-y: -100%;
+  }
+  .slide-out-to-top {
+    --exit-y: -100%;
+  }
+  .slide-in-from-bottom {
+    --enter-y: 100%;
+  }
+  .slide-out-to-bottom {
+    --exit-y: 100%;
+  }
+}
+
+@keyframes enter {
+  from {
+    opacity: var(--enter-opacity, 1);
+    translate: var(--enter-x, 0) var(--enter-y, 0);
+    scale: var(--enter-scale, 1);
+  }
+}
+
+@keyframes exit {
+  to {
+    opacity: var(--exit-opacity, 1);
+    translate: var(--exit-x, 0) var(--exit-y, 0);
+    scale: var(--exit-scale, 1);
+  }
+}
+
+/* First-visit intro: hidden unless the inline boot script marked this visit (see FirstVisitIntro). */
+.intro {
+  display: none;
+}
+html[data-intro]:has(.intro) {
+  overflow: hidden;
+}
+html[data-intro] .intro {
+  display: block;
+  /* Failsafe: never trap the visitor if the script fails to finish. */
+  animation: intro-failsafe 0s linear 7s forwards;
+}
+
+/* Reveal: once the ball fills the frame, a hole opens from the centre and the store shows through. */
+@property --hole {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: -10px;
+}
+.intro-stage {
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  mask-image: radial-gradient(circle at 50% 50%, transparent var(--hole), #000 calc(var(--hole) + 1px));
+  transition: --hole 0.8s cubic-bezier(0.5, 0, 0.3, 1);
+}
+.intro-reveal {
+  --hole: 170vmax;
+}
+
+@keyframes intro-failsafe {
+  to {
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0.4);
+  }
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes rotate-msg {
+  0%,
+  30% {
+    opacity: 1;
+    visibility: visible;
+  }
+  33%,
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+}
+
 img {
   max-width: 100%;
   height: auto;
   display: block;
 }
 
-/* Improve focus states */
-:focus-visible {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: hsl(var(--background));
-}
-
-::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground));
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--primary));
-}
-
-/* Respect the visitor's motion preference */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -123,5 +276,14 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Without rotation, show only the first announcement. */
+  .rotate-msg > *:first-child {
+    opacity: 1;
+    visibility: visible;
+  }
+  .shimmer::after {
+    display: none;
   }
 }

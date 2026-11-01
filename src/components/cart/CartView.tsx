@@ -56,7 +56,7 @@ export default function CartView() {
     return (
       <div className="flex flex-col items-center justify-center gap-4 py-20 text-center">
         <ShoppingBag className="h-10 w-10 text-muted-foreground" />
-        <h2 className="text-xl font-bold uppercase">Your bag is empty</h2>
+        <h2 className="text-xl font-bold">Your bag is empty</h2>
         <p className="max-w-md text-sm text-muted-foreground">
           Add a jersey, a pair of track pants or an accessory to get started.
         </p>
@@ -110,7 +110,7 @@ export default function CartView() {
                   <div className="min-w-0">
                     <Link
                       href={`/product/${line.slug}`}
-                      className="text-sm font-semibold uppercase hover:underline"
+                      className="text-sm font-semibold hover:underline"
                     >
                       {line.name}
                     </Link>
@@ -124,7 +124,7 @@ export default function CartView() {
                   <button
                     type="button"
                     aria-label={`Remove ${line.name}`}
-                    className="p-1 text-muted-foreground hover:text-[var(--brand-sale)]"
+                    className="p-1 text-muted-foreground hover:text-sale"
                     onClick={() => remove(line.variantId)}
                   >
                     <Trash2 className="h-4 w-4" />
@@ -143,7 +143,7 @@ export default function CartView() {
                     Checking availability…
                   </p>
                 ) : lowStock ? (
-                  <p className="mt-2 bg-secondary px-2 py-1 text-xs text-[var(--brand-sale)]">
+                  <p className="mt-2 bg-secondary px-2 py-1 text-xs text-sale">
                     Only {detail.stock} left — please reduce the quantity.
                   </p>
                 ) : null}
@@ -188,7 +188,7 @@ export default function CartView() {
 
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <div className="border border-border p-5">
-          <h2 className="text-sm font-bold uppercase tracking-widest">Summary</h2>
+          <h2 className="text-base font-semibold">Summary</h2>
           <dl className="mt-4 space-y-2 text-sm">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
@@ -218,14 +218,14 @@ export default function CartView() {
             </p>
           )}
           {!pending && hasProblem && (
-            <p className="mt-2 text-xs text-[var(--brand-sale)]">
+            <p className="mt-2 text-xs text-sale">
               Please fix the highlighted items before checking out.
             </p>
           )}
 
           <Link
             href="/shop"
-            className="mt-3 block text-center text-xs font-bold uppercase tracking-widest underline underline-offset-4 hover:decoration-2"
+            className="mt-3 block text-center text-sm font-semibold underline underline-offset-4 hover:decoration-2"
           >
             Continue shopping
           </Link>

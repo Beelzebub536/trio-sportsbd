@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import StoreChrome from "@/components/layout/StoreChrome";
 import StoreChromeFallback from "@/components/layout/StoreChromeFallback";
 import StoreFooter from "@/components/layout/StoreFooter";
+import FirstVisitIntro from "@/components/intro/FirstVisitIntro";
 import Footer from "@/components/layout/Footer";
 import { defaultSettings } from "@/lib/settings";
 
@@ -16,7 +17,9 @@ export default function StoreLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex min-h-screen flex-col">
+    // Bottom padding keeps content clear of the mobile tab bar / sticky action bars.
+    <div className="flex min-h-dvh flex-col pb-[var(--tabbar-h)]">
+      <FirstVisitIntro />
       <Suspense fallback={<StoreChromeFallback />}>
         <StoreChrome />
       </Suspense>

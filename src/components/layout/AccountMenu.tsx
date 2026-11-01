@@ -35,7 +35,7 @@ export default function AccountMenu({ user }: { user: HeaderUser }) {
       <Link
         href="/login"
         aria-label="Sign in"
-        className="hidden p-2 hover:bg-secondary sm:block"
+        className="press hidden h-11 w-11 items-center justify-center hover:bg-secondary sm:flex"
       >
         <UserIcon className="h-5 w-5" />
       </Link>
@@ -46,12 +46,12 @@ export default function AccountMenu({ user }: { user: HeaderUser }) {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label="Account menu"
-        className="p-2 hover:bg-secondary"
+        className="press flex h-11 w-11 items-center justify-center hover:bg-secondary"
       >
         <UserIcon className="h-5 w-5" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel className="truncate text-xs uppercase tracking-widest text-muted-foreground">
+        <DropdownMenuLabel className="truncate text-sm text-muted-foreground">
           {user.name}
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

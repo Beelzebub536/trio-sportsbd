@@ -89,9 +89,6 @@ export const useCartStore = create<CartState>()(
   ),
 );
 
-export const countItems = (items: CartItem[]): number =>
-  items.reduce((total, line) => total + line.qty, 0);
-
 export const subtotalOf = (items: CartItem[]): number =>
   items.reduce((total, line) => total + line.unitPrice * line.qty, 0);
 

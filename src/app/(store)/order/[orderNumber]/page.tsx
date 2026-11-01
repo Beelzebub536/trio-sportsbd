@@ -19,8 +19,8 @@ export async function generateMetadata({
   params,
   searchParams,
 }: {
-  params: { orderNumber: string };
-  searchParams: { token?: string };
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ token?: string }>;
 }): Promise<Metadata> {
   const [{ orderNumber }, { token }] = await Promise.all([params, searchParams]);
   const order = await prisma.order.findUnique({
@@ -52,8 +52,8 @@ export default async function OrderPage({
   params,
   searchParams,
 }: {
-  params: { orderNumber: string };
-  searchParams: { token?: string };
+  params: Promise<{ orderNumber: string }>;
+  searchParams: Promise<{ token?: string }>;
 }) {
   const { orderNumber } = await params;
   const { token } = await searchParams;
@@ -106,12 +106,12 @@ export default async function OrderPage({
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
       <div className="flex items-center gap-3">
-        <CheckCircle2 className="h-8 w-8 text-[var(--brand-accent)]" aria-hidden />
+        <CheckCircle2 className="h-8 w-8 text-primary" aria-hidden />
         <div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Order placed
           </p>
-          <h1 className="text-3xl font-bold uppercase leading-none md:text-4xl">
+          <h1 className="text-3xl font-bold leading-none md:text-4xl">
             {order.orderNumber}
           </h1>
         </div>
@@ -135,7 +135,7 @@ export default async function OrderPage({
       </div>
 
       <section className="mt-8">
-        <h2 className="text-sm font-bold uppercase tracking-widest">Items</h2>
+        <h2 className="text-base font-semibold">Items</h2>
         <ul className="mt-3 divide-y divide-border border-y border-border">
           {order.orderItems.map((item) => (
             <li key={item.id} className="flex items-center gap-4 py-4">
@@ -151,7 +151,7 @@ export default async function OrderPage({
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold uppercase">
+                <span className="block text-sm font-semibold">
                   {item.name}
                 </span>
                 <span className="block text-xs text-muted-foreground">
@@ -168,7 +168,7 @@ export default async function OrderPage({
 
       <section className="mt-8 grid gap-6 sm:grid-cols-2">
         <div className="border border-border p-5 text-sm">
-          <h2 className="text-sm font-bold uppercase tracking-widest">
+          <h2 className="text-base font-semibold">
             Delivery to
           </h2>
           <p className="mt-3">{order.customerName}</p>
@@ -179,7 +179,7 @@ export default async function OrderPage({
         </div>
 
         <div className="border border-border p-5 text-sm">
-          <h2 className="text-sm font-bold uppercase tracking-widest">Payment</h2>
+          <h2 className="text-base font-semibold">Payment</h2>
           <dl className="mt-3 space-y-2">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
@@ -218,7 +218,7 @@ export default async function OrderPage({
           href={whatsappLink}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-black px-6 py-3 text-xs font-bold uppercase tracking-widest text-white hover:opacity-90"
+          className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
         >
           {order.advanceAmount === 0 ? "Send order request on WhatsApp" : "Confirm on WhatsApp"}
         </a>

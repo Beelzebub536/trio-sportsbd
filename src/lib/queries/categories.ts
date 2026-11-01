@@ -17,7 +17,6 @@ export type CategoryNode = {
 /** All categories as a parent/child tree, ordered by `sortOrder`. */
 const getCachedCategoryTree = unstable_cache(
   async (): Promise<CategoryNode[]> => {
-  try {
     const rows = await prisma.category.findMany({
       orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
       select: {
@@ -41,16 +40,19 @@ const getCachedCategoryTree = unstable_cache(
     });
 
     return roots;
-  } catch {
-    // Never let a transient DB problem take down the whole storefront shell.
-    return [];
-  }
   },
   ["category-tree-v1"],
   { tags: [CATEGORIES_TAG], revalidate: 300 },
 );
 
-export const getCategoryTree = cache(() => getCachedCategoryTree());
+// Never let a transient DB problem take down the storefront shell, and never cache that failure.
+export const getCategoryTree = cache(async (): Promise<CategoryNode[]> => {
+  try {
+    return await getCachedCategoryTree();
+  } catch {
+    return [];
+  }
+});
 
 /** Flat list of top-level categories (for menus and tiles). */
 export async function getTopLevelCategories(): Promise<CategoryNode[]> {

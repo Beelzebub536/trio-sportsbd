@@ -196,7 +196,7 @@ export default function CheckoutForm({
   if (hydrated && items.length === 0) {
     return (
       <div className="flex flex-col items-center gap-4 py-20 text-center">
-        <h2 className="text-xl font-bold uppercase">Your bag is empty</h2>
+        <h2 className="text-xl font-bold">Your bag is empty</h2>
         <p className="text-sm text-muted-foreground">
           Add something to your bag before checking out.
         </p>
@@ -226,7 +226,7 @@ export default function CheckoutForm({
         )}
         {addresses.length > 0 && (
           <section>
-            <h2 className="text-sm font-bold uppercase tracking-widest">
+            <h2 className="text-base font-semibold">
               Saved addresses
             </h2>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -248,7 +248,7 @@ export default function CheckoutForm({
         )}
 
         <section className="space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest">
+          <h2 className="text-base font-semibold">
             Delivery details
           </h2>
 
@@ -354,7 +354,7 @@ export default function CheckoutForm({
         </section>
 
         <section className="space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest">
+          <h2 className="text-base font-semibold">
             Payment
           </h2>
           {settings.onlinePaymentsEnabled ? (

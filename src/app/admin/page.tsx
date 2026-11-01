@@ -145,7 +145,7 @@ export default async function AdminDashboardPage() {
                     ({variant.color} / {variant.size})
                   </span>
                 </span>
-                <span className="font-bold text-[var(--brand-sale)]">
+                <span className="font-bold text-sale">
                   {variant.stock} left
                 </span>
               </li>

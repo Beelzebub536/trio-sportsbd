@@ -23,14 +23,14 @@ export default function OrderTimeline({ status }: { status: string }) {
               <span
                 className={cn(
                   "flex h-6 w-6 items-center justify-center text-[11px] font-bold",
-                  done ? "bg-black text-white" : "bg-secondary text-muted-foreground",
+                  done ? "bg-primary text-primary-foreground" : "bg-secondary text-muted-foreground",
                 )}
               >
                 {index + 1}
               </span>
               <span
                 className={cn(
-                  "text-xs font-bold uppercase tracking-widest",
+                  "text-sm font-semibold",
                   done ? "text-foreground" : "text-muted-foreground",
                 )}
               >
@@ -42,7 +42,7 @@ export default function OrderTimeline({ status }: { status: string }) {
                 aria-hidden
                 className={cn(
                   "mx-3 h-px w-6 sm:w-10",
-                  index < currentIndex ? "bg-black" : "bg-border",
+                  index < currentIndex ? "bg-primary" : "bg-border",
                 )}
               />
             )}

@@ -19,7 +19,7 @@ export async function updateProfile(values: {
   await requireUserId();
   const parsed = profileSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.errors[0]?.message };
+    return { ok: false, error: parsed.error.issues[0]?.message };
   }
 
   try {
@@ -54,7 +54,7 @@ export async function changePassword(values: {
   await requireUserId();
   const parsed = passwordSchema.safeParse(values);
   if (!parsed.success) {
-    return { ok: false, error: parsed.error.errors[0]?.message };
+    return { ok: false, error: parsed.error.issues[0]?.message };
   }
 
   try {

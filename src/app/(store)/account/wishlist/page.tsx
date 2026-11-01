@@ -14,7 +14,7 @@ export default async function AccountWishlistPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+      <h1 className="text-2xl font-bold leading-none md:text-3xl">
         My wishlist
       </h1>
 

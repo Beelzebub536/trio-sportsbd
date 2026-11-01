@@ -20,7 +20,7 @@ export default function CachedListingPreview({
         <article key={product.id}>
           <Link
             href={`/product/${product.slug}`}
-            className="relative block aspect-[4/5] overflow-hidden bg-secondary"
+            className="relative block aspect-[4/5] overflow-hidden rounded-2xl bg-card"
             aria-label={product.name}
           >
             {product.image && (
@@ -34,7 +34,7 @@ export default function CachedListingPreview({
               />
             )}
           </Link>
-          <p className="mt-2 text-xs font-semibold uppercase leading-snug">
+          <p className="mt-2 text-xs font-semibold leading-snug">
             {product.name}
           </p>
           <p className="text-xs text-muted-foreground">{product.categoryName}</p>
@@ -45,7 +45,7 @@ export default function CachedListingPreview({
             <button
               type="button"
               onClick={() => onRemove(product.id)}
-              className="mt-2 text-xs uppercase tracking-wide underline underline-offset-2"
+              className="mt-2 text-xs underline underline-offset-2"
             >
               Remove from wishlist
             </button>

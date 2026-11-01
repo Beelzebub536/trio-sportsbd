@@ -39,5 +39,3 @@ export const productSchema = z
   );
 
 export type ProductValues = z.infer<typeof productSchema>;
-export type ProductImageValues = z.infer<typeof productImageSchema>;
-export type ProductVariantValues = z.infer<typeof productVariantSchema>;

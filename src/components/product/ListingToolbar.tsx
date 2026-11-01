@@ -43,7 +43,7 @@ export default function ListingToolbar({
 
   return (
     <div className="flex items-center justify-between gap-3 border-b border-border pb-4">
-      <p className="text-xs uppercase tracking-widest text-muted-foreground">
+      <p className="price text-sm text-muted-foreground">
         {total} {total === 1 ? "product" : "products"}
       </p>
 
@@ -52,7 +52,7 @@ export default function ListingToolbar({
           <SheetTrigger asChild>
             <button
               type="button"
-              className="flex items-center gap-2 border border-border px-3 py-2 text-xs font-bold uppercase tracking-widest lg:hidden"
+              className="press flex h-11 items-center gap-2 rounded-full border border-foreground px-4 text-sm font-semibold lg:hidden"
             >
               <SlidersHorizontal className="h-4 w-4" />
               Filter
@@ -60,7 +60,7 @@ export default function ListingToolbar({
           </SheetTrigger>
           <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto">
             <SheetHeader className="text-left">
-              <SheetTitle className="text-lg font-bold uppercase">
+              <SheetTitle className="text-lg font-bold">
                 Filters
               </SheetTitle>
             </SheetHeader>

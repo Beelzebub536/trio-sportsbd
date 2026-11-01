@@ -39,4 +39,4 @@ Always confirm details against current docs (context7) for the versions in packa
 
 ## Vercel
 - No long-running processes, no websockets, no writing to local disk at runtime. Uploads go to Cloudinary. Keep server actions fast; Neon may take ~1s to wake from idle.
-- All env vars must be listed in `.env.example` and validated at startup with Zod in `src/lib/env.ts` (clear error message when something is missing).
+- All env vars must be listed in `.env.example`. Read them where they are used and degrade gracefully when an optional one is missing (seed-only vars such as `ADMIN_EMAIL` must never be required at runtime).

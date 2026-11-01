@@ -23,3 +23,6 @@ npm-debug.log*
 *.pem
 .vercel
 *.tsbuildinfo
+
+# Playwright MCP screenshots and logs
+/.playwright-mcp/

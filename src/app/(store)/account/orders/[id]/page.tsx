@@ -14,7 +14,7 @@ export const metadata = { title: "Order details" };
 export default async function AccountOrderDetailPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
   const session = await requireUser();
   const id = Number((await params).id);
@@ -34,7 +34,7 @@ export default async function AccountOrderDetailPage({
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+          <h1 className="text-2xl font-bold leading-none md:text-3xl">
             {order.orderNumber}
           </h1>
           <p className="mt-1 text-xs text-muted-foreground">
@@ -49,7 +49,7 @@ export default async function AccountOrderDetailPage({
       </div>
 
       <section>
-        <h2 className="text-sm font-bold uppercase tracking-widest">Items</h2>
+        <h2 className="text-base font-semibold">Items</h2>
         <ul className="mt-3 divide-y divide-border border-y border-border">
           {order.orderItems.map((item) => (
             <li key={item.id} className="flex items-center gap-4 py-4">
@@ -59,7 +59,7 @@ export default async function AccountOrderDetailPage({
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block text-sm font-semibold uppercase">
+                <span className="block text-sm font-semibold">
                   {item.name}
                 </span>
                 <span className="block text-xs text-muted-foreground">
@@ -76,7 +76,7 @@ export default async function AccountOrderDetailPage({
 
       <section className="grid gap-6 sm:grid-cols-2">
         <div className="border border-border p-5 text-sm">
-          <h2 className="text-sm font-bold uppercase tracking-widest">
+          <h2 className="text-base font-semibold">
             Delivery address
           </h2>
           <p className="mt-3">{order.customerName}</p>
@@ -87,7 +87,7 @@ export default async function AccountOrderDetailPage({
         </div>
 
         <div className="border border-border p-5 text-sm">
-          <h2 className="text-sm font-bold uppercase tracking-widest">Totals</h2>
+          <h2 className="text-base font-semibold">Totals</h2>
           <dl className="mt-3 space-y-2">
             <div className="flex justify-between">
               <dt>Subtotal</dt>
@@ -130,13 +130,13 @@ export default async function AccountOrderDetailPage({
           )}`}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-black px-5 py-3 text-xs font-bold uppercase tracking-widest text-white hover:opacity-90"
+          className="rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110"
         >
           Need help? WhatsApp us
         </a>
         <Link
           href="/account/orders"
-          className="border border-black px-5 py-3 text-xs font-bold uppercase tracking-widest hover:bg-secondary"
+          className="rounded-full border border-input px-5 py-3 text-sm font-semibold hover:bg-secondary"
         >
           Back to orders
         </Link>

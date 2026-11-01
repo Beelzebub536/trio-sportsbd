@@ -19,7 +19,7 @@ export async function saveCategory(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.errors[0]?.message ?? "Invalid category",
+      error: parsed.error.issues[0]?.message ?? "Invalid category",
     };
   }
   const data = parsed.data;
@@ -53,8 +53,8 @@ export async function saveCategory(
 
     revalidatePath("/admin/categories");
     revalidatePath("/");
-    revalidateTag(CATEGORIES_TAG);
-    revalidateTag(CATALOG_TAG);
+    revalidateTag(CATEGORIES_TAG, { expire: 0 });
+    revalidateTag(CATALOG_TAG, { expire: 0 });
     return { ok: true };
   } catch (error) {
     console.error("saveCategory failed:", error);
@@ -85,8 +85,8 @@ export async function deleteCategory(id: number): Promise<AdminActionResult> {
 
   try {
     await prisma.category.delete({ where: { id } });
-    revalidateTag(CATEGORIES_TAG);
-    revalidateTag(CATALOG_TAG);
+    revalidateTag(CATEGORIES_TAG, { expire: 0 });
+    revalidateTag(CATALOG_TAG, { expire: 0 });
     revalidatePath("/admin/categories");
     revalidatePath("/");
     return { ok: true };

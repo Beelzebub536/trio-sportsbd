@@ -12,9 +12,8 @@ export type BannerData = {
 };
 
 const getCachedActiveBanners = unstable_cache(
-  async (): Promise<BannerData[]> => {
-  try {
-    return await prisma.banner.findMany({
+  async (): Promise<BannerData[]> =>
+    prisma.banner.findMany({
       where: { isActive: true },
       orderBy: { sortOrder: "asc" },
       select: {
@@ -24,15 +23,16 @@ const getCachedActiveBanners = unstable_cache(
         imageUrl: true,
         linkUrl: true,
       },
-    });
-  } catch {
-    return [];
-  }
-  },
+    }),
   ["active-banners-v1"],
   { tags: [BANNERS_TAG], revalidate: 300 },
 );
 
 export async function getActiveBanners(): Promise<BannerData[]> {
-  return getCachedActiveBanners();
+  // Fall back outside the cache so a transient DB error is never cached as "no banners".
+  try {
+    return await getCachedActiveBanners();
+  } catch {
+    return [];
+  }
 }

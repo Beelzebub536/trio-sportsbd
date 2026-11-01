@@ -2,14 +2,19 @@
 name: adidas-ui
 description: Design rules for the Adidas-inspired look and feel of trio-sportsbd. Load for any storefront or admin UI work.
 ---
-# Adidas-style UI rules
+# Night-match UI rules (dark theme, 2026-11-01; replaces the Adidas and Stadium looks)
+
+Tokens live in `src/app/globals.css` (dark-first) and are mapped in `tailwind.config.ts`; never hard-code hex values in components.
 
 ## Look
-- Palette: black `#000`, white `#fff`, light grey surfaces `#ecefef`, mid grey text `#767677`, ONE accent (electric green `#c4f000` or red `#e4002b`; pick one in `globals.css` tokens and reuse). Sale prices in red.
-- Sharp corners everywhere (`--radius: 0`). Buttons are rectangular, black fill with white text, with a small arrow icon on the right (`->`); hover shifts the arrow. Secondary button = white with black 1px border.
-- Typography: headings in a bold condensed uppercase face (Barlow Condensed or Oswald, weights 700-800, tight tracking) loaded with `next/font/google`; body in Inter. Huge hero headings; small uppercase labels (12px, tracking wide).
-- Lots of whitespace, edge-to-edge imagery, grid of product cards with no borders or shadows. Links use a 2px underline that thickens on hover.
-- Motion: subtle only (150-250 ms). Respect `prefers-reduced-motion`.
+- Dark charcoal surfaces (`background`, `card`, `secondary`), off-white text, floodlight green `primary` for CTAs and active states (dark text on it), `sale`/`destructive` red only for sale, discounts and errors. `floodlight` class = green-glow panel.
+- Type: Archivo 700/800 (`font-display`) for headings in sentence case with tight tracking; Inter body 16px. No all-caps labels, no tracked-out eyebrows. Prices use the `price` class.
+- Shape: rounded (`--radius` 0.75rem), pill buttons (`rounded-full`), photo tiles `rounded-2xl`, bands `rounded-3xl`.
+- Imagery: editorial photos from `src/lib/photos.ts` (Unsplash, no third-party logos) behind dark gradients for legibility.
+- Phones: fixed bottom tab bar (`MobileTabBar`), hidden on product/cart/checkout; product page uses `StickyBuyBar`. Store layout pads for it via `--tabbar-h`.
+- Motion: CSS for hover/press; GSAP only through `<Reveal>` / `loadGsap()` (lazy; skipped for reduced motion and Save-Data). Never hide content already on screen.
+- First-visit intro: Blender render in `public/intro/` (source `scripts/blender/intro_kick.py`, encode with `scripts/blender/encode_intro.mjs`), played by `FirstVisitIntro`; boot logic in `src/lib/intro.ts`. `?intro=1` previews it.
+- Loading: keep every `Suspense` fallback; skeletons use `Skeleton` (shimmer) and `LoadingSurface`.
 
 ## Components
 - Announcement bar (black, small white text, "Free delivery over ৳X" from settings) above the header.

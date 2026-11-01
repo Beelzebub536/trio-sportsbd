@@ -21,7 +21,7 @@ export default async function AccountLayout({
   return (
     <div className="mx-auto grid max-w-7xl gap-8 px-4 py-8 lg:grid-cols-[220px_1fr]">
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">
+        <p className="text-sm text-muted-foreground">
           Signed in as
         </p>
         <p className="truncate font-semibold">{session.user.name}</p>
@@ -32,7 +32,7 @@ export default async function AccountLayout({
               <li key={item.href}>
                 <Link
                   href={item.href}
-                  className="block py-2 text-sm font-semibold uppercase tracking-wide hover:underline hover:decoration-2 hover:underline-offset-4"
+                  className="block py-2 text-sm font-semibold hover:underline hover:decoration-2 hover:underline-offset-4"
                 >
                   {item.label}
                 </Link>

@@ -35,12 +35,12 @@ const sources = [
   "prisma/seed-data.ts",
 ];
 const failures = [];
-const nextConfig = readFileSync(join(projectRoot, "next.config.js"), "utf8");
+const nextConfig = readFileSync(join(projectRoot, "next.config.mjs"), "utf8");
 if (
   !nextConfig.includes('source: "/cricket-jerseys"') ||
   !nextConfig.includes('destination: "/shop?category=cricket-jerseys"')
 ) {
-  failures.push("next.config.js: legacy cricket jersey URL must redirect to its listing");
+  failures.push("next.config.mjs: legacy cricket jersey URL must redirect to its listing");
 }
 
 for (const sourcePath of sources) {

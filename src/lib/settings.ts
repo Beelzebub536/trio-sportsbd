@@ -45,13 +45,7 @@ const asNumber = (value: unknown, fallback: number): number => {
 /** Read all settings, merged over the defaults. Cached and tagged `SETTINGS_TAG`. */
 const getCachedSettings = unstable_cache(
   async (): Promise<StoreSettings> => {
-    let rows: Array<{ key: string; value: unknown }> = [];
-    try {
-      rows = await prisma.setting.findMany();
-    } catch {
-      // The storefront should still render if the DB is unreachable.
-      return defaultSettings;
-    }
+    const rows: Array<{ key: string; value: unknown }> = await prisma.setting.findMany();
 
     const map = new Map(rows.map((row) => [row.key, row.value]));
 
@@ -99,4 +93,12 @@ const getCachedSettings = unstable_cache(
 
 // Coalesce simultaneous reads in one React render as well as using the
 // persistent Next.js data cache to avoid duplicate cold-cache DB queries.
-export const getSettings = cache(() => getCachedSettings());
+// The storefront still renders if the DB is unreachable; the fallback is outside the cache so
+// defaults (e.g. shipping fees) are never cached in place of the real settings.
+export const getSettings = cache(async (): Promise<StoreSettings> => {
+  try {
+    return await getCachedSettings();
+  } catch {
+    return defaultSettings;
+  }
+});

@@ -86,7 +86,7 @@ export async function placeOrder(
   if (!parsed.success) {
     return {
       ok: false,
-      error: parsed.error.errors[0]?.message ?? "Please check the form.",
+      error: parsed.error.issues[0]?.message ?? "Please check the form.",
     };
   }
   const values = parsed.data;
@@ -320,7 +320,7 @@ export async function placeOrder(
 
     revalidatePath("/admin");
     revalidatePath("/admin/orders");
-    revalidateTag(PRODUCT_DETAIL_TAG);
+    revalidateTag(PRODUCT_DETAIL_TAG, { expire: 0 });
 
     return {
       ok: true,

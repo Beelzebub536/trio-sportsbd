@@ -26,7 +26,7 @@ export default async function AccountAddressesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+      <h1 className="text-2xl font-bold leading-none md:text-3xl">
         My addresses
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">

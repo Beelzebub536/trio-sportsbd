@@ -18,7 +18,7 @@ type PageParams = { slug: string };
 export async function generateMetadata({
   params,
 }: {
-  params: PageParams;
+  params: Promise<PageParams>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
@@ -32,7 +32,7 @@ export async function generateMetadata({
   });
 }
 
-export default async function ProductPage({ params }: { params: PageParams }) {
+export default async function ProductPage({ params }: { params: Promise<PageParams> }) {
   const { slug } = await params;
   const settingsPromise = getSettings();
   const sessionPromise = getSession();
@@ -71,7 +71,7 @@ export default async function ProductPage({ params }: { params: PageParams }) {
     <div className="mx-auto max-w-7xl px-4 py-6">
       <nav
         aria-label="Breadcrumb"
-        className="mb-6 flex flex-wrap items-center gap-1 text-xs uppercase tracking-widest text-muted-foreground"
+        className="mb-6 flex flex-wrap items-center gap-1 text-sm text-muted-foreground"
       >
         <Link href="/" className="hover:underline">
           Home
@@ -117,7 +117,8 @@ export default async function ProductPage({ params }: { params: PageParams }) {
 
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        // Escape "<" so admin-entered text like "</script>" cannot break out of the tag.
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
     </div>
   );

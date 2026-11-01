@@ -12,6 +12,8 @@ import LoadingSurface from "@/components/ui/LoadingSurface";
 import { formatBDT } from "@/lib/format";
 import { useDebouncedValue } from "@/lib/hooks";
 
+const POPULAR = ["Football jersey", "Cricket jersey", "Track pants", "Shorts", "Socks", "Bag"];
+
 type Suggestion = {
   id: number;
   name: string;
@@ -78,7 +80,7 @@ export default function SearchOverlay({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="top-20 max-w-xl translate-y-0 gap-0 overflow-hidden p-0">
+      <DialogContent className="top-0 max-w-xl translate-y-0 gap-0 overflow-hidden p-0 sm:top-20">
         <DialogTitle className="sr-only">Search products</DialogTitle>
         <form
           onSubmit={submit}
@@ -91,14 +93,14 @@ export default function SearchOverlay({
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search jerseys, trousers, accessories…"
             aria-label="Search products"
-            className="h-14 flex-1 border-0 shadow-none focus-visible:ring-0"
+            className="h-14 flex-1 border-0 text-base shadow-none focus-visible:ring-0"
           />
         </form>
 
         <div className="max-h-[60vh] overflow-y-auto">
           {loading && (
             <LoadingSurface className="min-h-32" label="Searching products">
-              <div className="h-32 bg-gradient-to-br from-white to-slate-100" />
+              <div className="h-32 bg-secondary" />
             </LoadingSurface>
           )}
 
@@ -129,14 +131,14 @@ export default function SearchOverlay({
                       )}
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold uppercase">
+                      <span className="block truncate text-sm font-semibold">
                         {item.name}
                       </span>
                       <span className="block text-xs text-muted-foreground">
                         {item.categoryName}
                       </span>
                     </span>
-                    <span className="text-sm font-semibold">
+                    <span className="price text-sm font-semibold">
                       {formatBDT(item.price)}
                     </span>
                   </Link>
@@ -146,7 +148,7 @@ export default function SearchOverlay({
                 <Link
                   href={`/search?q=${encodeURIComponent(query.trim())}`}
                   onClick={() => onOpenChange(false)}
-                  className="block bg-secondary px-4 py-3 text-center text-xs font-bold uppercase tracking-widest hover:underline"
+                  className="block bg-secondary px-4 py-3 text-center text-sm font-semibold hover:underline"
                 >
                   See all results
                 </Link>
@@ -155,9 +157,22 @@ export default function SearchOverlay({
           )}
 
           {!query.trim() && (
-            <p className="px-4 py-6 text-sm text-muted-foreground">
-              Start typing to see suggestions.
-            </p>
+            <div className="px-4 py-5">
+              <p className="text-sm text-muted-foreground">Popular right now</p>
+              <ul className="mt-3 flex flex-wrap gap-2">
+                {POPULAR.map((term) => (
+                  <li key={term}>
+                    <button
+                      type="button"
+                      onClick={() => setQuery(term)}
+                      className="press rounded-full border border-border px-4 py-2 text-sm font-medium hover:border-primary hover:text-primary"
+                    >
+                      {term}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
         </div>
       </DialogContent>

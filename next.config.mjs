@@ -20,10 +20,18 @@ const nextConfig = {
     optimizePackageImports: ["lucide-react"],
   },
   images: {
+    // Next 16 only allows q=75 unless listed; cards and gallery thumbnails use 60.
+    qualities: [60, 75],
     remotePatterns: [
       {
         protocol: "https",
         hostname: "res.cloudinary.com",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
         port: "",
         pathname: "/**",
       },

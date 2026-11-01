@@ -22,7 +22,7 @@ const STATUSES = [
 export default async function AdminOrdersPage({
   searchParams,
 }: {
-  searchParams: { status?: string; q?: string };
+  searchParams: Promise<{ status?: string; q?: string }>;
 }) {
   await requireAdmin();
   await expireStalePendingOrders();

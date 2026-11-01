@@ -1,58 +1,65 @@
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
+import { PHOTOS } from "@/lib/photos";
 import type { CategoryNode } from "@/lib/queries/categories";
+import { cn } from "@/lib/utils";
 
-const FEATURED_SLUGS = ["jerseys", "trousers", "accessories"];
+const FEATURED = [
+  { slug: "jerseys", blurb: "Club, country and training", photo: PHOTOS.jerseys },
+  { slug: "trousers", blurb: "Track pants and shorts", photo: PHOTOS.trousers },
+  { slug: "accessories", blurb: "Balls, bags, socks, gloves", photo: PHOTOS.accessories },
+] as const;
 
-export default function CategoryTiles({
-  categories,
-}: {
-  categories: CategoryNode[];
-}) {
-  const featured = FEATURED_SLUGS.map((slug) =>
-    categories.find((category) => category.slug === slug),
-  ).filter((category): category is CategoryNode => Boolean(category));
-
+export default function CategoryTiles({ categories }: { categories: CategoryNode[] }) {
   const tiles = [
-    ...featured.map((category) => ({
-      name: category.name,
-      href: `/${category.slug}`,
-      image: category.image,
-      highlight: false,
-    })),
-    { name: "Sale", href: "/sale", image: null, highlight: true },
+    ...FEATURED.flatMap((tile) => {
+      const category = categories.find((item) => item.slug === tile.slug);
+      return category ? [{ ...tile, name: category.name, href: `/${category.slug}`, sale: false }] : [];
+    }),
+    { slug: "sale", name: "Sale", blurb: "Up to 30% off", photo: PHOTOS.sale, href: "/sale", sale: true },
   ];
 
   return (
-    <section aria-label="Shop by category" className="mx-auto max-w-7xl px-4 py-8">
-      <h2 className="mb-4 text-2xl font-bold uppercase md:text-3xl">
+    <section aria-labelledby="shop-by-category" className="mx-auto max-w-7xl px-4 pt-16 md:pt-24">
+      <h2 id="shop-by-category" className="text-3xl md:text-5xl">
         Shop by category
       </h2>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="mt-6 grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         {tiles.map((tile) => (
           <Link
             key={tile.href}
             href={tile.href}
-            className="group relative block aspect-square overflow-hidden bg-black text-white"
+            className="press group relative isolate flex aspect-[3/4] flex-col justify-end overflow-hidden rounded-2xl bg-card p-4 md:p-5"
           >
-            {tile.image && (
-              <Image
-                src={tile.image}
-                alt={tile.name}
-                fill
-                sizes="(max-width: 1024px) 50vw, 25vw"
-                className="object-cover opacity-80 transition-transform duration-300 group-hover:scale-105"
-              />
-            )}
-            <span className="absolute inset-0 flex items-end p-4">
-              <span className="text-lg font-bold uppercase tracking-wide md:text-2xl">
-                {tile.name}
-              </span>
+            <Image
+              src={tile.photo.src}
+              alt=""
+              fill
+              sizes="(max-width: 1024px) 50vw, 25vw"
+              quality={60}
+              className="-z-20 object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <span
+              aria-hidden
+              className={cn(
+                "absolute inset-0 -z-10",
+                tile.sale
+                  ? "bg-[linear-gradient(to_top,hsl(var(--destructive)/0.9),hsl(var(--destructive)/0.15)_70%)]"
+                  : "bg-[linear-gradient(to_top,hsl(var(--background)/0.92),transparent_65%)]",
+              )}
+            />
+            <span className="font-display text-2xl font-extrabold tracking-tight text-white md:text-3xl">
+              {tile.name}
             </span>
-            {tile.highlight && (
-              <span className="absolute inset-0 border-2 border-[var(--brand-sale)]" />
-            )}
+            <span className="mt-1 text-sm text-white/80">{tile.blurb}</span>
+            <span
+              aria-hidden
+              className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-black/30 text-white transition-colors group-hover:bg-primary group-hover:text-primary-foreground"
+            >
+              <ArrowUpRight className="h-5 w-5" />
+            </span>
           </Link>
         ))}
       </div>

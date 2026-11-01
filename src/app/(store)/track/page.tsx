@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function TrackPage() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-12">
-      <h1 className="text-3xl font-bold uppercase leading-none md:text-4xl">
+      <h1 className="text-3xl font-bold leading-none md:text-4xl">
         Track your order
       </h1>
       <p className="mt-3 max-w-2xl text-sm text-muted-foreground">

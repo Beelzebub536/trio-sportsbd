@@ -1,10 +1,10 @@
 # Trio Sports BD
 
 E-commerce store for sports jerseys, trousers and accessories in Bangladesh.
-Adidas-inspired storefront, cash on delivery with a small advance payment, and a
+Dark, photo-led storefront with a first-visit 3D kick intro, cash on delivery with a small advance payment, and a
 full admin panel including a bulk price manager.
 
-- **Stack:** Next.js 14 (App Router, TypeScript strict), Tailwind CSS, shadcn/ui,
+- **Stack:** Next.js 16 (App Router, TypeScript strict), Tailwind CSS, shadcn/ui,
   lucide-react, Better Auth, Prisma + Neon Postgres, Zustand, Zod, Cloudinary.
 - **Money:** whole taka only, formatted as `৳1,250`.
 - **Not in this project:** email sending, online payment gateway, websockets,
@@ -71,7 +71,7 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 | `npm run dev` | dev server on http://localhost:3000 |
 | `npm run build` | production build |
 | `npm run start` | serve the production build |
-| `npm run lint` | ESLint (next lint) |
+| `npm run lint` | ESLint 9 (flat config, `eslint.config.mjs`) |
 | `npm run tsc` | TypeScript, no emit |
 | `npm run db:push` | push `prisma/schema.prisma` to the database |
 | `npm run db:seed` | seed data + admin account (safe to re-run) |

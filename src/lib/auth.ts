@@ -43,8 +43,7 @@ export const auth = betterAuth({
   trustedOrigins: [
     ...(canonicalAuthOrigin ? [canonicalAuthOrigin] : []),
     ...(deploymentHost ? [`https://${deploymentHost}`] : []),
-    "http://localhost:*",
-    "http://127.0.0.1:*",
+    ...(process.env.NODE_ENV === "production" ? [] : ["http://localhost:*", "http://127.0.0.1:*"]),
   ],
   emailAndPassword: {
     // Email + password sign-in with NO email sending: no verification mail and

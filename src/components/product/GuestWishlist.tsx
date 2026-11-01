@@ -49,7 +49,7 @@ export default function GuestWishlist() {
 
   return (
     <section>
-      <h1 className="text-2xl font-bold uppercase leading-none md:text-3xl">
+      <h1 className="text-2xl font-bold leading-none md:text-3xl">
         Wishlist
       </h1>
       {loading ? (
